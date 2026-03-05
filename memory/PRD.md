@@ -8,20 +8,6 @@ Build a Demand-Side Platform (DSP) Bidder that:
 4. Constructs valid OpenRTB bid responses
 5. Generates SSP endpoints with API key authentication
 
-## User Personas
-- **Ad Tech Professionals**: DSP operators managing programmatic campaigns
-- **Campaign Managers**: Setting up targeting and budgets
-- **SSP Integration Partners**: Sending bid requests via API
-
-## Core Requirements (Static)
-- OpenRTB 2.5 and 2.6 protocol support
-- Dual-parse logic for version detection
-- Campaign CRUD with comprehensive targeting
-- Creative management (banner/video/native)
-- SSP endpoint management with API keys
-- Real-time bid logging and analytics
-- Migration matrix documentation
-
 ## Architecture
 - **Backend**: FastAPI + MongoDB
 - **Frontend**: React + Tailwind + Shadcn
@@ -30,49 +16,52 @@ Build a Demand-Side Platform (DSP) Bidder that:
 
 ## What's Been Implemented
 
-### Phase 1 - Core MVP (Completed)
+### Phase 1 - Core MVP
 - OpenRTB parser with 2.5/2.6 version detection
 - Campaign Manager APIs (CRUD, activate/pause)
 - Creative Management (banner/video/native)
-- SSP Endpoint Management with API key auth
-- Bid endpoint POST /api/bid with targeting engine
-- Bid logging and statistics
+- SSP Endpoint Management
+- Bid endpoint with targeting engine
 - Dark theme dashboard with charts
-- Campaigns, Creatives, SSP, Bid Logs pages
 
-### Phase 2 - Advanced Bidding (Completed)
+### Phase 2 - Advanced Bidding
 - Win/Billing notification callbacks
-- Budget pacing (even distribution, hourly enforcement)
+- Budget pacing (even distribution)
 - Campaign performance reporting
 - Bid shading (automatic price optimization)
 
-### Phase 3 - Optimization Features (Completed)
+### Phase 3 - Optimization Features
 - Frequency capping (in-memory via MongoDB)
 - Supply Path Optimization (SPO)
 - ML-based bid prediction (heuristic model)
 - Custom report exports (CSV/JSON)
-- API key auth removed from bid endpoint
 
-### Phase 4 - Insights & Management (Completed - December 2025)
-- **Campaign Performance Insights**
-  - Health score analysis (0-100)
-  - Issue detection (win rate, pacing, budget)
-  - Actionable recommendations with one-click apply
-  - Issues: Low win rate, underpacing, overspending
-  - Actions: increase_bid, reduce_bid, enable_shading, enable_ml, enable_spo
-  
-- **ML Model Management Page**
-  - View all ML-enabled campaigns
-  - Training status and data points
-  - Feature groups breakdown
-  - Best/worst performing features
-  - One-click model training
-  
-- **Multi-Currency Support**
-  - Supported: USD, EUR, GBP, CAD, AUD, JPY
-  - Currency selector in campaign form
-  - Conversion API endpoint
-  - Stored per campaign
+### Phase 4 - Insights & Management
+- Campaign Performance Insights with health scores
+- ML Model Management page
+- Multi-Currency Support (USD, EUR, GBP, CAD, AUD, JPY)
+
+### Phase 5 - Enhanced Campaign Targeting (December 2025)
+- **Ad Placements**: In-App, In-Stream, In-Stream Non-Skip, In-Banner, In-Article, In-Feed, Interstitial, Side Banner, Above/Below Fold, Sticky, Floating, Rewarded
+- **Geo Targeting**: Countries, Regions, Cities + Lat/Long/Radius targeting
+- **Device Targeting**: 
+  - Device types: Mobile/Tablet, PC, CTV, Phone, Tablet, Connected Device, Set Top Box
+  - Connection types: Ethernet, WiFi, Cellular 2G-5G
+  - Mobile carriers by country (USA, GBR, DEU, FRA, IND, BRA, JPN, CAN, AUS)
+- **Video Targeting (OpenRTB 2.5/2.6)**:
+  - Placements: In-Stream, In-Banner, In-Article, In-Feed, Interstitial
+  - PLCMT: In-Stream, Accompanying, Interstitial, No Content
+  - Protocols: VAST 1.0-4.2 with wrappers, DAAST
+  - MIME Types: MP4, WebM, OGG, FLV, 3GPP, VPAID JS, SWF
+  - Pod Positions: First, Last, First or Last, Any
+- **SSP ORTB Version**: Choose OpenRTB 2.5 or 2.6 per SSP endpoint
+- **Theme Toggle**: Dark/Light mode with localStorage persistence
+- **Creative Preview**: Preview banners, video VAST, native ads, audio
+
+### Creative Manager Enhancements
+- Multiple creative formats: Raw Banner, Raw Video, VAST URL, VAST XML, JS Tag, Native JSON, Audio VAST
+- Creative preview functionality for all types
+- Format badges on creative cards
 
 ## Key API Endpoints
 
@@ -82,30 +71,26 @@ Build a Demand-Side Platform (DSP) Bidder that:
 ### Campaigns
 - `GET/POST /api/campaigns` - List/create campaigns
 - `GET/PUT/DELETE /api/campaigns/{id}` - Single campaign ops
-- `POST /api/campaigns/{id}/activate|pause` - Status changes
 
-### Insights
-- `GET /api/insights/campaigns` - All campaign insights
-- `GET /api/insights/campaign/{id}` - Single campaign insight
-- `POST /api/insights/apply-recommendation/{id}` - Apply fix
-
-### ML Models
-- `GET /api/ml/models` - List ML-enabled campaigns
-- `GET /api/ml/model/{id}/details` - Model details
-- `POST /api/ml/train/{id}` - Train model
+### Reference Data
+- `GET /api/reference/iab-categories` - IAB content categories
+- `GET /api/reference/ad-placements` - Ad placement options
+- `GET /api/reference/video-placements` - OpenRTB 2.5 video placements
+- `GET /api/reference/video-plcmt` - OpenRTB 2.6 PLCMT types
+- `GET /api/reference/video-protocols` - VAST versions
+- `GET /api/reference/video-mimes` - Video MIME types
+- `GET /api/reference/pod-positions` - Ad pod positions
+- `GET /api/reference/device-types` - Device types
+- `GET /api/reference/connection-types` - Connection types
+- `GET /api/reference/carriers/{country}` - Mobile carriers
 
 ### Currency
 - `GET /api/currencies` - Supported currencies
 - `GET /api/currency/convert` - Convert amount
 
-### Reporting
-- `GET /api/reports/summary` - Overall stats
-- `GET /api/reports/export/csv` - CSV export
-- `GET /api/reports/export/json` - JSON export
-
 ## Prioritized Backlog
 
-### P0 - Completed
+### Completed
 - [x] Core bidding engine
 - [x] Campaign targeting
 - [x] Win notifications
@@ -115,19 +100,25 @@ Build a Demand-Side Platform (DSP) Bidder that:
 - [x] SPO
 - [x] ML prediction
 - [x] Campaign insights
-- [x] ML model management
 - [x] Multi-currency
+- [x] Enhanced targeting (geo lat/long, device carriers)
+- [x] Video targeting with dropdowns
+- [x] Ad placements
+- [x] SSP ORTB version
+- [x] Theme toggle
+- [x] Creative preview
 
 ### P1 - Upcoming
-- [ ] Real-time dashboard WebSocket updates
-- [ ] Advanced fraud detection
+- [ ] Campaign Comparison Tool
+- [ ] Real-time Dashboard (WebSocket)
+- [ ] A/B Testing Framework
 
 ### P2 - Future
-- [ ] Viewability prediction
-- [ ] A/B testing framework
-- [ ] Custom audience segments
-- [ ] Native/audio ad formats
-- [ ] Advanced analytics drill-down
+- [ ] Advanced Fraud Detection
+- [ ] Viewability Prediction
+- [ ] Custom Audience Segments
+- [ ] Native/Audio Ad Format Expansion
+- [ ] Creative Editor with Live Preview
 
 ## Tech Stack
 - **Backend**: FastAPI, Motor (async MongoDB), Pydantic
