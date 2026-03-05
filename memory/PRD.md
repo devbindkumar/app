@@ -11,131 +11,134 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 
 ## Implemented Features
 
-### Phase 1 - Core MVP
+### Phase 1-3 - Core & Optimization
 - OpenRTB parser with 2.5/2.6 version detection
 - Campaign Manager APIs (CRUD, activate/pause)
 - Creative Management (banner/video/native/audio)
 - SSP Endpoint Management
-- Bid endpoint with targeting engine
-- Dark theme dashboard with charts
-
-### Phase 2 - Advanced Bidding
 - Win/Billing notification callbacks
-- Budget pacing (even distribution)
-- Campaign performance reporting
-- Bid shading (automatic price optimization)
+- Budget pacing, Bid shading
+- Frequency capping, SPO, ML-based bid prediction
 
-### Phase 3 - Optimization Features
-- Frequency capping (in-memory via MongoDB)
-- Supply Path Optimization (SPO)
-- ML-based bid prediction (heuristic model)
-- Custom report exports (CSV/JSON)
-
-### Phase 4 - Insights & Management
+### Phase 4-5 - Insights & Targeting
 - Campaign Performance Insights with health scores
 - ML Model Management page
-- Multi-Currency Support (USD, EUR, GBP, CAD, AUD, JPY)
-
-### Phase 5 - Enhanced Targeting
-- Ad Placements (In-App, In-Stream, Interstitial, etc.)
-- Geo Targeting with Lat/Long/Radius
-- Device Targeting with carriers by country
-- Video Targeting with full dropdowns
-- SSP ORTB version selector
+- Multi-Currency Support
+- Ad Placements, Geo/Device Targeting
 - Theme toggle (Dark/Light mode)
 - Creative preview functionality
 
 ### Phase 6 - Advanced Platform Features
-- **Campaign Comparison Tool** - Compare 2-3 campaigns side-by-side
-- **A/B Testing Framework** - Split test campaigns with traffic allocation
-- **Fraud Detection** - Bot detection, invalid geo filtering
-- **Viewability Prediction** - Device/placement impact scoring
-- **Custom Audience Segments** - Rule-based targeting
-- **Real-Time Bid Stream** - Live bid activity feed
+- Campaign Comparison Tool
+- A/B Testing Framework
+- Fraud Detection
+- Custom Audience Segments
+- Real-Time Bid Stream
 
-### Phase 7 - SSP Identification & Auth Removal (December 2025)
+### Phase 7 - SSP Token Authentication (December 2025)
 - **X-API-Key Authentication Removed** from bid endpoint
-- **SSP Identification via Unique URLs**
-  - Each SSP gets unique endpoint: `/api/bid/{ssp_name}`
-  - Generic endpoint `/api/bid` still available for untracked traffic
-  - Invalid SSP names return 404
-  - Inactive SSPs return 403
-- **UI Updates**
-  - SSP Endpoints page shows unique URL for each SSP
-  - Copy button for each endpoint URL
-  - "No authentication required" message
-  - All API key UI elements removed
+- **SSP Identification via Unique Tokens**
+  - Each SSP gets unique 16-char hex token
+  - Endpoint: `/api/bid/{endpoint_token}`
+  - Invalid tokens return 404, inactive SSPs return 403
+
+### Phase 8 - Analytics & Advanced Features (December 2025)
+- **SSP Performance Analytics** (`/ssp-analytics`)
+  - Overview stats: total requests, bid rate, win rate, spend
+  - SSP rankings table
+  - Per-SSP details with response time metrics
+  
+- **Automated Bid Optimization** (`/bid-optimization`)
+  - Enable/disable optimization per campaign
+  - Target win rate configuration
+  - Auto-adjust bid prices based on performance
+  - Optimization history tracking
+  
+- **Cross-Campaign Attribution** (`/attribution`)
+  - Four attribution models: first_touch, last_touch, linear, time_decay
+  - User journey tracking
+  - Attribution share analysis per campaign
+  
+- **Advanced Creative Editor** (`/creatives/editor`)
+  - Image upload capability (JPG, PNG, GIF, WebP)
+  - Live preview for banner/native creatives
+  - Template library
+  - CTA customization with color picker
 
 ## Key API Endpoints
 
 ### Bidding (NO AUTH REQUIRED)
-- `POST /api/bid/{ssp_name}` - SSP-specific bid endpoint (tracked)
+- `POST /api/bid/{endpoint_token}` - Token-specific bid endpoint (tracked)
 - `POST /api/bid` - Generic bid endpoint (untracked)
 
-### Campaigns
-- `GET/POST /api/campaigns` - List/create campaigns
-- `POST /api/campaigns/compare` - Compare campaigns (JSON body)
+### SSP Analytics
+- `GET /api/ssp-analytics/overview` - SSP performance overview
+- `GET /api/ssp-analytics/{ssp_id}/details` - Per-SSP details
+- `POST /api/ssp-endpoints/{id}/regenerate-token` - Regenerate token
 
-### A/B Testing
-- `GET/POST /api/ab-tests` - List/create tests
-- `PUT /api/ab-tests/{id}/status` - Update status
+### Bid Optimization
+- `GET /api/bid-optimization/status` - All campaigns status
+- `POST /api/bid-optimization/{id}/enable` - Enable optimization
+- `POST /api/bid-optimization/{id}/run` - Run optimization
+- `GET /api/bid-optimization/{id}/history` - View history
 
-### Fraud Detection
-- `GET /api/fraud/stats` - Fraud statistics
-- `POST /api/fraud/check` - Check request for fraud
+### Attribution
+- `POST /api/attribution/track` - Track attribution event
+- `GET /api/attribution/user/{user_id}` - User journey
+- `GET /api/attribution/analysis?model={model}` - Analysis
 
-### Audiences
-- `GET/POST /api/audiences` - List/create segments
-
-### Real-Time
-- `GET /api/bid-stream` - Live bid activity (last 50)
+### File Upload
+- `POST /api/upload/image` - Upload image
+- `GET /api/uploads/{filename}` - Serve image
+- `DELETE /api/uploads/{filename}` - Delete image
 
 ## Navigation Pages
 - Dashboard
-- Campaigns
-- Compare (`/campaigns/compare`)
-- Creatives
-- SSP Endpoints
-- Bid Logs
-- Bid Stream (`/bid-stream`)
-- Reports
-- Budget Pacing
-- Insights
-- ML Models
-- A/B Testing (`/ab-testing`)
-- Fraud (`/fraud-detection`)
-- Audiences (`/audiences`)
+- Campaigns, Compare
+- Creatives, Creative Editor
+- SSP Endpoints, SSP Analytics
+- Bid Logs, Bid Stream
+- Reports, Budget Pacing
+- Insights, ML Models
+- Bid Optimizer
+- A/B Testing, Fraud
+- Audiences, Attribution
 - Migration
 
 ## Prioritized Backlog
 
 ### Completed
 - [x] All core bidding features
-- [x] Campaign management
-- [x] Advanced targeting
-- [x] ML prediction
-- [x] Campaign comparison
-- [x] A/B testing
-- [x] Fraud detection
-- [x] Custom audiences
-- [x] Real-time bid stream
-- [x] X-API auth removal
-- [x] SSP identification via unique URLs
+- [x] Campaign management & targeting
+- [x] ML prediction & optimization
+- [x] Campaign comparison & A/B testing
+- [x] Fraud detection & audiences
+- [x] SSP token-based identification
+- [x] SSP Performance Analytics
+- [x] Automated Bid Optimization
+- [x] Cross-Campaign Attribution
+- [x] Advanced Creative Editor with image upload
 
 ### P1 - Upcoming
-- [ ] Intelligent Campaign Creation Wizard
+- [ ] WebSocket real-time updates for Bid Stream
+- [ ] Intelligent Campaign Creation Wizard (refactor CampaignForm.jsx)
 - [ ] Real-Time Creative Preview System
-- [ ] WebSocket for live updates (replace polling)
 
 ### P2 - Future
-- [ ] Advanced Creative Editor
-- [ ] Automated bid optimization
-- [ ] Cross-campaign attribution
-- [ ] Server.py refactoring (split into routers)
-- [ ] CampaignForm.jsx refactoring (multi-step wizard)
+- [ ] Server.py refactoring (split into modular routers)
+- [ ] Advanced fraud detection algorithms
+- [ ] Automated campaign optimization recommendations
 
 ## Tech Stack
 - **Backend**: FastAPI, Motor (async MongoDB), Pydantic
 - **Frontend**: React, Tailwind CSS, Shadcn/UI, Recharts, Axios
 - **Database**: MongoDB
 - **Domain**: Ad-Tech, OpenRTB, Programmatic Advertising
+
+## Latest Updates (December 2025)
+- SSP endpoints now use unique 16-char hex tokens instead of names
+- Added SSP Performance Analytics dashboard
+- Added Automated Bid Optimization with win rate targeting
+- Added Cross-Campaign Attribution with 4 models
+- Added Advanced Creative Editor with image upload
+- All 18 backend tests passing, all frontend pages functional
