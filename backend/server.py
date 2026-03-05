@@ -465,10 +465,11 @@ async def handle_bid_request(
     """
     Handle OpenRTB bid requests from SSPs
     Supports both OpenRTB 2.5 and 2.6
+    Requires valid API key authentication
     """
     start_time = time.time()
     
-    # Verify API key if provided
+    # Verify API key - required for authenticated requests
     ssp_id = None
     if x_api_key:
         endpoint = await verify_api_key(x_api_key)
@@ -480,8 +481,12 @@ async def handle_bid_request(
                 {"$inc": {"total_requests": 1}}
             )
         else:
-            # Invalid key - still process but log it
+            # Invalid key - reject the request
             logger.warning(f"Invalid API key received: {x_api_key[:10]}...")
+            raise HTTPException(status_code=401, detail="Invalid API key")
+    else:
+        # No API key provided - reject the request
+        raise HTTPException(status_code=401, detail="API key required. Include X-API-Key header")
     
     try:
         bid_request = await request.json()
