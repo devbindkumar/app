@@ -867,16 +867,32 @@ class BiddingEngine:
             {"_id": 0}
         ).to_list(1000)
         
+        logger.info(f"Found {len(campaigns)} active campaigns")
+        
         # Load creatives for each campaign
         for campaign in campaigns:
-            creative = await self.db.creatives.find_one(
-                {"id": campaign["creative_id"]},
-                {"_id": 0}
-            )
-            if creative:
-                campaign["_creative"] = creative
+            # Support both creative_id (singular) and creative_ids (array)
+            creative_ids = campaign.get("creative_ids", [])
+            if campaign.get("creative_id"):
+                creative_ids.append(campaign["creative_id"])
+            
+            logger.info(f"Campaign {campaign['name']}: creative_ids={creative_ids}")
+            
+            if creative_ids:
+                # Get first matching creative
+                creative = await self.db.creatives.find_one(
+                    {"id": {"$in": creative_ids}},
+                    {"_id": 0}
+                )
+                if creative:
+                    campaign["_creative"] = creative
+                    logger.info(f"  -> Loaded creative: {creative['name']} ({creative['type']})")
+                else:
+                    logger.warning(f"  -> No creative found for IDs: {creative_ids}")
         
-        return [c for c in campaigns if "_creative" in c]
+        result = [c for c in campaigns if "_creative" in c]
+        logger.info(f"Returning {len(result)} campaigns with creatives")
+        return result
     
     async def _match_campaigns(
         self,
@@ -890,19 +906,23 @@ class BiddingEngine:
         for campaign in campaigns:
             creative = campaign.get("_creative")
             if not creative:
+                logger.debug(f"Campaign {campaign['name']}: no creative loaded")
                 continue
             
             # Check creative type matches impression
             if not self._creative_matches_impression(creative, imp):
+                logger.info(f"Campaign {campaign['name']}: creative type mismatch")
                 continue
             
             # Check all targeting rules
             targeting = campaign.get("targeting", {})
             
             if not self._check_geo_targeting(targeting.get("geo", {}), request.get("device", {}).get("geo")):
+                logger.info(f"Campaign {campaign['name']}: geo targeting mismatch")
                 continue
             
             if not self._check_device_targeting(targeting.get("device", {}), request.get("device", {})):
+                logger.info(f"Campaign {campaign['name']}: device targeting mismatch")
                 continue
             
             if not self._check_inventory_targeting(
@@ -910,9 +930,11 @@ class BiddingEngine:
                 request.get("site"),
                 request.get("app")
             ):
+                logger.info(f"Campaign {campaign['name']}: inventory targeting mismatch")
                 continue
             
             if not self._check_video_targeting(targeting.get("video", {}), imp.get("video")):
+                logger.info(f"Campaign {campaign['name']}: video targeting mismatch")
                 continue
             
             site_content = (request.get("site") or {}).get("content")
@@ -921,20 +943,25 @@ class BiddingEngine:
                 targeting.get("content", {}),
                 site_content or app_content
             ):
+                logger.info(f"Campaign {campaign['name']}: content targeting mismatch")
                 continue
             
             if not self._check_privacy_compliance(targeting.get("privacy", {}), request.get("regs", {})):
+                logger.info(f"Campaign {campaign['name']}: privacy compliance failed")
                 continue
             
             # Check budget
             budget = campaign.get("budget", {})
             if budget.get("daily_budget", 0) > 0 and budget.get("daily_spend", 0) >= budget.get("daily_budget", 0):
+                logger.debug(f"Campaign {campaign['name']}: daily budget exhausted")
                 continue
             if budget.get("total_budget", 0) > 0 and budget.get("total_spend", 0) >= budget.get("total_budget", 0):
+                logger.debug(f"Campaign {campaign['name']}: total budget exhausted")
                 continue
             
             # Calculate match score
             score = campaign.get("priority", 1) * campaign.get("bid_price", 0)
+            logger.info(f"Campaign {campaign['name']}: MATCHED with score {score}")
             matches.append((campaign, creative, score))
         
         return matches
@@ -988,7 +1015,15 @@ class BiddingEngine:
     
     def _check_geo_targeting(self, targeting: Dict[str, Any], geo: Optional[Dict[str, Any]]) -> bool:
         """Check geo targeting rules"""
-        if not targeting or not any(targeting.values()):
+        # Check if there's any actual targeting criteria
+        has_targeting = bool(
+            targeting.get("countries") or 
+            targeting.get("regions") or 
+            targeting.get("cities") or
+            targeting.get("lat_lon_radius")
+        )
+        
+        if not has_targeting:
             return True  # No geo targeting
         
         if not geo:
@@ -1032,8 +1067,18 @@ class BiddingEngine:
     
     def _check_device_targeting(self, targeting: Dict[str, Any], device: Dict[str, Any]) -> bool:
         """Check device targeting rules"""
-        if not targeting or not any(targeting.values()):
-            return True
+        # Check if there's any actual targeting criteria
+        has_targeting = bool(
+            targeting.get("device_types") or
+            targeting.get("makes") or
+            targeting.get("models") or
+            targeting.get("os_list") or
+            targeting.get("connection_types") or
+            targeting.get("carriers")
+        )
+        
+        if not has_targeting:
+            return True  # No device targeting
         
         # Check device types
         device_types = targeting.get("device_types", [])
@@ -1069,8 +1114,18 @@ class BiddingEngine:
         app: Optional[Dict[str, Any]]
     ) -> bool:
         """Check inventory targeting rules"""
-        if not targeting or not any(targeting.values()):
-            return True
+        # Check if there's any actual targeting criteria
+        has_targeting = bool(
+            targeting.get("domain_whitelist") or
+            targeting.get("domain_blacklist") or
+            targeting.get("bundle_whitelist") or
+            targeting.get("bundle_blacklist") or
+            targeting.get("publisher_ids") or
+            targeting.get("categories")
+        )
+        
+        if not has_targeting:
+            return True  # No inventory targeting
         
         # Get domain/bundle
         domain = site.get("domain") if site else None
