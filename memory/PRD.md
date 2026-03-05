@@ -45,56 +45,36 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - Theme toggle (Dark/Light mode)
 - Creative preview functionality
 
-### Phase 6 - Advanced Platform Features (December 2025)
-- **Campaign Comparison Tool**
-  - Compare 2-3 campaigns side-by-side
-  - Metrics comparison (bids, wins, win rate, price)
-  - Targeting differences analysis
-  - Optimization recommendations
+### Phase 6 - Advanced Platform Features
+- **Campaign Comparison Tool** - Compare 2-3 campaigns side-by-side
+- **A/B Testing Framework** - Split test campaigns with traffic allocation
+- **Fraud Detection** - Bot detection, invalid geo filtering
+- **Viewability Prediction** - Device/placement impact scoring
+- **Custom Audience Segments** - Rule-based targeting
+- **Real-Time Bid Stream** - Live bid activity feed
 
-- **A/B Testing Framework**
-  - Create tests with 2-4 campaigns
-  - Traffic split configuration
-  - Real-time winner determination
-  - Status management (active/paused/completed)
-
-- **Fraud Detection**
-  - Bot user agent detection
-  - Invalid geo pattern filtering
-  - High frequency threshold monitoring
-  - Real-time fraud checking API
-  - Fraud score calculation
-
-- **Viewability Prediction**
-  - Device type impact scoring
-  - Placement impact analysis
-  - Banner size optimization
-  - Video viewability factors
-
-- **Custom Audience Segments**
-  - Create/manage audience segments
-  - Rule-based targeting
-  - Geo and category filters
-  - Size estimation
-
-- **Real-Time Bid Stream**
-  - Live bid activity feed
-  - Auto-refresh every 2 seconds
-  - Pause/resume functionality
-  - Bid/No-bid status tracking
-
-- **X-API Auth Removal**
-  - Bid endpoint works without authentication
-  - POST /api/bid accepts requests with no headers
+### Phase 7 - SSP Identification & Auth Removal (December 2025)
+- **X-API-Key Authentication Removed** from bid endpoint
+- **SSP Identification via Unique URLs**
+  - Each SSP gets unique endpoint: `/api/bid/{ssp_name}`
+  - Generic endpoint `/api/bid` still available for untracked traffic
+  - Invalid SSP names return 404
+  - Inactive SSPs return 403
+- **UI Updates**
+  - SSP Endpoints page shows unique URL for each SSP
+  - Copy button for each endpoint URL
+  - "No authentication required" message
+  - All API key UI elements removed
 
 ## Key API Endpoints
 
-### Bidding
-- `POST /api/bid` - Main bid endpoint (NO AUTH REQUIRED)
+### Bidding (NO AUTH REQUIRED)
+- `POST /api/bid/{ssp_name}` - SSP-specific bid endpoint (tracked)
+- `POST /api/bid` - Generic bid endpoint (untracked)
 
 ### Campaigns
 - `GET/POST /api/campaigns` - List/create campaigns
-- `POST /api/campaigns/compare` - Compare campaigns
+- `POST /api/campaigns/compare` - Compare campaigns (JSON body)
 
 ### A/B Testing
 - `GET/POST /api/ab-tests` - List/create tests
@@ -104,32 +84,27 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - `GET /api/fraud/stats` - Fraud statistics
 - `POST /api/fraud/check` - Check request for fraud
 
-### Viewability
-- `GET /api/viewability/stats` - Viewability stats
-- `POST /api/viewability/predict` - Predict score
-
 ### Audiences
 - `GET/POST /api/audiences` - List/create segments
-- `DELETE /api/audiences/{id}` - Delete segment
 
 ### Real-Time
-- `GET /api/bid-stream` - Live bid activity
+- `GET /api/bid-stream` - Live bid activity (last 50)
 
 ## Navigation Pages
 - Dashboard
 - Campaigns
-- Compare
+- Compare (`/campaigns/compare`)
 - Creatives
 - SSP Endpoints
 - Bid Logs
-- Bid Stream
+- Bid Stream (`/bid-stream`)
 - Reports
 - Budget Pacing
 - Insights
 - ML Models
-- A/B Testing
-- Fraud
-- Audiences
+- A/B Testing (`/ab-testing`)
+- Fraud (`/fraud-detection`)
+- Audiences (`/audiences`)
 - Migration
 
 ## Prioritized Backlog
@@ -142,20 +117,22 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - [x] Campaign comparison
 - [x] A/B testing
 - [x] Fraud detection
-- [x] Viewability prediction
 - [x] Custom audiences
 - [x] Real-time bid stream
 - [x] X-API auth removal
+- [x] SSP identification via unique URLs
 
 ### P1 - Upcoming
 - [ ] Intelligent Campaign Creation Wizard
 - [ ] Real-Time Creative Preview System
-- [ ] WebSocket for live updates
+- [ ] WebSocket for live updates (replace polling)
 
 ### P2 - Future
 - [ ] Advanced Creative Editor
 - [ ] Automated bid optimization
 - [ ] Cross-campaign attribution
+- [ ] Server.py refactoring (split into routers)
+- [ ] CampaignForm.jsx refactoring (multi-step wizard)
 
 ## Tech Stack
 - **Backend**: FastAPI, Motor (async MongoDB), Pydantic
