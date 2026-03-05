@@ -30,115 +30,49 @@ Build a Demand-Side Platform (DSP) Bidder that:
 
 ## What's Been Implemented
 
-### Phase 1 (Completed)
-- Backend Core:
-  - OpenRTB parser with 2.5/2.6 version detection
-  - Campaign Manager APIs (CRUD, activate/pause)
-  - Creative Management (banner/video/native)
-  - SSP Endpoint Management with API key auth
-  - Bid endpoint POST /api/bid with targeting engine
-  - Bid logging and statistics
-  - Migration matrix endpoint
+### Phase 1 - Core MVP (Completed)
+- OpenRTB parser with 2.5/2.6 version detection
+- Campaign Manager APIs (CRUD, activate/pause)
+- Creative Management (banner/video/native)
+- SSP Endpoint Management with API key auth
+- Bid endpoint POST /api/bid with targeting engine
+- Bid logging and statistics
+- Dark theme dashboard with charts
+- Campaigns, Creatives, SSP, Bid Logs pages
 
-- Frontend Core:
-  - Dark theme dashboard with charts (Recharts)
-  - Campaigns list with status management
-  - Campaign form with multi-tab targeting configuration
-  - Creatives grid with type badges
-  - SSP Endpoints with API key reveal/copy
-  - Bid Logs with real-time monitoring
-  - Migration Matrix reference page
+### Phase 2 - Advanced Bidding (Completed)
+- Win/Billing notification callbacks
+- Budget pacing (even distribution, hourly enforcement)
+- Campaign performance reporting
+- Bid shading (automatic price optimization)
 
-### Phase 2 (Completed)
-- Win/Billing Notifications:
-  - POST /api/notify/win/{bid_id} - Win notification callback
-  - POST /api/notify/billing/{bid_id} - Billing notification
-  - Automatic campaign stats update on win
-  - Win rate tracking for bid shading
+### Phase 3 - Optimization Features (Completed)
+- Frequency capping (in-memory via MongoDB)
+- Supply Path Optimization (SPO)
+- ML-based bid prediction (heuristic model)
+- Custom report exports (CSV/JSON)
+- API key auth removed from bid endpoint
 
-- Budget Pacing:
-  - Even pacing algorithm (24-hour distribution)
-  - Hourly budget enforcement
-  - GET /api/pacing/status - Monitor all campaigns
-  - POST /api/pacing/reset-all - Reset daily budgets
-  - Overpacing/underpacing detection
-
-- Campaign Performance Reporting:
-  - GET /api/reports/summary - Overall performance
-  - GET /api/reports/campaign/{id} - Per-campaign analytics
-  - Reports page with interactive charts
-  - Date range filtering (1d, 7d, 30d)
-  - Campaign breakdown table
-
-- Bid Shading:
-  - Automatic bid price optimization
-  - Target win rate configuration
-  - Learning rate adjustment
-  - Min/max shade factor bounds
-  - Real-time factor updates based on wins
-
-### Phase 3 (Completed - December 2025)
-- Frequency Capping:
-  - In-memory storage via MongoDB user_frequencies collection
-  - Max impressions per user/day/total limits
-  - Time window configuration
-  - UI tab in campaign form with toggle and inputs
-  - Bid endpoint checks frequency limits before bidding
-
-- Supply Path Optimization (SPO):
-  - Preferred/blocked SSP lists
-  - Max supply chain hops filtering
-  - Bid adjustment factor for preferred paths
-  - Authorized sellers requirement option
-  - GET /api/spo/analyze/{campaign_id} - Supply path analysis
-  - UI tab with full configuration controls
-
-- ML-Based Bid Prediction:
-  - Heuristic-based model using historical win/loss data
-  - Feature weights for device type, geo, bid floor
-  - Prediction weight blending with base price
-  - Minimum data points threshold
-  - GET /api/ml/stats/{campaign_id} - Model statistics
-  - POST /api/ml/train/{campaign_id} - Train from historical data
-  - UI tab with configuration options
-
-- Custom Report Exports:
-  - GET /api/reports/export/csv - Download reports as CSV
-  - GET /api/reports/export/json - Download reports as JSON
-  - Date range and campaign filtering
-
-- API Key Auth Removal from Bid Endpoint:
-  - POST /api/bid now accepts requests without X-API-Key header
-  - Open endpoint for SSP integration
-
-## Prioritized Backlog
-
-### P0 - Completed
-- [x] Core bidding engine
-- [x] Campaign targeting
-- [x] API key authentication
-- [x] Dashboard analytics
-- [x] Win notification callbacks
-- [x] Budget pacing algorithms
-- [x] Performance reporting
-- [x] Bid shading optimization
-- [x] Frequency capping
-- [x] Supply path optimization
-- [x] ML-based bid prediction
-- [x] Report exports (CSV/JSON)
-
-### P1 - Upcoming
-- [ ] UI for ML Model Management page (view models, trigger retraining)
-- [ ] Multi-currency support
-- [ ] Real-time dashboard WebSocket updates
-
-### P2 - Future
-- [ ] Advanced fraud detection
-- [ ] Viewability prediction
-- [ ] A/B testing framework
-- [ ] Custom audience segments
-- [ ] Native and audio ad format expansion
-- [ ] Advanced analytics with drill-down
+### Phase 4 - Insights & Management (Completed - December 2025)
+- **Campaign Performance Insights**
+  - Health score analysis (0-100)
+  - Issue detection (win rate, pacing, budget)
+  - Actionable recommendations with one-click apply
+  - Issues: Low win rate, underpacing, overspending
+  - Actions: increase_bid, reduce_bid, enable_shading, enable_ml, enable_spo
+  
+- **ML Model Management Page**
+  - View all ML-enabled campaigns
+  - Training status and data points
+  - Feature groups breakdown
+  - Best/worst performing features
+  - One-click model training
+  
+- **Multi-Currency Support**
+  - Supported: USD, EUR, GBP, CAD, AUD, JPY
+  - Currency selector in campaign form
+  - Conversion API endpoint
+  - Stored per campaign
 
 ## Key API Endpoints
 
@@ -147,21 +81,53 @@ Build a Demand-Side Platform (DSP) Bidder that:
 
 ### Campaigns
 - `GET/POST /api/campaigns` - List/create campaigns
-- `GET/PUT/DELETE /api/campaigns/{id}` - Single campaign operations
+- `GET/PUT/DELETE /api/campaigns/{id}` - Single campaign ops
 - `POST /api/campaigns/{id}/activate|pause` - Status changes
+
+### Insights
+- `GET /api/insights/campaigns` - All campaign insights
+- `GET /api/insights/campaign/{id}` - Single campaign insight
+- `POST /api/insights/apply-recommendation/{id}` - Apply fix
+
+### ML Models
+- `GET /api/ml/models` - List ML-enabled campaigns
+- `GET /api/ml/model/{id}/details` - Model details
+- `POST /api/ml/train/{id}` - Train model
+
+### Currency
+- `GET /api/currencies` - Supported currencies
+- `GET /api/currency/convert` - Convert amount
 
 ### Reporting
 - `GET /api/reports/summary` - Overall stats
-- `GET /api/reports/campaign/{id}` - Campaign details
 - `GET /api/reports/export/csv` - CSV export
 - `GET /api/reports/export/json` - JSON export
 
-### Advanced Features
-- `GET /api/pacing/status` - Budget pacing status
-- `GET /api/ml/stats/{campaign_id}` - ML statistics
-- `POST /api/ml/train/{campaign_id}` - Train ML model
-- `GET /api/spo/analyze/{campaign_id}` - SPO analysis
-- `GET /api/frequency/{campaign_id}/{user_id}` - User frequency
+## Prioritized Backlog
+
+### P0 - Completed
+- [x] Core bidding engine
+- [x] Campaign targeting
+- [x] Win notifications
+- [x] Budget pacing
+- [x] Bid shading
+- [x] Frequency capping
+- [x] SPO
+- [x] ML prediction
+- [x] Campaign insights
+- [x] ML model management
+- [x] Multi-currency
+
+### P1 - Upcoming
+- [ ] Real-time dashboard WebSocket updates
+- [ ] Advanced fraud detection
+
+### P2 - Future
+- [ ] Viewability prediction
+- [ ] A/B testing framework
+- [ ] Custom audience segments
+- [ ] Native/audio ad formats
+- [ ] Advanced analytics drill-down
 
 ## Tech Stack
 - **Backend**: FastAPI, Motor (async MongoDB), Pydantic
