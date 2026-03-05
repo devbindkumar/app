@@ -8,8 +8,14 @@ import { Label } from "../components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Switch } from "../components/ui/switch";
+import { Checkbox } from "../components/ui/checkbox";
 import { toast } from "sonner";
-import { getCampaign, getCreatives, createCampaign, updateCampaign } from "../lib/api";
+import { 
+  getCampaign, getCreatives, createCampaign, updateCampaign,
+  getIABCategories, getVideoPlacements, getVideoPlcmt, getVideoProtocols,
+  getVideoMimes, getPodPositions, getAdPlacements, getDeviceTypes,
+  getConnectionTypes, getCarriersByCountry
+} from "../lib/api";
 
 export default function CampaignForm() {
   const { id } = useParams();
@@ -20,12 +26,27 @@ export default function CampaignForm() {
   const [saving, setSaving] = useState(false);
   const [creatives, setCreatives] = useState([]);
   
+  // Reference data states
+  const [refData, setRefData] = useState({
+    iabCategories: [],
+    videoPlacements: [],
+    videoPlcmt: [],
+    videoProtocols: [],
+    videoMimes: [],
+    podPositions: [],
+    adPlacements: [],
+    deviceTypes: [],
+    connectionTypes: [],
+    carriers: []
+  });
+  
   const [form, setForm] = useState({
     name: "",
     bid_price: 1.0,
     bid_floor: 0.0,
     currency: "USD",
     priority: 5,
+    placements: [],
     creative_id: "",
     budget: {
       daily_budget: 0,
@@ -64,8 +85,8 @@ export default function CampaignForm() {
       min_data_points: 100
     },
     targeting: {
-      geo: { countries: [], regions: [], cities: [] },
-      device: { device_types: [], makes: [], models: [], os_list: [], connection_types: [] },
+      geo: { countries: [], regions: [], cities: [], latitude: null, longitude: null, radius_km: null },
+      device: { device_types: [], makes: [], models: [], os_list: [], connection_types: [], carriers: [], carrier_mccs: [], carrier_mncs: [] },
       inventory: { domain_whitelist: [], domain_blacklist: [], bundle_whitelist: [], bundle_blacklist: [], publisher_ids: [], categories: [] },
       video: { placements: [], plcmts: [], min_duration: null, max_duration: null, protocols: [], mimes: [], pod_positions: [] },
       content: { categories: [], keywords: [] },
@@ -86,8 +107,45 @@ export default function CampaignForm() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const creativesRes = await getCreatives();
+        
+        // Load creatives and reference data in parallel
+        const [
+          creativesRes,
+          iabRes, 
+          placementsRes, 
+          plcmtRes, 
+          protocolsRes, 
+          mimesRes, 
+          podRes, 
+          adPlacementsRes,
+          deviceTypesRes,
+          connectionTypesRes
+        ] = await Promise.all([
+          getCreatives(),
+          getIABCategories(),
+          getVideoPlacements(),
+          getVideoPlcmt(),
+          getVideoProtocols(),
+          getVideoMimes(),
+          getPodPositions(),
+          getAdPlacements(),
+          getDeviceTypes(),
+          getConnectionTypes()
+        ]);
+        
         setCreatives(creativesRes.data);
+        setRefData({
+          iabCategories: iabRes.data.categories || [],
+          videoPlacements: placementsRes.data.placements || [],
+          videoPlcmt: plcmtRes.data.plcmt || [],
+          videoProtocols: protocolsRes.data.protocols || [],
+          videoMimes: mimesRes.data.mimes || [],
+          podPositions: podRes.data.positions || [],
+          adPlacements: adPlacementsRes.data.placements || [],
+          deviceTypes: deviceTypesRes.data.device_types || [],
+          connectionTypes: connectionTypesRes.data.connection_types || [],
+          carriers: []
+        });
         
         if (isEdit) {
           const campaignRes = await getCampaign(id);
@@ -101,6 +159,26 @@ export default function CampaignForm() {
     };
     fetchData();
   }, [id, isEdit]);
+
+  // Fetch carriers when countries change
+  useEffect(() => {
+    const fetchCarriers = async () => {
+      const countries = form.targeting?.geo?.countries || [];
+      if (countries.length > 0) {
+        try {
+          const carriersPromises = countries.map(c => getCarriersByCountry(c));
+          const results = await Promise.all(carriersPromises);
+          const allCarriers = results.flatMap(r => r.data.carriers || []);
+          setRefData(prev => ({ ...prev, carriers: allCarriers }));
+        } catch (e) {
+          // Silently handle carrier fetch errors
+        }
+      } else {
+        setRefData(prev => ({ ...prev, carriers: [] }));
+      }
+    };
+    fetchCarriers();
+  }, [form.targeting?.geo?.countries]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -310,6 +388,33 @@ export default function CampaignForm() {
                     />
                   </div>
                 </div>
+                
+                {/* Ad Placements */}
+                <div className="space-y-2">
+                  <Label className="text-[#94A3B8]">Ad Placements</Label>
+                  <div className="grid grid-cols-4 gap-2 p-3 surface-secondary rounded border border-[#2D3B55]">
+                    {refData.adPlacements.map(p => (
+                      <div key={p.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`placement-${p.value}`}
+                          checked={form.placements?.includes(p.value)}
+                          onCheckedChange={(checked) => {
+                            const current = form.placements || [];
+                            if (checked) {
+                              updateField('placements', [...current, p.value]);
+                            } else {
+                              updateField('placements', current.filter(x => x !== p.value));
+                            }
+                          }}
+                        />
+                        <label htmlFor={`placement-${p.value}`} className="text-sm text-[#94A3B8] cursor-pointer">
+                          {p.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#64748B]">Select where your ads can appear</p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -484,26 +589,72 @@ export default function CampaignForm() {
                     onChange={(e) => updateField('targeting.geo.countries', parseList(e.target.value))}
                     placeholder="USA, CAN, GBR"
                     className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                    data-testid="geo-countries"
                   />
                   <p className="text-xs text-[#64748B]">Leave empty to target all countries</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Regions</Label>
-                  <Input
-                    value={form.targeting.geo.regions?.join(', ') || ''}
-                    onChange={(e) => updateField('targeting.geo.regions', parseList(e.target.value))}
-                    placeholder="CA, NY, TX"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Regions</Label>
+                    <Input
+                      value={form.targeting.geo.regions?.join(', ') || ''}
+                      onChange={(e) => updateField('targeting.geo.regions', parseList(e.target.value))}
+                      placeholder="CA, NY, TX"
+                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Cities</Label>
+                    <Input
+                      value={form.targeting.geo.cities?.join(', ') || ''}
+                      onChange={(e) => updateField('targeting.geo.cities', parseList(e.target.value))}
+                      placeholder="Los Angeles, New York, Chicago"
+                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Cities</Label>
-                  <Input
-                    value={form.targeting.geo.cities?.join(', ') || ''}
-                    onChange={(e) => updateField('targeting.geo.cities', parseList(e.target.value))}
-                    placeholder="Los Angeles, New York, Chicago"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                  />
+                
+                <div className="p-4 surface-secondary rounded border border-[#2D3B55]">
+                  <Label className="text-[#F8FAFC] mb-3 block">Radius Targeting (Lat/Long)</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[#94A3B8]">Latitude</Label>
+                      <Input
+                        type="number"
+                        step="0.0001"
+                        value={form.targeting.geo.latitude || ''}
+                        onChange={(e) => updateField('targeting.geo.latitude', e.target.value ? parseFloat(e.target.value) : null)}
+                        placeholder="34.0522"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                        data-testid="geo-latitude"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[#94A3B8]">Longitude</Label>
+                      <Input
+                        type="number"
+                        step="0.0001"
+                        value={form.targeting.geo.longitude || ''}
+                        onChange={(e) => updateField('targeting.geo.longitude', e.target.value ? parseFloat(e.target.value) : null)}
+                        placeholder="-118.2437"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                        data-testid="geo-longitude"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[#94A3B8]">Radius (km)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        value={form.targeting.geo.radius_km || ''}
+                        onChange={(e) => updateField('targeting.geo.radius_km', e.target.value ? parseFloat(e.target.value) : null)}
+                        placeholder="10"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-[#64748B] mt-2">Target users within a specific radius of a location</p>
                 </div>
               </CardContent>
             </Card>
@@ -518,13 +669,27 @@ export default function CampaignForm() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-[#94A3B8]">Device Types</Label>
-                  <Input
-                    value={form.targeting.device.device_types?.join(', ') || ''}
-                    onChange={(e) => updateField('targeting.device.device_types', parseIntList(e.target.value))}
-                    placeholder="1, 4, 5 (1=Mobile/Tablet, 3=CTV, 4=Phone, 5=Tablet)"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                  />
-                  <p className="text-xs text-[#64748B]">1=Mobile/Tablet, 2=PC, 3=CTV, 4=Phone, 5=Tablet, 6=Connected Device, 7=Set Top Box</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {refData.deviceTypes.map(dt => (
+                      <div key={dt.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`device-${dt.id}`}
+                          checked={form.targeting.device.device_types?.includes(dt.id)}
+                          onCheckedChange={(checked) => {
+                            const current = form.targeting.device.device_types || [];
+                            if (checked) {
+                              updateField('targeting.device.device_types', [...current, dt.id]);
+                            } else {
+                              updateField('targeting.device.device_types', current.filter(x => x !== dt.id));
+                            }
+                          }}
+                        />
+                        <label htmlFor={`device-${dt.id}`} className="text-sm text-[#94A3B8] cursor-pointer">
+                          {dt.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -558,14 +723,64 @@ export default function CampaignForm() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[#94A3B8]">Connection Types</Label>
-                    <Input
-                      value={form.targeting.device.connection_types?.join(', ') || ''}
-                      onChange={(e) => updateField('targeting.device.connection_types', parseIntList(e.target.value))}
-                      placeholder="2, 6 (2=WiFi, 6=4G)"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                    />
-                    <p className="text-xs text-[#64748B]">1=Ethernet, 2=WiFi, 3-7=Cellular</p>
+                    <div className="grid grid-cols-2 gap-1">
+                      {refData.connectionTypes.map(ct => (
+                        <div key={ct.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`conn-${ct.id}`}
+                            checked={form.targeting.device.connection_types?.includes(ct.id)}
+                            onCheckedChange={(checked) => {
+                              const current = form.targeting.device.connection_types || [];
+                              if (checked) {
+                                updateField('targeting.device.connection_types', [...current, ct.id]);
+                              } else {
+                                updateField('targeting.device.connection_types', current.filter(x => x !== ct.id));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`conn-${ct.id}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                            {ct.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                </div>
+                
+                {/* Carrier/Operator Targeting */}
+                <div className="p-4 surface-secondary rounded border border-[#2D3B55]">
+                  <Label className="text-[#F8FAFC] mb-3 block">Mobile Carrier/Operator Targeting</Label>
+                  {form.targeting.geo.countries?.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-[#64748B] mb-2">Available carriers for selected countries: {form.targeting.geo.countries.join(', ')}</p>
+                      <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                        {refData.carriers.map((carrier, idx) => (
+                          <div key={idx} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`carrier-${idx}`}
+                              checked={form.targeting.device.carriers?.includes(carrier.name)}
+                              onCheckedChange={(checked) => {
+                                const current = form.targeting.device.carriers || [];
+                                if (checked) {
+                                  updateField('targeting.device.carriers', [...current, carrier.name]);
+                                } else {
+                                  updateField('targeting.device.carriers', current.filter(x => x !== carrier.name));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`carrier-${idx}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                              {carrier.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {refData.carriers.length === 0 && (
+                        <p className="text-xs text-[#F59E0B]">No carrier data available for selected countries</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[#64748B]">Select countries in Geo tab to see available carriers</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -651,24 +866,52 @@ export default function CampaignForm() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Placements (2.5)</Label>
-                    <Input
-                      value={form.targeting.video.placements?.join(', ') || ''}
-                      onChange={(e) => updateField('targeting.video.placements', parseIntList(e.target.value))}
-                      placeholder="1, 5 (1=In-Stream, 5=Interstitial)"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                    />
-                    <p className="text-xs text-[#64748B]">1=In-Stream, 2=In-Banner, 3=In-Article, 4=In-Feed, 5=Interstitial</p>
+                    <Label className="text-[#94A3B8]">Placements (OpenRTB 2.5)</Label>
+                    <div className="grid grid-cols-1 gap-1 p-2 surface-secondary rounded border border-[#2D3B55]">
+                      {refData.videoPlacements.map(p => (
+                        <div key={p.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`vplacement-${p.id}`}
+                            checked={form.targeting.video.placements?.includes(p.id)}
+                            onCheckedChange={(checked) => {
+                              const current = form.targeting.video.placements || [];
+                              if (checked) {
+                                updateField('targeting.video.placements', [...current, p.id]);
+                              } else {
+                                updateField('targeting.video.placements', current.filter(x => x !== p.id));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`vplacement-${p.id}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                            {p.id}: {p.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Plcmts (2.6)</Label>
-                    <Input
-                      value={form.targeting.video.plcmts?.join(', ') || ''}
-                      onChange={(e) => updateField('targeting.video.plcmts', parseIntList(e.target.value))}
-                      placeholder="1, 3 (1=Instream, 3=Interstitial)"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                    />
-                    <p className="text-xs text-[#64748B]">1=Instream, 2=Accompanying, 3=Interstitial, 4=No-Content</p>
+                    <Label className="text-[#94A3B8]">PLCMT (OpenRTB 2.6)</Label>
+                    <div className="grid grid-cols-1 gap-1 p-2 surface-secondary rounded border border-[#2D3B55]">
+                      {refData.videoPlcmt.map(p => (
+                        <div key={p.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`plcmt-${p.id}`}
+                            checked={form.targeting.video.plcmts?.includes(p.id)}
+                            onCheckedChange={(checked) => {
+                              const current = form.targeting.video.plcmts || [];
+                              if (checked) {
+                                updateField('targeting.video.plcmts', [...current, p.id]);
+                              } else {
+                                updateField('targeting.video.plcmts', current.filter(x => x !== p.id));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`plcmt-${p.id}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                            {p.id}: {p.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -695,34 +938,78 @@ export default function CampaignForm() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Protocols</Label>
-                    <Input
-                      value={form.targeting.video.protocols?.join(', ') || ''}
-                      onChange={(e) => updateField('targeting.video.protocols', parseIntList(e.target.value))}
-                      placeholder="2, 3, 5, 6"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                    />
-                    <p className="text-xs text-[#64748B]">2=VAST 2.0, 3=VAST 3.0, 5=VAST 2.0 Wrapper, 6=VAST 3.0 Wrapper</p>
+                    <Label className="text-[#94A3B8]">Protocols (VAST Versions)</Label>
+                    <div className="grid grid-cols-2 gap-1 p-2 surface-secondary rounded border border-[#2D3B55] max-h-40 overflow-y-auto">
+                      {refData.videoProtocols.map(p => (
+                        <div key={p.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`protocol-${p.id}`}
+                            checked={form.targeting.video.protocols?.includes(p.id)}
+                            onCheckedChange={(checked) => {
+                              const current = form.targeting.video.protocols || [];
+                              if (checked) {
+                                updateField('targeting.video.protocols', [...current, p.id]);
+                              } else {
+                                updateField('targeting.video.protocols', current.filter(x => x !== p.id));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`protocol-${p.id}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                            {p.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[#94A3B8]">MIME Types</Label>
-                    <Input
-                      value={form.targeting.video.mimes?.join(', ') || ''}
-                      onChange={(e) => updateField('targeting.video.mimes', parseList(e.target.value))}
-                      placeholder="video/mp4, video/webm"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                    />
+                    <div className="grid grid-cols-1 gap-1 p-2 surface-secondary rounded border border-[#2D3B55]">
+                      {refData.videoMimes.map(m => (
+                        <div key={m.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`mime-${m.value}`}
+                            checked={form.targeting.video.mimes?.includes(m.value)}
+                            onCheckedChange={(checked) => {
+                              const current = form.targeting.video.mimes || [];
+                              if (checked) {
+                                updateField('targeting.video.mimes', [...current, m.value]);
+                              } else {
+                                updateField('targeting.video.mimes', current.filter(x => x !== m.value));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`mime-${m.value}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                            {m.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Pod Positions (2.6 slotinpod)</Label>
-                  <Input
-                    value={form.targeting.video.pod_positions?.join(', ') || ''}
-                    onChange={(e) => updateField('targeting.video.pod_positions', parseIntList(e.target.value))}
-                    placeholder="0, 1, -1 (0=any, 1=first, -1=last)"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
-                  />
-                  <p className="text-xs text-[#64748B]">For ad pod targeting: 0=any, 1=first, -1=last, 2+=specific position</p>
+                  <Label className="text-[#94A3B8]">Pod Positions (OpenRTB 2.6 slotinpod)</Label>
+                  <div className="grid grid-cols-5 gap-2 p-2 surface-secondary rounded border border-[#2D3B55]">
+                    {refData.podPositions.map(p => (
+                      <div key={p.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`pod-${p.id}`}
+                          checked={form.targeting.video.pod_positions?.includes(p.id)}
+                          onCheckedChange={(checked) => {
+                            const current = form.targeting.video.pod_positions || [];
+                            if (checked) {
+                              updateField('targeting.video.pod_positions', [...current, p.id]);
+                            } else {
+                              updateField('targeting.video.pod_positions', current.filter(x => x !== p.id));
+                            }
+                          }}
+                        />
+                        <label htmlFor={`pod-${p.id}`} className="text-xs text-[#94A3B8] cursor-pointer">
+                          {p.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#64748B]">For ad pod targeting in CTV/OTT inventory</p>
                 </div>
               </CardContent>
             </Card>

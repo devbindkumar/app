@@ -22,6 +22,38 @@ class CreativeType(str, Enum):
     BANNER = "banner"
     VIDEO = "video"
     NATIVE = "native"
+    AUDIO = "audio"
+
+
+class CreativeFormat(str, Enum):
+    RAW_BANNER = "raw_banner"
+    RAW_VIDEO = "raw_video"
+    VAST_URL = "vast_url"
+    VAST_XML = "vast_xml"
+    JS_TAG = "js_tag"
+    NATIVE_JSON = "native_json"
+    AUDIO_VAST = "audio_vast"
+
+
+class ORTBVersion(str, Enum):
+    V2_5 = "2.5"
+    V2_6 = "2.6"
+
+
+class AdPlacement(str, Enum):
+    IN_APP = "in_app"
+    IN_STREAM = "in_stream"
+    IN_STREAM_NON_SKIP = "in_stream_non_skip"
+    IN_BANNER = "in_banner"
+    IN_ARTICLE = "in_article"
+    IN_FEED = "in_feed"
+    INTERSTITIAL = "interstitial"
+    SIDE_BANNER = "side_banner"
+    ABOVE_FOLD = "above_fold"
+    BELOW_FOLD = "below_fold"
+    STICKY = "sticky"
+    FLOATING = "floating"
+    REWARDED = "rewarded"
 
 
 class DeviceType(int, Enum):
@@ -69,6 +101,9 @@ class GeoTargeting(BaseModel):
     regions: List[str] = Field(default_factory=list)
     cities: List[str] = Field(default_factory=list)
     lat_lon_radius: Optional[Dict[str, float]] = Field(default=None, description="{'lat': x, 'lon': y, 'radius_km': z}")
+    latitude: Optional[float] = Field(default=None, description="Target latitude")
+    longitude: Optional[float] = Field(default=None, description="Target longitude")
+    radius_km: Optional[float] = Field(default=None, description="Radius in kilometers")
 
 
 class DeviceTargeting(BaseModel):
@@ -80,6 +115,9 @@ class DeviceTargeting(BaseModel):
     os_list: List[str] = Field(default_factory=list)
     os_versions: List[str] = Field(default_factory=list)
     connection_types: List[int] = Field(default_factory=list)
+    carriers: List[str] = Field(default_factory=list, description="Mobile carrier/operator names")
+    carrier_mccs: List[str] = Field(default_factory=list, description="Mobile Country Codes")
+    carrier_mncs: List[str] = Field(default_factory=list, description="Mobile Network Codes")
 
 
 class InventoryTargeting(BaseModel):
@@ -139,26 +177,41 @@ class BannerCreative(BaseModel):
     width: int
     height: int
     mimes: List[str] = Field(default=["image/jpeg", "image/png", "image/gif"])
-    ad_markup: str = Field(description="HTML/JS ad markup")
+    ad_markup: str = Field(default="", description="HTML/JS ad markup")
+    image_url: Optional[str] = Field(default=None, description="Direct image URL for raw banner")
 
 
 class VideoCreative(BaseModel):
-    duration: int = Field(description="Duration in seconds")
-    width: int
-    height: int
+    duration: int = Field(default=30, description="Duration in seconds")
+    width: int = Field(default=1920)
+    height: int = Field(default=1080)
     mimes: List[str] = Field(default=["video/mp4", "video/webm"])
     protocols: List[int] = Field(default=[2, 3, 5, 6])
     vast_url: Optional[str] = None
     vast_xml: Optional[str] = None
+    video_url: Optional[str] = Field(default=None, description="Direct video URL for raw video")
+    skip_offset: Optional[int] = Field(default=None, description="Skip button appears after X seconds")
+    bitrate: Optional[int] = Field(default=None, description="Video bitrate in Kbps")
+
+
+class AudioCreative(BaseModel):
+    duration: int = Field(default=30, description="Duration in seconds")
+    mimes: List[str] = Field(default=["audio/mp3", "audio/mpeg", "audio/ogg"])
+    protocols: List[int] = Field(default=[2, 3, 5, 6])
+    vast_url: Optional[str] = None
+    vast_xml: Optional[str] = None
+    audio_url: Optional[str] = Field(default=None, description="Direct audio URL")
+    bitrate: Optional[int] = Field(default=None, description="Audio bitrate in Kbps")
 
 
 class NativeCreative(BaseModel):
-    title: str
-    description: str
+    title: str = Field(default="")
+    description: str = Field(default="")
     icon_url: Optional[str] = None
     image_url: Optional[str] = None
     cta_text: str = "Learn More"
-    click_url: str
+    click_url: str = Field(default="")
+    sponsored_by: Optional[str] = None
 
 
 class Creative(BaseModel):
@@ -167,6 +220,7 @@ class Creative(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     type: CreativeType
+    format: CreativeFormat = Field(default=CreativeFormat.RAW_BANNER, description="Creative format/delivery method")
     status: str = Field(default="active")
     adomain: List[str] = Field(default_factory=list, description="Advertiser domains")
     iurl: Optional[str] = Field(default=None, description="Sample image URL")
@@ -178,6 +232,13 @@ class Creative(BaseModel):
     banner_data: Optional[BannerCreative] = None
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None
+    audio_data: Optional[AudioCreative] = None
+    
+    # JS Tag specific
+    js_tag: Optional[str] = Field(default=None, description="JavaScript tag for ad serving")
+    
+    # Preview URL (auto-generated for VAST, computed for others)
+    preview_url: Optional[str] = Field(default=None, description="Preview URL for the creative")
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -265,6 +326,9 @@ class Campaign(BaseModel):
     currency: str = Field(default="USD", description="Campaign currency (USD, EUR, GBP, etc.)")
     priority: int = Field(default=1, ge=1, le=10)
     
+    # Ad Placement targeting
+    placements: List[str] = Field(default_factory=list, description="Ad placement types (in_app, in_stream, etc.)")
+    
     # Budget
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
     
@@ -318,6 +382,7 @@ class SSPEndpoint(BaseModel):
     api_key: str = Field(default_factory=lambda: f"ssp_{uuid.uuid4().hex}")
     description: Optional[str] = None
     status: str = Field(default="active")
+    ortb_version: str = Field(default="2.5", description="OpenRTB version (2.5 or 2.6)")
     
     # Stats
     total_requests: int = Field(default=0)
@@ -417,6 +482,7 @@ class CampaignCreate(BaseModel):
     bid_floor: float = 0.0
     currency: str = "USD"
     priority: int = 1
+    placements: List[str] = Field(default_factory=list)
     creative_id: str
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
     bid_shading: BidShadingConfig = Field(default_factory=BidShadingConfig)
@@ -435,6 +501,7 @@ class CampaignUpdate(BaseModel):
     bid_floor: Optional[float] = None
     currency: Optional[str] = None
     priority: Optional[int] = None
+    placements: Optional[List[str]] = None
     creative_id: Optional[str] = None
     budget: Optional[BudgetConfig] = None
     bid_shading: Optional[BidShadingConfig] = None
@@ -449,17 +516,21 @@ class CampaignUpdate(BaseModel):
 class CreativeCreate(BaseModel):
     name: str
     type: CreativeType
+    format: CreativeFormat = Field(default=CreativeFormat.RAW_BANNER)
     adomain: List[str] = Field(default_factory=list)
     iurl: Optional[str] = None
     cat: List[str] = Field(default_factory=list)
     banner_data: Optional[BannerCreative] = None
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None
+    audio_data: Optional[AudioCreative] = None
+    js_tag: Optional[str] = None
 
 
 class SSPEndpointCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    ortb_version: str = Field(default="2.5", description="OpenRTB version (2.5 or 2.6)")
 
 
 class DashboardStats(BaseModel):

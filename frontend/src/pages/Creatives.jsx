@@ -6,7 +6,12 @@ import {
   Image, 
   Video, 
   FileText,
-  MoreVertical
+  MoreVertical,
+  Music,
+  Code,
+  Link as LinkIcon,
+  Eye,
+  X
 } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -27,6 +32,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { toast } from "sonner";
 import { getCreatives, deleteCreative } from "../lib/api";
 
@@ -34,7 +45,8 @@ function CreativeTypeIcon({ type }) {
   const icons = {
     banner: Image,
     video: Video,
-    native: FileText
+    native: FileText,
+    audio: Music
   };
   const Icon = icons[type] || FileText;
   return <Icon className="w-5 h-5" />;
@@ -44,7 +56,8 @@ function CreativeTypeBadge({ type }) {
   const colors = {
     banner: "bg-[#3B82F6]/20 text-[#3B82F6] border-[#3B82F6]/30",
     video: "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30",
-    native: "bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30"
+    native: "bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30",
+    audio: "bg-[#8B5CF6]/20 text-[#8B5CF6] border-[#8B5CF6]/30"
   };
   
   return (
@@ -54,10 +67,214 @@ function CreativeTypeBadge({ type }) {
   );
 }
 
+function CreativeFormatBadge({ format }) {
+  const labels = {
+    raw_banner: "Raw Banner",
+    raw_video: "Raw Video",
+    vast_url: "VAST URL",
+    vast_xml: "VAST XML",
+    js_tag: "JS Tag",
+    native_json: "Native JSON",
+    audio_vast: "Audio VAST"
+  };
+  
+  const icons = {
+    raw_banner: Image,
+    raw_video: Video,
+    vast_url: LinkIcon,
+    vast_xml: Code,
+    js_tag: Code,
+    native_json: FileText,
+    audio_vast: Music
+  };
+  
+  const Icon = icons[format] || Code;
+  
+  return (
+    <Badge variant="outline" className="bg-[#64748B]/20 text-[#94A3B8] border-[#64748B]/30 text-[9px]">
+      <Icon className="w-3 h-3 mr-1" />
+      {labels[format] || format}
+    </Badge>
+  );
+}
+
+function CreativePreview({ creative, onClose }) {
+  const renderPreview = () => {
+    switch (creative.type) {
+      case "banner":
+        if (creative.banner_data?.image_url) {
+          return (
+            <div className="flex items-center justify-center p-4 surface-secondary rounded">
+              <img 
+                src={creative.banner_data.image_url} 
+                alt={creative.name}
+                className="max-w-full max-h-[400px] object-contain rounded"
+              />
+            </div>
+          );
+        } else if (creative.banner_data?.ad_markup) {
+          return (
+            <div className="p-4 surface-secondary rounded">
+              <p className="text-xs text-[#64748B] mb-2">HTML Markup Preview:</p>
+              <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
+                {creative.banner_data.ad_markup.substring(0, 500)}...
+              </pre>
+            </div>
+          );
+        }
+        break;
+      case "video":
+        if (creative.video_data?.video_url) {
+          return (
+            <div className="flex items-center justify-center p-4 surface-secondary rounded">
+              <video 
+                src={creative.video_data.video_url} 
+                controls 
+                className="max-w-full max-h-[400px] rounded"
+              />
+            </div>
+          );
+        } else if (creative.video_data?.vast_url) {
+          return (
+            <div className="p-4 surface-secondary rounded space-y-3">
+              <p className="text-xs text-[#64748B]">VAST URL:</p>
+              <code className="text-xs text-[#3B82F6] font-mono block break-all bg-[#020408] p-2 rounded">
+                {creative.video_data.vast_url}
+              </code>
+              <a 
+                href={creative.video_data.vast_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-[#3B82F6] hover:underline"
+              >
+                Open VAST URL in new tab →
+              </a>
+            </div>
+          );
+        } else if (creative.video_data?.vast_xml) {
+          return (
+            <div className="p-4 surface-secondary rounded">
+              <p className="text-xs text-[#64748B] mb-2">VAST XML Preview:</p>
+              <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
+                {creative.video_data.vast_xml.substring(0, 1000)}...
+              </pre>
+            </div>
+          );
+        }
+        break;
+      case "native":
+        if (creative.native_data) {
+          return (
+            <div className="p-4 surface-secondary rounded space-y-3">
+              {creative.native_data.image_url && (
+                <img 
+                  src={creative.native_data.image_url} 
+                  alt={creative.native_data.title}
+                  className="w-full max-h-[200px] object-cover rounded"
+                />
+              )}
+              <div className="flex items-start gap-3">
+                {creative.native_data.icon_url && (
+                  <img 
+                    src={creative.native_data.icon_url} 
+                    alt="icon"
+                    className="w-12 h-12 rounded"
+                  />
+                )}
+                <div>
+                  <h4 className="text-sm font-semibold text-[#F8FAFC]">{creative.native_data.title}</h4>
+                  <p className="text-xs text-[#94A3B8]">{creative.native_data.description}</p>
+                  {creative.native_data.sponsored_by && (
+                    <p className="text-[10px] text-[#64748B] mt-1">Sponsored by: {creative.native_data.sponsored_by}</p>
+                  )}
+                </div>
+              </div>
+              <Button size="sm" className="w-full bg-[#3B82F6]">{creative.native_data.cta_text}</Button>
+            </div>
+          );
+        }
+        break;
+      case "audio":
+        if (creative.audio_data?.audio_url) {
+          return (
+            <div className="p-4 surface-secondary rounded">
+              <audio src={creative.audio_data.audio_url} controls className="w-full" />
+            </div>
+          );
+        } else if (creative.audio_data?.vast_url) {
+          return (
+            <div className="p-4 surface-secondary rounded space-y-3">
+              <p className="text-xs text-[#64748B]">Audio VAST URL:</p>
+              <code className="text-xs text-[#8B5CF6] font-mono block break-all bg-[#020408] p-2 rounded">
+                {creative.audio_data.vast_url}
+              </code>
+            </div>
+          );
+        }
+        break;
+      default:
+        break;
+    }
+    
+    if (creative.js_tag) {
+      return (
+        <div className="p-4 surface-secondary rounded">
+          <p className="text-xs text-[#64748B] mb-2">JavaScript Tag:</p>
+          <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
+            {creative.js_tag.substring(0, 500)}...
+          </pre>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="p-8 text-center text-[#64748B]">
+        <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <p>No preview available for this creative</p>
+      </div>
+    );
+  };
+
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="surface-primary border-panel max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-[#F8FAFC] flex items-center gap-3">
+            <CreativeTypeIcon type={creative.type} />
+            {creative.name}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <CreativeTypeBadge type={creative.type} />
+            {creative.format && <CreativeFormatBadge format={creative.format} />}
+          </div>
+          {renderPreview()}
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            {creative.adomain?.length > 0 && (
+              <div>
+                <span className="text-[#64748B]">Domains: </span>
+                <span className="text-[#94A3B8] font-mono">{creative.adomain.join(', ')}</span>
+              </div>
+            )}
+            {creative.cat?.length > 0 && (
+              <div>
+                <span className="text-[#64748B]">Categories: </span>
+                <span className="text-[#94A3B8] font-mono">{creative.cat.join(', ')}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function Creatives() {
   const [creatives, setCreatives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [previewCreative, setPreviewCreative] = useState(null);
 
   const fetchCreatives = async () => {
     try {
@@ -162,6 +379,13 @@ export default function Creatives() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="surface-primary border-panel">
                       <DropdownMenuItem 
+                        onClick={() => setPreviewCreative(creative)}
+                        className="text-[#94A3B8] focus:text-[#F8FAFC]"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Preview
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
                         onClick={() => setDeleteId(creative.id)}
                         className="text-[#EF4444] focus:text-[#EF4444]"
                       >
@@ -175,7 +399,10 @@ export default function Creatives() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-[#64748B]">Type</span>
-                    <CreativeTypeBadge type={creative.type} />
+                    <div className="flex items-center gap-1">
+                      <CreativeTypeBadge type={creative.type} />
+                      {creative.format && <CreativeFormatBadge format={creative.format} />}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-[#64748B]">Status</span>
@@ -195,8 +422,17 @@ export default function Creatives() {
                   )}
                 </div>
                 
-                <div className="mt-3 pt-3 border-t border-[#2D3B55]">
+                <div className="mt-3 pt-3 border-t border-[#2D3B55] flex items-center justify-between">
                   <p className="text-[10px] text-[#64748B] font-mono truncate">ID: {creative.id}</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setPreviewCreative(creative)}
+                    className="text-[#3B82F6] hover:text-[#60A5FA] text-xs h-6 px-2"
+                  >
+                    <Eye className="w-3 h-3 mr-1" />
+                    Preview
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -226,6 +462,14 @@ export default function Creatives() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Preview Dialog */}
+      {previewCreative && (
+        <CreativePreview 
+          creative={previewCreative} 
+          onClose={() => setPreviewCreative(null)} 
+        />
+      )}
     </div>
   );
 }

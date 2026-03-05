@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Megaphone, 
@@ -10,9 +11,12 @@ import {
   BarChart3,
   Gauge,
   Lightbulb,
-  Brain
+  Brain,
+  Sun,
+  Moon
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { Switch } from "./ui/switch";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -28,19 +32,32 @@ const navItems = [
 ];
 
 export default function Layout() {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true; // Default to dark
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    document.documentElement.classList.toggle('light-theme', !isDarkMode);
+  }, [isDarkMode]);
+
   return (
-    <div className="min-h-screen bg-[#020408] flex" data-testid="app-layout">
+    <div className={cn("min-h-screen flex", isDarkMode ? "bg-[#020408]" : "bg-slate-100")} data-testid="app-layout">
       {/* Sidebar */}
-      <aside className="w-56 surface-primary border-r border-[#2D3B55] flex flex-col" data-testid="sidebar">
+      <aside className={cn(
+        "w-56 flex flex-col border-r",
+        isDarkMode ? "surface-primary border-[#2D3B55]" : "bg-white border-slate-200"
+      )} data-testid="sidebar">
         {/* Logo */}
-        <div className="p-4 border-b border-[#2D3B55]">
+        <div className={cn("p-4 border-b", isDarkMode ? "border-[#2D3B55]" : "border-slate-200")}>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-sm bg-[#3B82F6] flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-[#F8FAFC]">OpenRTB</h1>
-              <p className="text-[10px] text-[#64748B] uppercase tracking-wider">Bidder</p>
+              <h1 className={cn("text-sm font-semibold", isDarkMode ? "text-[#F8FAFC]" : "text-slate-900")}>OpenRTB</h1>
+              <p className={cn("text-[10px] uppercase tracking-wider", isDarkMode ? "text-[#64748B]" : "text-slate-500")}>Bidder</p>
             </div>
           </div>
         </div>
@@ -56,8 +73,12 @@ export default function Layout() {
                 cn(
                   "flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-150",
                   isActive
-                    ? "nav-active text-[#F8FAFC] bg-[#151F32]"
-                    : "text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]/50"
+                    ? isDarkMode 
+                      ? "nav-active text-[#F8FAFC] bg-[#151F32]"
+                      : "text-[#3B82F6] bg-blue-50 font-medium"
+                    : isDarkMode
+                      ? "text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]/50"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 )
               }
             >
@@ -67,9 +88,22 @@ export default function Layout() {
           ))}
         </nav>
         
-        {/* Footer */}
-        <div className="p-4 border-t border-[#2D3B55]">
-          <div className="text-xs text-[#64748B]">
+        {/* Theme Toggle & Footer */}
+        <div className={cn("p-4 border-t", isDarkMode ? "border-[#2D3B55]" : "border-slate-200")}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              {isDarkMode ? <Moon className="w-4 h-4 text-[#94A3B8]" /> : <Sun className="w-4 h-4 text-amber-500" />}
+              <span className={cn("text-xs", isDarkMode ? "text-[#94A3B8]" : "text-slate-600")}>
+                {isDarkMode ? "Dark" : "Light"}
+              </span>
+            </div>
+            <Switch 
+              checked={isDarkMode} 
+              onCheckedChange={setIsDarkMode}
+              data-testid="theme-toggle"
+            />
+          </div>
+          <div className={cn("text-xs", isDarkMode ? "text-[#64748B]" : "text-slate-500")}>
             <p>OpenRTB 2.5/2.6</p>
             <p className="mt-1">DSP Bidder v1.0</p>
           </div>
@@ -77,7 +111,7 @@ export default function Layout() {
       </aside>
       
       {/* Main Content */}
-      <main className="flex-1 overflow-auto" data-testid="main-content">
+      <main className={cn("flex-1 overflow-auto", !isDarkMode && "bg-slate-50")} data-testid="main-content">
         <Outlet />
       </main>
     </div>

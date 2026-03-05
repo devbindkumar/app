@@ -111,4 +111,17 @@ export const getSupportedCurrencies = () => api.get('/currencies');
 export const convertCurrency = (amount, fromCurrency, toCurrency) => 
   api.get('/currency/convert', { params: { amount, from_currency: fromCurrency, to_currency: toCurrency } });
 
+// Reference Data
+export const getIABCategories = () => api.get('/reference/iab-categories');
+export const getVideoPlacements = () => api.get('/reference/video-placements');
+export const getVideoPlcmt = () => api.get('/reference/video-plcmt');
+export const getVideoProtocols = () => api.get('/reference/video-protocols');
+export const getVideoMimes = () => api.get('/reference/video-mimes');
+export const getPodPositions = () => api.get('/reference/pod-positions');
+export const getAdPlacements = () => api.get('/reference/ad-placements');
+export const getDeviceTypes = () => api.get('/reference/device-types');
+export const getConnectionTypes = () => api.get('/reference/connection-types');
+export const getCarriersByCountry = (countryCode) => api.get(`/reference/carriers/${countryCode}`);
+export const getAllCarriers = () => api.get('/reference/carriers');
+
 export default api;

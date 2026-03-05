@@ -178,3 +178,48 @@
   margin-bottom: 1rem;
   color: #64748B;
 }
+
+/* Light Theme Overrides */
+.light-theme .surface-primary {
+  background-color: #ffffff;
+}
+
+.light-theme .surface-secondary {
+  background-color: #f8fafc;
+}
+
+.light-theme .border-panel {
+  border-color: #e2e8f0;
+}
+
+.light-theme .text-\[\#F8FAFC\] {
+  color: #0f172a;
+}
+
+.light-theme .text-\[\#94A3B8\] {
+  color: #475569;
+}
+
+.light-theme .text-\[\#64748B\] {
+  color: #64748b;
+}
+
+.light-theme .card-hover:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.15);
+}
+
+.light-theme .nav-active {
+  background-color: #eff6ff;
+}
+
+.light-theme input,
+.light-theme select {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light-theme input::placeholder {
+  color: #94a3b8;
+}

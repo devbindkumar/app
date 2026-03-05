@@ -82,7 +82,8 @@ export default function SSPEndpoints() {
   
   const [form, setForm] = useState({
     name: "",
-    description: ""
+    description: "",
+    ortb_version: "2.5"
   });
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -117,7 +118,7 @@ export default function SSPEndpoints() {
       await createSSPEndpoint(form);
       toast.success("SSP endpoint created");
       setShowCreate(false);
-      setForm({ name: "", description: "" });
+      setForm({ name: "", description: "", ortb_version: "2.5" });
       fetchEndpoints();
     } catch (error) {
       toast.error("Failed to create SSP endpoint");
@@ -259,6 +260,12 @@ export default function SSPEndpoints() {
                         <span className={`status-dot ${endpoint.status === "active" ? 'status-active' : 'status-draft'} mr-1.5`}></span>
                         {endpoint.status}
                       </Badge>
+                      <Badge 
+                        variant="outline"
+                        className="bg-[#8B5CF6]/20 text-[#8B5CF6] border-[#8B5CF6]/30"
+                      >
+                        ORTB {endpoint.ortb_version || "2.5"}
+                      </Badge>
                     </div>
                     
                     {endpoint.description && (
@@ -357,6 +364,34 @@ export default function SSPEndpoints() {
                 placeholder="Optional description"
                 className="surface-secondary border-[#2D3B55] text-[#F8FAFC] input-glow"
               />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[#94A3B8]">OpenRTB Version</Label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="ortb_version"
+                    value="2.5"
+                    checked={form.ortb_version === "2.5"}
+                    onChange={(e) => setForm(prev => ({ ...prev, ortb_version: e.target.value }))}
+                    className="accent-[#3B82F6]"
+                  />
+                  <span className="text-[#F8FAFC]">OpenRTB 2.5</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="ortb_version"
+                    value="2.6"
+                    checked={form.ortb_version === "2.6"}
+                    onChange={(e) => setForm(prev => ({ ...prev, ortb_version: e.target.value }))}
+                    className="accent-[#3B82F6]"
+                  />
+                  <span className="text-[#F8FAFC]">OpenRTB 2.6</span>
+                </label>
+              </div>
+              <p className="text-xs text-[#64748B]">Select the protocol version the SSP will use</p>
             </div>
           </div>
           <DialogFooter>
