@@ -35,7 +35,7 @@ export const deleteCreative = (id) => api.delete(`/creatives/${id}`);
 export const getSSPEndpoints = () => api.get('/ssp-endpoints');
 export const createSSPEndpoint = (data) => api.post('/ssp-endpoints', data);
 export const deleteSSPEndpoint = (id) => api.delete(`/ssp-endpoints/${id}`);
-export const regenerateAPIKey = (id) => api.post(`/ssp-endpoints/${id}/regenerate-key`);
+export const getSSPEndpointURL = (id) => api.get(`/ssp-endpoints/${id}/endpoint-url`);
 export const updateSSPStatus = (id, status) => 
   api.put(`/ssp-endpoints/${id}/status`, null, { params: { status } });
 
@@ -125,7 +125,7 @@ export const getCarriersByCountry = (countryCode) => api.get(`/reference/carrier
 export const getAllCarriers = () => api.get('/reference/carriers');
 
 // Campaign Comparison
-export const compareCampaigns = (campaignIds) => api.post('/campaigns/compare', campaignIds);
+export const compareCampaigns = (campaignIds) => api.post('/campaigns/compare', { campaign_ids: campaignIds });
 
 // A/B Testing
 export const getABTests = () => api.get('/ab-tests');

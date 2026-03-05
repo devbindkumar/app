@@ -810,21 +810,15 @@ async def get_bid_log(log_id: str):
 
 # ==================== OpenRTB BID ENDPOINT ====================
 
-@bid_router.post("")
-@bid_router.post("/")
-async def handle_bid_request(
+async def _process_bid_request_internal(
     request: Request,
-    x_openrtb_version: str = Header(None)
+    x_openrtb_version: str = None,
+    ssp_id: str = None
 ):
     """
-    Handle OpenRTB bid requests from SSPs
-    Supports both OpenRTB 2.5 and 2.6
-    No authentication required - open endpoint for SSPs
+    Internal bid request processor - shared logic for all bid endpoints
     """
     start_time = time.time()
-    
-    # Track SSP if identifiable from request (optional)
-    ssp_id = None
     
     try:
         bid_request = await request.json()
@@ -852,18 +846,24 @@ async def handle_bid_request(
         logger.error(f"Bid processing error: {e}")
         raise HTTPException(status_code=500, detail="Bid processing failed")
     
-    # Save bid log
+    # Save bid log with SSP info
+    log_data["ssp_id"] = ssp_id
     log = BidLog(**log_data)
     log_doc = log.model_dump()
     log_doc["timestamp"] = log_doc["timestamp"].isoformat()
     await db.bid_logs.insert_one(log_doc)
     
-    # Update SSP stats if bid was made
-    if log_data.get("bid_made") and ssp_id:
+    # Update SSP stats
+    if ssp_id:
         await db.ssp_endpoints.update_one(
             {"id": ssp_id},
-            {"$inc": {"total_bids": 1}}
+            {"$inc": {"total_requests": 1}}
         )
+        if log_data.get("bid_made"):
+            await db.ssp_endpoints.update_one(
+                {"id": ssp_id},
+                {"$inc": {"total_bids": 1}}
+            )
     
     # Update campaign stats if bid was made
     if log_data.get("bid_made") and log_data.get("campaign_id"):
@@ -880,6 +880,7 @@ async def handle_bid_request(
         "bid_made": log_data.get("bid_made", False),
         "campaign_name": log_data.get("campaign_name"),
         "bid_price": log_data.get("bid_price"),
+        "ssp_id": ssp_id,
         "device_type": bid_request.get("device", {}).get("devicetype"),
         "geo_country": bid_request.get("device", {}).get("geo", {}).get("country"),
         "domain": bid_request.get("site", {}).get("domain") or bid_request.get("app", {}).get("bundle")
@@ -893,6 +894,76 @@ async def handle_bid_request(
         return Response(status_code=204)
     
     return JSONResponse(content=response, status_code=200)
+
+
+@bid_router.post("/{ssp_name}")
+async def handle_bid_request_by_ssp(
+    request: Request,
+    ssp_name: str,
+    x_openrtb_version: str = Header(None)
+):
+    """
+    Handle OpenRTB bid requests for a specific SSP by name
+    URL: /api/bid/{ssp_name} (e.g., /api/bid/google, /api/bid/pubmatic)
+    No authentication required - SSP identified by URL path
+    """
+    # Look up SSP by name (case-insensitive, URL-friendly)
+    ssp_name_clean = ssp_name.lower().replace("-", " ").replace("_", " ")
+    endpoint = await db.ssp_endpoints.find_one(
+        {"name": {"$regex": f"^{ssp_name_clean}$", "$options": "i"}},
+        {"_id": 0}
+    )
+    
+    if not endpoint:
+        # Also try exact match on id
+        endpoint = await db.ssp_endpoints.find_one({"id": ssp_name}, {"_id": 0})
+    
+    if not endpoint:
+        raise HTTPException(status_code=404, detail=f"SSP endpoint '{ssp_name}' not found")
+    
+    if endpoint.get("status") != "active":
+        raise HTTPException(status_code=403, detail="SSP endpoint is inactive")
+    
+    return await _process_bid_request_internal(request, x_openrtb_version, endpoint.get("id"))
+
+
+@bid_router.post("")
+@bid_router.post("/")
+async def handle_bid_request(
+    request: Request,
+    x_openrtb_version: str = Header(None)
+):
+    """
+    Handle OpenRTB bid requests from SSPs (generic endpoint)
+    Supports both OpenRTB 2.5 and 2.6
+    No authentication required - open endpoint for SSPs
+    Note: For SSP-specific tracking, use /api/bid/{ssp_name} instead
+    """
+    return await _process_bid_request_internal(request, x_openrtb_version, None)
+
+
+# Legacy compatibility - kept for reference but logic moved to internal function
+async def _legacy_bid_handler():
+    pass  # Removed - all logic in _process_bid_request_internal
+
+
+@api_router.get("/ssp-endpoints/{endpoint_id}/endpoint-url")
+async def get_ssp_endpoint_url(endpoint_id: str, request: Request):
+    """Get the unique bid endpoint URL for an SSP"""
+    endpoint = await db.ssp_endpoints.find_one({"id": endpoint_id}, {"_id": 0})
+    if not endpoint:
+        raise HTTPException(status_code=404, detail="Endpoint not found")
+    
+    # Generate URL-friendly name
+    ssp_name = endpoint.get("name", "").lower().replace(" ", "-")
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', str(request.base_url).rstrip('/'))
+    
+    return {
+        "endpoint_url": f"{base_url}/api/bid/{ssp_name}",
+        "generic_url": f"{base_url}/api/bid",
+        "ssp_name": ssp_name,
+        "ortb_version": endpoint.get("ortb_version", "2.5")
+    }
 
 
 # ==================== MIGRATION MATRIX ====================
@@ -2395,9 +2466,13 @@ async def convert_currency(amount: float, from_currency: str = "USD", to_currenc
 
 # ==================== CAMPAIGN COMPARISON ====================
 
+class CampaignCompareRequest(BaseModel):
+    campaign_ids: List[str]
+
 @api_router.post("/campaigns/compare")
-async def compare_campaigns(campaign_ids: List[str]):
+async def compare_campaigns(request: CampaignCompareRequest):
     """Compare 2-3 campaigns side by side"""
+    campaign_ids = request.campaign_ids
     if len(campaign_ids) < 2 or len(campaign_ids) > 3:
         raise HTTPException(status_code=400, detail="Select 2-3 campaigns to compare")
     
