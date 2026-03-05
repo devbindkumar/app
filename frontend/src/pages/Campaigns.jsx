@@ -35,16 +35,17 @@ import { getCampaigns, deleteCampaign, activateCampaign, pauseCampaign } from ".
 
 function StatusBadge({ status }) {
   const variants = {
-    active: "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30",
-    paused: "bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30",
-    draft: "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30",
-    completed: "bg-[#3B82F6]/20 text-[#3B82F6] border-[#3B82F6]/30"
+    active: "badge-success",
+    paused: "badge-warning", 
+    draft: "badge-neutral",
+    completed: "badge-info",
+    error: "badge-error"
   };
   
   return (
     <Badge 
       variant="outline" 
-      className={`${variants[status] || variants.draft} font-medium uppercase text-[10px] tracking-wider`}
+      className={`${variants[status] || variants.draft} font-medium uppercase text-[10px] tracking-wider px-2 py-0.5`}
     >
       <span className={`status-dot status-${status} mr-1.5`}></span>
       {status}

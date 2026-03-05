@@ -437,22 +437,89 @@ export default function CampaignWizard() {
             <div className="space-y-6">
               <div className="space-y-3">
                 <Label className="text-[#94A3B8]">Target Countries</Label>
-                <div className="flex flex-wrap gap-2">
-                  {["USA", "CAN", "GBR", "DEU", "FRA", "AUS", "JPN", "IND", "BRA"].map(country => (
-                    <Badge
-                      key={country}
-                      variant="outline"
-                      className={`cursor-pointer ${
-                        form.geo_countries.includes(country)
-                          ? "bg-[#3B82F6]/20 text-[#3B82F6] border-[#3B82F6]"
-                          : "text-[#94A3B8] border-[#2D3B55]"
-                      }`}
-                      onClick={() => toggleArrayItem("geo_countries", country)}
-                    >
-                      {country}
-                    </Badge>
-                  ))}
-                </div>
+                <Select
+                  value=""
+                  onValueChange={(country) => {
+                    if (!form.geo_countries.includes(country)) {
+                      updateField("geo_countries", [...form.geo_countries, country]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                    <SelectValue placeholder="Select countries to target..." />
+                  </SelectTrigger>
+                  <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155] max-h-[300px]">
+                    {[
+                      { code: "USA", name: "United States" },
+                      { code: "CAN", name: "Canada" },
+                      { code: "GBR", name: "United Kingdom" },
+                      { code: "DEU", name: "Germany" },
+                      { code: "FRA", name: "France" },
+                      { code: "AUS", name: "Australia" },
+                      { code: "JPN", name: "Japan" },
+                      { code: "IND", name: "India" },
+                      { code: "BRA", name: "Brazil" },
+                      { code: "MEX", name: "Mexico" },
+                      { code: "ESP", name: "Spain" },
+                      { code: "ITA", name: "Italy" },
+                      { code: "NLD", name: "Netherlands" },
+                      { code: "CHN", name: "China" },
+                      { code: "KOR", name: "South Korea" },
+                      { code: "SGP", name: "Singapore" },
+                      { code: "HKG", name: "Hong Kong" },
+                      { code: "TWN", name: "Taiwan" },
+                      { code: "THA", name: "Thailand" },
+                      { code: "IDN", name: "Indonesia" },
+                      { code: "MYS", name: "Malaysia" },
+                      { code: "PHL", name: "Philippines" },
+                      { code: "VNM", name: "Vietnam" },
+                      { code: "NZL", name: "New Zealand" },
+                      { code: "ZAF", name: "South Africa" },
+                      { code: "ARE", name: "United Arab Emirates" },
+                      { code: "SAU", name: "Saudi Arabia" },
+                      { code: "ISR", name: "Israel" },
+                      { code: "TUR", name: "Turkey" },
+                      { code: "RUS", name: "Russia" },
+                      { code: "POL", name: "Poland" },
+                      { code: "SWE", name: "Sweden" },
+                      { code: "NOR", name: "Norway" },
+                      { code: "DNK", name: "Denmark" },
+                      { code: "FIN", name: "Finland" },
+                      { code: "CHE", name: "Switzerland" },
+                      { code: "AUT", name: "Austria" },
+                      { code: "BEL", name: "Belgium" },
+                      { code: "PRT", name: "Portugal" },
+                      { code: "IRL", name: "Ireland" },
+                      { code: "ARG", name: "Argentina" },
+                      { code: "CHL", name: "Chile" },
+                      { code: "COL", name: "Colombia" },
+                      { code: "PER", name: "Peru" },
+                      { code: "EGY", name: "Egypt" },
+                      { code: "NGA", name: "Nigeria" },
+                      { code: "KEN", name: "Kenya" },
+                      { code: "PAK", name: "Pakistan" },
+                      { code: "BGD", name: "Bangladesh" }
+                    ].filter(c => !form.geo_countries.includes(c.code)).map(country => (
+                      <SelectItem key={country.code} value={country.code} className="text-[#F8FAFC] dark:text-[#F8FAFC]">
+                        {country.name} ({country.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                {form.geo_countries.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.geo_countries.map(code => (
+                      <Badge
+                        key={code}
+                        className="bg-[#3B82F6]/20 text-[#3B82F6] border-[#3B82F6] cursor-pointer hover:bg-[#EF4444]/20 hover:text-[#EF4444] hover:border-[#EF4444]"
+                        onClick={() => updateField("geo_countries", form.geo_countries.filter(c => c !== code))}
+                      >
+                        {code} ×
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-[#64748B]">Leave empty to target all countries</p>
               </div>
               
@@ -470,10 +537,10 @@ export default function CampaignWizard() {
                     <Badge
                       key={device.id}
                       variant="outline"
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer transition-colors ${
                         form.device_types.includes(device.id)
                           ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]"
-                          : "text-[#94A3B8] border-[#2D3B55]"
+                          : "text-[#94A3B8] border-[#2D3B55] hover:border-[#10B981]/50"
                       }`}
                       onClick={() => toggleArrayItem("device_types", device.id)}
                     >
@@ -490,10 +557,10 @@ export default function CampaignWizard() {
                     <Badge
                       key={os}
                       variant="outline"
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer transition-colors ${
                         form.os_list.includes(os)
                           ? "bg-[#8B5CF6]/20 text-[#8B5CF6] border-[#8B5CF6]"
-                          : "text-[#94A3B8] border-[#2D3B55]"
+                          : "text-[#94A3B8] border-[#2D3B55] hover:border-[#8B5CF6]/50"
                       }`}
                       onClick={() => toggleArrayItem("os_list", os)}
                     >

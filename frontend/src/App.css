@@ -214,12 +214,116 @@
 }
 
 .light-theme input,
-.light-theme select {
+.light-theme select,
+.light-theme textarea {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
 }
 
-.light-theme input::placeholder {
+.light-theme input::placeholder,
+.light-theme textarea::placeholder {
   color: #94a3b8;
 }
+
+/* Light theme - Dropdown/Select styling */
+.light-theme [role="listbox"],
+.light-theme [data-radix-popper-content-wrapper] > div {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme [role="option"] {
+  color: #0f172a !important;
+}
+
+.light-theme [role="option"]:hover,
+.light-theme [role="option"][data-highlighted] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Light theme - Switch/Toggle styling */
+.light-theme [role="switch"][data-state="unchecked"] {
+  background-color: #cbd5e1 !important;
+}
+
+.light-theme [role="switch"][data-state="checked"] {
+  background-color: #3B82F6 !important;
+}
+
+/* Light theme - Badge improvements */
+.light-theme .badge-status-active {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.light-theme .badge-status-paused {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #d97706 !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.light-theme .badge-status-draft {
+  background-color: rgba(100, 116, 139, 0.15) !important;
+  color: #475569 !important;
+  border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+/* Improved Badge Colors - More vibrant and accessible */
+.badge-success {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.badge-warning {
+  background-color: rgba(251, 191, 36, 0.2);
+  color: #F59E0B;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.badge-error {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-info {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.badge-neutral {
+  background-color: rgba(148, 163, 184, 0.2);
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+/* Light theme badge overrides */
+.light-theme .badge-success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.light-theme .badge-warning {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #b45309;
+}
+
+.light-theme .badge-error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.light-theme .badge-info {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.light-theme .badge-neutral {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: #475569;
+}
+

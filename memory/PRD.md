@@ -19,117 +19,87 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - Budget pacing, Bid shading
 - Frequency capping, SPO, ML-based prediction
 
-### Analytics & Management (Phases 4-5)
+### Analytics & Management (Phases 4-8)
 - Campaign Performance Insights
-- ML Model Management
-- Multi-Currency Support
-- Ad Placements, Geo/Device Targeting
-- Theme toggle (Dark/Light mode)
+- SSP Token Authentication (16-char hex tokens)
+- SSP Performance Analytics
+- Automated Bid Optimization
+- Cross-Campaign Attribution
+- WebSocket Real-time Bid Stream
+- Campaign Creation Wizard (5-step)
 
-### Platform Features (Phase 6)
-- Campaign Comparison Tool
-- A/B Testing Framework
-- Fraud Detection
-- Custom Audience Segments
+### UI/UX Improvements (Phase 10 - December 2025)
 
-### SSP & Analytics (Phases 7-8)
-- **SSP Token Authentication** - 16-char hex tokens per SSP
-- **SSP Performance Analytics** - Rankings, metrics, response times
-- **Automated Bid Optimization** - Auto-adjust bids based on win rate
-- **Cross-Campaign Attribution** - 4 attribution models
-- **Advanced Creative Editor** - Image upload, live preview
+**Campaign Wizard Enhancements:**
+- Full country dropdown with 50+ countries (searchable)
+- Country selection shows as removable badges
+- Improved device type and OS targeting badges
 
-### Real-time & UX (Phase 9 - December 2025)
-- **WebSocket Bid Stream** (`/api/ws/bid-stream`)
-  - Real-time bid activity feed
-  - Live connection status indicator
-  - Pause/Resume functionality
-  - Auto-reconnect on disconnect
-  
-- **Campaign Creation Wizard** (`/campaigns/wizard`)
-  - 5-step guided form
-  - Step 1: Basic Info (name, dates, budget)
-  - Step 2: Targeting (geo, device, OS)
-  - Step 3: Creative selection
-  - Step 4: Advanced (frequency cap, bid shading, ML)
-  - Step 5: Review and launch
+**Creative Editor - Video Support:**
+- Video Source Type toggle: VAST Tag vs RAW Video Upload
+- VAST Tag Configuration with version selection (2.0 - 4.2)
+- RAW Video file upload support
+- Video preview panel:
+  - VAST Tag: Shows icon, version badge, URL, duration, "Test VAST Tag" button
+  - RAW Upload: Native video player with controls
+
+**Theme Consistency:**
+- Dropdowns properly styled in both dark/light themes
+- Toggle switches respect theme colors
+- All form inputs have theme-aware styling
+- Badge colors optimized for both themes
+
+**Badge Color Improvements:**
+- Active: Vibrant green (#10B981)
+- Paused: Amber/orange (#F59E0B)
+- Draft: Neutral gray (#94A3B8)
+- Error: Clear red (#EF4444)
+- Info: Blue (#3B82F6)
 
 ## Key API Endpoints
 
-### Bidding (NO AUTH REQUIRED)
+### Bidding
 - `POST /api/bid/{endpoint_token}` - SSP-specific bid endpoint
-- `POST /api/bid` - Generic bid endpoint
-
-### WebSocket
 - `WS /api/ws/bid-stream` - Real-time bid stream
 
-### Campaigns
-- `GET/POST /api/campaigns` - List/create campaigns
-- `GET /api/campaigns/{id}` - Get single campaign
-- `POST /api/campaigns/compare` - Compare campaigns
+### Campaigns & Creatives
+- `GET/POST /api/campaigns` - Campaign management
+- `GET/POST /api/creatives` - Creative management
+- `POST /api/upload/image` - Image upload
+- `GET /api/reference/all` - All reference data
 
-### SSP Analytics
-- `GET /api/ssp-analytics/overview` - Performance overview
-- `GET /api/ssp-analytics/{id}/details` - Per-SSP details
+### Analytics
+- `GET /api/ssp-analytics/overview` - SSP performance
+- `GET /api/bid-optimization/status` - Bid optimization
+- `GET /api/attribution/analysis` - Attribution analysis
 
-### Bid Optimization
-- `GET /api/bid-optimization/status` - All campaigns status
-- `POST /api/bid-optimization/{id}/enable` - Enable optimization
-- `POST /api/bid-optimization/{id}/run` - Run optimization
+## Navigation Structure
+Dashboard | Campaigns | Wizard | Compare | Creatives | Editor | 
+SSP Endpoints | SSP Analytics | Bid Logs | Bid Stream | Reports | 
+Budget Pacing | Insights | ML Models | Bid Optimizer | A/B Testing | 
+Fraud | Audiences | Attribution | Migration
 
-### Attribution
-- `GET /api/attribution/analysis?model={model}` - Analysis
-
-## Navigation
-- Dashboard
-- Campaigns, Wizard, Compare
-- Creatives, Editor
-- SSP Endpoints, SSP Analytics
-- Bid Logs, Bid Stream (WebSocket)
-- Reports, Budget Pacing
-- Insights, ML Models, Bid Optimizer
-- A/B Testing, Fraud, Audiences, Attribution
-- Migration
+## Tech Stack
+- **Backend**: FastAPI, Motor, Pydantic, WebSockets
+- **Frontend**: React, Tailwind CSS, Shadcn/UI, Recharts
+- **Database**: MongoDB
 
 ## Prioritized Backlog
 
-### Completed
-- [x] All core bidding features
-- [x] Campaign management & targeting
-- [x] ML prediction & optimization
-- [x] Campaign comparison & A/B testing
-- [x] SSP token-based identification
-- [x] SSP Performance Analytics
-- [x] Automated Bid Optimization
-- [x] Cross-Campaign Attribution
-- [x] Advanced Creative Editor
-- [x] WebSocket Real-time Bid Stream
-- [x] Campaign Creation Wizard (5-step)
+### Completed (December 2025)
+- [x] Full country dropdown in Campaign Wizard
+- [x] Theme support for all dropdowns and toggles
+- [x] Video creative with VAST tag OR RAW upload
+- [x] VAST version selection (2.0-4.2)
+- [x] Video preview for VAST tags
+- [x] Improved badge color scheme
 
 ### P1 - Upcoming
-- [ ] Code Refactoring - Split server.py (~3600 lines) into modular routers
-- [ ] Advanced Fraud Detection algorithms
-- [ ] Automated campaign optimization recommendations
+- [ ] Code Refactoring - Split server.py into modular routers
+- [ ] Video upload to cloud storage (currently local preview only)
+- [ ] VAST tag validation and parsing
 
 ### P2 - Future
-- [ ] CampaignForm.jsx refactoring
-- [ ] Video creative preview
 - [ ] Bulk campaign management
-
-## Tech Stack
-- **Backend**: FastAPI, Motor (async MongoDB), Pydantic, WebSockets
-- **Frontend**: React, Tailwind CSS, Shadcn/UI, Recharts, Axios
-- **Database**: MongoDB
-- **Domain**: Ad-Tech, OpenRTB, Programmatic Advertising
-
-## Test Coverage
-- Backend: 15+ pytest tests passing
-- Frontend: All pages functional
-- WebSocket: Connection verified
-- Campaign Wizard: 5-step flow tested
-
-## Latest Updates (December 2025)
-- Added WebSocket for real-time bid streaming
-- Created 5-step Campaign Creation Wizard
-- Fixed targeting logic for geo/device/inventory checks
-- All API endpoints returning valid responses
+- [ ] Advanced fraud detection algorithms
+- [ ] Campaign duplication feature
