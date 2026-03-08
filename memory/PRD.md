@@ -131,11 +131,26 @@ Fraud | Audiences | Attribution | Migration
     - "How it works" explanation
   - Run optimization, View history, Disable buttons
   - Optimization history panel with bid adjustment timeline
+- [x] **Backend Refactoring (Phase 14)**
+  - Refactored server.py from 3,650 lines to ~80 lines
+  - Created modular router architecture:
+    - `routers/shared.py` - DB connection, utilities, WebSocket manager
+    - `routers/reference.py` - Reference data (IAB categories, device types, etc.)
+    - `routers/campaigns.py` - Campaign CRUD operations
+    - `routers/creatives.py` - Creative CRUD operations
+    - `routers/bidding.py` - SSP endpoints, bid handling, win/billing notifications
+    - `routers/analytics.py` - SSP analytics, reports, pacing, dashboard
+    - `routers/optimization.py` - Bid optimization, ML, frequency capping, SPO
+    - `routers/attribution.py` - Cross-campaign attribution
+    - `routers/misc.py` - Currencies, A/B testing, audiences, uploads, insights, fraud
+  - Fixed Dashboard chartData format compatibility
+  - All 25 backend API tests passing
+  - 100% frontend page functionality verified
 
 ### P1 - Upcoming
-- [ ] Code Refactoring - Split server.py into modular routers
 - [ ] Video upload to cloud storage (currently local preview only)
 - [ ] VAST tag validation and parsing
+- [ ] Cross-Campaign Attribution UI
 
 ### P2 - Future
 - [ ] Bulk campaign management
@@ -145,3 +160,23 @@ Fraud | Audiences | Attribution | Migration
 
 ## Files Deleted (Phase 11)
 - `/app/frontend/src/pages/CampaignForm.jsx` - Replaced by CampaignWizard.jsx
+
+## Architecture Changes (Phase 14)
+```
+/app/backend/
+├── server.py           # Main app (~80 lines) - Imports routers, CORS, lifespan
+├── server_old.py       # Backup of original monolithic server
+├── models.py           # Pydantic models
+├── openrtb_handler.py  # Core bidding engine
+└── routers/            # Feature-based modular routers
+    ├── __init__.py
+    ├── shared.py       # DB connection, WebSocket manager, utilities
+    ├── reference.py    # Reference data endpoints
+    ├── campaigns.py    # Campaign CRUD
+    ├── creatives.py    # Creative CRUD
+    ├── bidding.py      # Bid handling, SSP endpoints, notifications
+    ├── analytics.py    # SSP analytics, reports, pacing
+    ├── optimization.py # Bid optimization, ML, SPO
+    ├── attribution.py  # Attribution tracking
+    └── misc.py         # Currencies, A/B testing, audiences, uploads
+```
