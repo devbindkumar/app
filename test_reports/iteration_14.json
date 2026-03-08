@@ -1,0 +1,78 @@
+{
+  "summary": "Phase 14 - Frontend testing of Media Planner, Insertion Orders, and Campaign Wizard features. Fixed critical bug in InsertionOrders.jsx - SelectItem with empty value causing runtime error. All tested features are working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Media Planner", "issues": ["Console warnings from Recharts about chart dimensions during rendering - non-blocking"]}
+    ]
+  },
+  "bugs_fixed_by_testing_agent": [
+    {
+      "file": "/app/frontend/src/pages/InsertionOrders.jsx",
+      "issue": "SelectItem with empty value=\"\" causing runtime error: 'A <Select.Item /> must have a value prop that is not an empty string'",
+      "fix": "Changed SelectItem value from empty string '' to 'none' for the campaign selection dropdown, and updated handleCreateIO to convert 'none' back to empty string before API call"
+    }
+  ],
+  "test_report_links": [
+    "/app/test_reports/iteration_14.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All three new features (Media Planner, Insertion Orders, Campaign Wizard) are fully functional",
+    "Navigation links for Media Planner and Insertion Orders are properly added to sidebar",
+    "All 8 Campaign Wizard steps are present with proper navigation between them",
+    "Line Item recommendations panel displays correctly in Insertion Orders",
+    "Industry benchmarks display correctly for Display, Video, Native, CTV, Audio formats"
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/InsertionOrders.jsx"
+  ],
+  "success_rate": {
+    "backend": "skipped - frontend only testing",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "Created test IO 'Test IO Automated' and Line Item 'Test Line Item' during testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "New features implemented and tested: 1) Media Planner at /media-planner with forecasting and strategy recommendations (MOCKED APIs: POST /api/media-planner/forecast, POST /api/media-planner/recommend-strategy, POST /api/line-items/recommend), 2) Insertion Orders at /insertion-orders with full CRUD for IOs and Line Items, 3) Campaign Wizard at /campaigns/new with 8-step advanced campaign creation wizard. All navigation links added to sidebar.",
+  "features_verified": {
+    "media_planner": {
+      "page_loads": "PASS",
+      "campaign_planning_parameters": "PASS - Budget, Duration, Goal, Creative Type fields present",
+      "generate_plan_button": "PASS",
+      "forecast_results": "PASS - Shows Impressions, Reach, Clicks, Conversions, CPM, Confidence",
+      "strategy_recommendations": "PASS - Shows Bidding Strategy, Frequency Cap, Pacing, Priority Inventory",
+      "recommended_line_items": "PASS - Shows budget allocation recommendations",
+      "industry_benchmarks": "PASS - Display, Video, Native, CTV, Audio formats with CTR, CVR, CPM data"
+    },
+    "insertion_orders": {
+      "page_loads": "PASS",
+      "stats_cards": "PASS - Total IOs, Total Line Items, Total Budget, Active IOs",
+      "create_io_dialog": "PASS - After fix",
+      "io_expansion": "PASS - Shows line items section when expanded",
+      "add_line_item_button": "PASS",
+      "line_item_recommendations": "PASS - Shows Site Retargeting, Prospecting, Lookalike options",
+      "crud_operations": "PASS - Create IO and Line Item tested successfully"
+    },
+    "campaign_wizard": {
+      "page_loads": "PASS",
+      "8_steps_visible": "PASS - Campaign overview, Budget & bidding, Targeting, Audience, Creatives, Schedule & pacing, Brand safety, Measurement",
+      "step_navigation": "PASS - Continue/Previous buttons work",
+      "step1_overview": "PASS - Campaign name, Business/Product, Primary Goal (8 options), KPI selection",
+      "step2_budget": "PASS - Currency, Daily Budget, Total Budget, Bidding Strategy (6 options), Pacing, Inventory Sources, Environments, Performance Forecast",
+      "step3_targeting": "PASS - Geography (16 countries), Device, Contextual, Technical tabs with radius-based targeting",
+      "step4_audience": "PASS - Demographics (Age, Gender, Income, Languages), Lookalike Modeling"
+    },
+    "navigation": {
+      "media_planner_link": "PASS",
+      "insertion_orders_link": "PASS",
+      "all_20_nav_links": "PASS"
+    }
+  },
+  "mocked_apis_note": "Media Planner forecasting uses mock data based on industry benchmarks - YouTube/GDN real API integrations flagged for later implementation"
+}

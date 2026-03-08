@@ -22,6 +22,8 @@ import FraudDetection from "./pages/FraudDetection";
 import Audiences from "./pages/Audiences";
 import Attribution from "./pages/Attribution";
 import BidStream from "./pages/BidStream";
+import MediaPlanner from "./pages/MediaPlanner";
+import InsertionOrders from "./pages/InsertionOrders";
 import "./App.css";
 
 function App() {
@@ -61,6 +63,8 @@ function App() {
           <Route path="fraud-detection" element={<FraudDetection />} />
           <Route path="audiences" element={<Audiences />} />
           <Route path="attribution" element={<Attribution />} />
+          <Route path="media-planner" element={<MediaPlanner />} />
+          <Route path="insertion-orders" element={<InsertionOrders />} />
           <Route path="migration-matrix" element={<MigrationMatrix />} />
         </Route>
       </Routes>
