@@ -3,7 +3,8 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { 
   ArrowLeft, Check, Save, Megaphone, Target, DollarSign, Image, Settings, 
   ChevronRight, Loader2, Users, Clock, Shield, BarChart3, Globe, 
-  Smartphone, Monitor, Tv, Radio, MapPin, Calendar, Lightbulb, Sparkles
+  Smartphone, Monitor, Tv, Radio, MapPin, Calendar, Lightbulb, Sparkles,
+  FileText, Layers, Plus, Trash2, Zap
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -34,8 +35,23 @@ const STEPS = [
   { id: 4, key: "audience", title: "Audience", icon: Users },
   { id: 5, key: "creatives", title: "Creatives", icon: Image },
   { id: 6, key: "schedule", title: "Schedule & pacing", icon: Clock },
-  { id: 7, key: "safety", title: "Brand safety", icon: Shield },
-  { id: 8, key: "measurement", title: "Measurement", icon: BarChart3 },
+  { id: 7, key: "io_lineitems", title: "IO & Line Items", icon: Layers },
+  { id: 8, key: "safety", title: "Brand safety", icon: Shield },
+  { id: 9, key: "measurement", title: "Measurement", icon: BarChart3 },
+];
+
+const LINE_ITEM_TYPES = [
+  { value: "prospecting", label: "Prospecting", color: "#3B82F6", desc: "New user acquisition" },
+  { value: "retargeting", label: "Retargeting", color: "#10B981", desc: "Re-engage visitors" },
+  { value: "contextual", label: "Contextual", color: "#F59E0B", desc: "Content-based targeting" },
+  { value: "audience", label: "Audience", color: "#8B5CF6", desc: "Segment-based targeting" },
+  { value: "lookalike", label: "Lookalike", color: "#EC4899", desc: "Similar audience expansion" },
+];
+
+const IO_STRUCTURE_TYPES = [
+  { value: "audience", label: "By Audience", desc: "Organize by audience segments" },
+  { value: "tactic", label: "By Tactic", desc: "Organize by marketing tactics" },
+  { value: "goal", label: "By Goal", desc: "Organize by campaign objectives" },
 ];
 
 const CAMPAIGN_GOALS = [
@@ -242,6 +258,12 @@ export default function CampaignWizard() {
     frequency_cap_count: 5,
     frequency_cap_period: "day",
     
+    // Insertion Order & Line Items
+    io_enabled: false,
+    io_name: "",
+    io_structure_type: "audience",
+    line_items: [],
+    
     // Advanced
     priority: 5,
     bid_shading_enabled: false,
@@ -439,8 +461,9 @@ export default function CampaignWizard() {
       case 4: return true; // Audience is optional
       case 5: return form.creative_id || form.creative_ids.length > 0;
       case 6: return form.start_date;
-      case 7: return true; // Brand safety has defaults
-      case 8: return true; // Measurement is optional
+      case 7: return true; // IO & Line Items is optional
+      case 8: return true; // Brand safety has defaults
+      case 9: return true; // Measurement is optional
       default: return true;
     }
   };
@@ -547,6 +570,21 @@ export default function CampaignWizard() {
         bidding_strategy: form.bidding_strategy,
         inventory_sources: form.inventory_sources,
         environments: form.environments,
+        // Insertion Order & Line Items
+        insertion_order: form.io_enabled ? {
+          enabled: true,
+          name: form.io_name || `IO - ${form.name}`,
+          structure_type: form.io_structure_type,
+          total_budget: form.total_budget,
+        } : { enabled: false },
+        line_items: form.io_enabled ? form.line_items.map(li => ({
+          name: li.name,
+          type: li.type,
+          budget: li.budget,
+          bid_strategy: li.bid_strategy,
+          bid_price: li.bid_price,
+          inventory_source: li.inventory_source,
+        })) : [],
       };
 
       if (isEdit) {
@@ -579,8 +617,9 @@ export default function CampaignWizard() {
       case 4: return renderAudienceStep();
       case 5: return renderCreativesStep();
       case 6: return renderScheduleStep();
-      case 7: return renderBrandSafetyStep();
-      case 8: return renderMeasurementStep();
+      case 7: return renderIOLineItemsStep();
+      case 8: return renderBrandSafetyStep();
+      case 9: return renderMeasurementStep();
       default: return null;
     }
   };
@@ -1476,7 +1515,329 @@ export default function CampaignWizard() {
     </div>
   );
 
-  // Step 7: Brand Safety
+  // Step 7: IO & Line Items
+  const renderIOLineItemsStep = () => {
+    const addLineItem = () => {
+      const newLineItem = {
+        id: Date.now().toString(),
+        name: `Line Item ${form.line_items.length + 1}`,
+        type: "prospecting",
+        budget: Math.round(form.total_budget * 0.2),
+        bid_strategy: form.bidding_strategy,
+        bid_price: form.bid_price,
+        inventory_source: form.inventory_sources[0] || "open_exchange",
+      };
+      updateField("line_items", [...form.line_items, newLineItem]);
+    };
+
+    const updateLineItem = (id, field, value) => {
+      const updated = form.line_items.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      );
+      updateField("line_items", updated);
+    };
+
+    const removeLineItem = (id) => {
+      updateField("line_items", form.line_items.filter(item => item.id !== id));
+    };
+
+    const getLineItemTypeColor = (type) => {
+      return LINE_ITEM_TYPES.find(t => t.value === type)?.color || "#64748B";
+    };
+
+    const totalLineItemBudget = form.line_items.reduce((sum, item) => sum + (item.budget || 0), 0);
+    const remainingBudget = form.total_budget - totalLineItemBudget;
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Insertion Order & Line Items</h2>
+          <p className="text-sm text-[#64748B]">Structure your campaign with insertion orders and line items for granular control</p>
+        </div>
+
+        {/* IO Toggle */}
+        <Card className="surface-secondary border-[#2D3B55]">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#3B82F6]/20">
+                  <FileText className="w-5 h-5 text-[#3B82F6]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#F8FAFC]">Enable Insertion Order</p>
+                  <p className="text-xs text-[#64748B]">Structure campaign with IO and line items for advanced budget control</p>
+                </div>
+              </div>
+              <Switch
+                checked={form.io_enabled}
+                onCheckedChange={(v) => updateField("io_enabled", v)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {form.io_enabled && (
+          <>
+            {/* IO Configuration */}
+            <Card className="surface-secondary border-[#2D3B55]">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-sm font-medium text-[#F8FAFC]">Insertion Order Details</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">IO Name</Label>
+                    <Input
+                      value={form.io_name}
+                      onChange={(e) => updateField("io_name", e.target.value)}
+                      placeholder={`IO - ${form.name || "Campaign"}`}
+                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Structure Type</Label>
+                    <Select 
+                      value={form.io_structure_type} 
+                      onValueChange={(v) => updateField("io_structure_type", v)}
+                    >
+                      <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="surface-primary border-[#2D3B55]">
+                        {IO_STRUCTURE_TYPES.map((type) => (
+                          <SelectItem key={type.value} value={type.value} className="text-[#F8FAFC]">
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Budget Summary */}
+                <div className="p-3 rounded-lg bg-[#0A0F1C] border border-[#2D3B55]">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#94A3B8]">Total Campaign Budget</span>
+                    <span className="text-sm font-medium text-[#F8FAFC]">${form.total_budget.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-sm text-[#94A3B8]">Allocated to Line Items</span>
+                    <span className="text-sm font-medium text-[#3B82F6]">${totalLineItemBudget.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-sm text-[#94A3B8]">Remaining</span>
+                    <span className={`text-sm font-medium ${remainingBudget < 0 ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>
+                      ${remainingBudget.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Line Items */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-[#F8FAFC]">Line Items</h3>
+                <Button
+                  size="sm"
+                  onClick={addLineItem}
+                  className="bg-[#10B981] hover:bg-[#059669]"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Add Line Item
+                </Button>
+              </div>
+
+              {form.line_items.length === 0 ? (
+                <Card className="surface-secondary border-[#2D3B55] border-dashed">
+                  <CardContent className="p-8 text-center">
+                    <Layers className="w-10 h-10 mx-auto text-[#64748B] mb-3" />
+                    <p className="text-sm text-[#94A3B8] mb-3">No line items yet</p>
+                    <p className="text-xs text-[#64748B] mb-4">
+                      Line items allow you to split your campaign budget across different tactics
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={addLineItem}
+                      className="bg-[#3B82F6] hover:bg-[#2563EB]"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Create First Line Item
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {form.line_items.map((item, index) => (
+                    <Card 
+                      key={item.id} 
+                      className="surface-secondary border-[#2D3B55] border-l-4"
+                      style={{ borderLeftColor: getLineItemTypeColor(item.type) }}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#64748B]">#{index + 1}</span>
+                            <Input
+                              value={item.name}
+                              onChange={(e) => updateLineItem(item.id, "name", e.target.value)}
+                              className="w-48 h-8 surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                              placeholder="Line item name"
+                            />
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => removeLineItem(item.id)}
+                            className="h-8 w-8 text-[#EF4444] hover:bg-[#EF4444]/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-4">
+                          {/* Type */}
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Type</Label>
+                            <Select 
+                              value={item.type} 
+                              onValueChange={(v) => updateLineItem(item.id, "type", v)}
+                            >
+                              <SelectTrigger className="h-9 surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="surface-primary border-[#2D3B55]">
+                                {LINE_ITEM_TYPES.map((type) => (
+                                  <SelectItem key={type.value} value={type.value} className="text-[#F8FAFC]">
+                                    <div className="flex items-center gap-2">
+                                      <div 
+                                        className="w-2 h-2 rounded-full" 
+                                        style={{ backgroundColor: type.color }}
+                                      />
+                                      {type.label}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Budget */}
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Budget ($)</Label>
+                            <Input
+                              type="number"
+                              value={item.budget}
+                              onChange={(e) => updateLineItem(item.id, "budget", parseFloat(e.target.value) || 0)}
+                              className="h-9 surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                            />
+                          </div>
+
+                          {/* Bid Strategy */}
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Bid Strategy</Label>
+                            <Select 
+                              value={item.bid_strategy} 
+                              onValueChange={(v) => updateLineItem(item.id, "bid_strategy", v)}
+                            >
+                              <SelectTrigger className="h-9 surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="surface-primary border-[#2D3B55]">
+                                {BIDDING_STRATEGIES.map((s) => (
+                                  <SelectItem key={s.value} value={s.value} className="text-[#F8FAFC]">
+                                    {s.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Inventory Source */}
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Inventory</Label>
+                            <Select 
+                              value={item.inventory_source} 
+                              onValueChange={(v) => updateLineItem(item.id, "inventory_source", v)}
+                            >
+                              <SelectTrigger className="h-9 surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="surface-primary border-[#2D3B55]">
+                                {INVENTORY_SOURCES.map((s) => (
+                                  <SelectItem key={s.value} value={s.value} className="text-[#F8FAFC]">
+                                    {s.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Quick Add Recommendations */}
+              {form.line_items.length > 0 && form.line_items.length < 5 && (
+                <Card className="surface-secondary border-[#2D3B55]">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-4 h-4 text-[#F59E0B]" />
+                      <span className="text-sm font-medium text-[#F8FAFC]">Suggested Line Items</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {LINE_ITEM_TYPES
+                        .filter(type => !form.line_items.some(li => li.type === type.value))
+                        .slice(0, 3)
+                        .map(type => (
+                          <Button
+                            key={type.value}
+                            size="sm"
+                            variant="outline"
+                            className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+                            onClick={() => {
+                              const newItem = {
+                                id: Date.now().toString(),
+                                name: `${type.label} - ${form.name || "Campaign"}`,
+                                type: type.value,
+                                budget: Math.round(remainingBudget * 0.3),
+                                bid_strategy: form.bidding_strategy,
+                                bid_price: form.bid_price,
+                                inventory_source: form.inventory_sources[0] || "open_exchange",
+                              };
+                              updateField("line_items", [...form.line_items, newItem]);
+                            }}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            {type.label}
+                          </Button>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </>
+        )}
+
+        {!form.io_enabled && (
+          <Card className="surface-secondary border-[#2D3B55]">
+            <CardContent className="p-6 text-center">
+              <Layers className="w-12 h-12 mx-auto text-[#64748B] mb-3" />
+              <h3 className="text-sm font-medium text-[#F8FAFC] mb-2">Simple Campaign Structure</h3>
+              <p className="text-xs text-[#64748B] max-w-md mx-auto">
+                Your campaign will run as a single entity. Enable Insertion Orders above to split 
+                budget across multiple line items for granular targeting and budget control.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
+
+  // Step 8: Brand Safety
   const renderBrandSafetyStep = () => (
     <div className="space-y-6">
       <div>

@@ -189,15 +189,23 @@ Fraud | Audiences | Attribution | Migration
     - Inventory sources
     - Forecast reference data
   - **MOCKED**: Forecasting uses mock data (YouTube/GDN real APIs flagged for later)
-- [x] **Insertion Orders & Line Items Management**
-  - Insertion Orders CRUD with stats overview
-  - IO Structure types (Audience, Tactic, Goal)
-  - Line Items within IOs with budget allocation
-  - Line Item Types (Prospecting, Retargeting, Contextual, Audience, Lookalike)
-  - Bid strategies and inventory source per line item
-  - AI-powered Line Item recommendations when creating
-  - Budget progress tracking per IO and per Line Item
-  - Performance metrics (Impressions, Clicks) per line item
+- [x] **IO & Line Items Integrated into Campaign Wizard** (Step 7 of 9)
+  - Toggle to enable Insertion Order structure
+  - IO configuration: Name, Structure Type (Audience/Tactic/Goal)
+  - Real-time budget tracking:
+    - Total Campaign Budget
+    - Allocated to Line Items
+    - Remaining (color-coded)
+  - Line Item Management:
+    - Add/Remove line items inline
+    - Configure per line item: Type, Budget, Bid Strategy, Inventory Source
+    - Line Item Types: Prospecting, Retargeting, Contextual, Audience, Lookalike
+    - Suggested Line Items quick-add buttons
+  - Data persisted with campaign creation
+- [x] **Standalone Insertion Orders Page** at `/insertion-orders`
+  - Full CRUD for IOs with stats overview
+  - Expandable IOs showing nested Line Items
+  - AI-powered Line Item recommendations
 - [x] **Navigation Updates**
   - Added "Media Planner" to sidebar
   - Added "Insertion Orders" to sidebar
