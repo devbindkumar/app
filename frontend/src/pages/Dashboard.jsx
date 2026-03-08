@@ -74,7 +74,20 @@ export default function Dashboard() {
         getChartData()
       ]);
       setStats(statsRes.data);
-      setChartData(chartRes.data);
+      
+      // Transform chart data from {labels:[], bids:[], wins:[], spend:[]} to [{date, bids, wins, spend}]
+      const rawChartData = chartRes.data;
+      if (rawChartData && rawChartData.labels && Array.isArray(rawChartData.labels)) {
+        const transformedData = rawChartData.labels.map((label, index) => ({
+          date: label,
+          bids: rawChartData.bids?.[index] || 0,
+          wins: rawChartData.wins?.[index] || 0,
+          spend: rawChartData.spend?.[index] || 0
+        }));
+        setChartData(transformedData);
+      } else {
+        setChartData([]);
+      }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
       toast.error("Failed to load dashboard data");
