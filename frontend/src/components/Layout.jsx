@@ -22,8 +22,7 @@ import {
   TrendingUp,
   GitBranch,
   PieChart,
-  Target,
-  FileText
+  Target
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Switch } from "./ui/switch";
@@ -33,7 +32,6 @@ const navItems = [
   { to: "/campaigns", icon: Megaphone, label: "Campaigns" },
   { to: "/campaigns/compare", icon: Scale, label: "Compare" },
   { to: "/media-planner", icon: Target, label: "Media Planner" },
-  { to: "/insertion-orders", icon: FileText, label: "Insertion Orders" },
   { to: "/creatives", icon: Image, label: "Creatives" },
   { to: "/ssp-endpoints", icon: Server, label: "SSP Endpoints" },
   { to: "/ssp-analytics", icon: PieChart, label: "SSP Analytics" },

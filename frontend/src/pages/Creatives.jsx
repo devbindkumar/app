@@ -11,11 +11,17 @@ import {
   Code,
   Link as LinkIcon,
   Eye,
-  X
+  X,
+  Play,
+  Monitor,
+  Smartphone,
+  Film,
+  Layers
 } from "lucide-react";
-import { Card, CardContent } from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +46,16 @@ import {
 } from "../components/ui/dialog";
 import { toast } from "sonner";
 import { getCreatives, deleteCreative } from "../lib/api";
+
+// Video format categories
+const VIDEO_FORMATS = {
+  preroll_15: { label: "Pre-roll 15s", duration: 15 },
+  preroll_30: { label: "Pre-roll 30s", duration: 30 },
+  midroll: { label: "Mid-roll", duration: null },
+  postroll: { label: "Post-roll", duration: null },
+  outstream: { label: "Outstream", duration: null },
+  interactive: { label: "Interactive", duration: null },
+};
 
 function CreativeTypeIcon({ type }) {
   const icons = {
@@ -364,6 +380,7 @@ export default function Creatives() {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
   const [previewCreative, setPreviewCreative] = useState(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   const fetchCreatives = async () => {
     try {
@@ -403,6 +420,149 @@ export default function Creatives() {
     return "-";
   };
 
+  // Filter creatives by type
+  const filterCreatives = (type) => {
+    if (type === "all") return creatives;
+    if (type === "display") return creatives.filter(c => c.type === "banner");
+    if (type === "video") return creatives.filter(c => c.type === "video");
+    if (type === "native") return creatives.filter(c => c.type === "native");
+    if (type === "jstag") return creatives.filter(c => c.format === "js_tag");
+    return creatives;
+  };
+
+  // Categorize video creatives by duration
+  const categorizeVideoByFormat = (creative) => {
+    if (creative.type !== "video") return null;
+    const duration = creative.video_data?.duration;
+    if (duration === 15) return "preroll_15";
+    if (duration === 30) return "preroll_30";
+    if (duration > 30 && duration <= 60) return "midroll";
+    if (creative.video_data?.video_format === "outstream") return "outstream";
+    if (creative.video_data?.video_format === "interactive") return "interactive";
+    return "midroll";
+  };
+
+  // Count by type
+  const counts = {
+    all: creatives.length,
+    display: creatives.filter(c => c.type === "banner").length,
+    video: creatives.filter(c => c.type === "video").length,
+    native: creatives.filter(c => c.type === "native").length,
+    jstag: creatives.filter(c => c.format === "js_tag").length,
+  };
+
+  // Render creative card with proper preview
+  const renderCreativeCard = (creative) => (
+    <Card 
+      key={creative.id} 
+      className="surface-primary border-panel card-hover group"
+      data-testid={`creative-${creative.id}`}
+    >
+      <CardContent className="p-0">
+        {/* Preview Area */}
+        <div 
+          className="relative aspect-video surface-secondary rounded-t-lg overflow-hidden cursor-pointer"
+          onClick={() => setPreviewCreative(creative)}
+        >
+          {creative.type === "banner" && creative.banner_data?.image_url && (
+            <img 
+              src={creative.banner_data.image_url} 
+              alt={creative.name}
+              className="w-full h-full object-contain bg-gray-900"
+            />
+          )}
+          {creative.type === "banner" && creative.banner_data?.ad_markup && !creative.banner_data?.image_url && (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center">
+                <Code className="w-8 h-8 text-[#3B82F6] mx-auto mb-2" />
+                <p className="text-xs text-[#64748B]">HTML Banner</p>
+              </div>
+            </div>
+          )}
+          {creative.type === "video" && (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A0F1C] to-[#151F32]">
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full bg-[#10B981]/20 flex items-center justify-center mx-auto mb-2 group-hover:bg-[#10B981]/30 transition-colors">
+                  <Play className="w-6 h-6 text-[#10B981] ml-1" />
+                </div>
+                <p className="text-xs text-[#10B981] font-medium">{creative.video_data?.duration || 0}s</p>
+              </div>
+            </div>
+          )}
+          {creative.type === "native" && creative.native_data && (
+            <div className="w-full h-full p-3 bg-white flex items-center gap-3">
+              {creative.native_data.icon_url && (
+                <img src={creative.native_data.icon_url} alt="" className="w-10 h-10 rounded" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{creative.native_data.title}</p>
+                <p className="text-xs text-gray-500 truncate">{creative.native_data.description}</p>
+              </div>
+            </div>
+          )}
+          {creative.format === "js_tag" && (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center">
+                <Code className="w-8 h-8 text-[#8B5CF6] mx-auto mb-2" />
+                <p className="text-xs text-[#64748B]">JavaScript Tag</p>
+              </div>
+            </div>
+          )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white">
+              <Eye className="w-4 h-4 mr-1" /> Preview
+            </Button>
+          </div>
+          {/* Size badge */}
+          {(creative.type === "banner" || creative.type === "video") && (
+            <Badge className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px]">
+              {getCreativeDimensions(creative)}
+            </Badge>
+          )}
+        </div>
+
+        {/* Info Area */}
+        <div className="p-4">
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-[#F8FAFC] truncate">{creative.name}</h3>
+              <div className="flex items-center gap-2 mt-1">
+                <CreativeTypeBadge type={creative.type} />
+                {creative.format && <CreativeFormatBadge format={creative.format} />}
+              </div>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#F8FAFC] -mr-2">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="surface-primary border-panel">
+                <DropdownMenuItem 
+                  onClick={() => setPreviewCreative(creative)}
+                  className="text-[#94A3B8] focus:text-[#F8FAFC]"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setDeleteId(creative.id)}
+                  className="text-[#EF4444] focus:text-[#EF4444]"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
+          <p className="text-[10px] text-[#64748B] font-mono truncate">ID: {creative.id}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="p-6" data-testid="creatives-page">
       {/* Header */}
@@ -434,112 +594,187 @@ export default function Creatives() {
         </div>
       </div>
 
-      {/* Creatives Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading creatives...</div>
-        </div>
-      ) : creatives.length === 0 ? (
-        <Card className="surface-primary border-panel">
-          <CardContent className="empty-state py-16">
-            <Image className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No creatives yet</h3>
-            <p className="text-sm text-[#94A3B8] mb-4">Create creatives to use in your campaigns</p>
-            <Link to="/creatives/new">
-              <Button className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Creative
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="creatives-grid">
-          {creatives.map((creative) => (
-            <Card 
-              key={creative.id} 
-              className="surface-primary border-panel card-hover"
-              data-testid={`creative-${creative.id}`}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-sm surface-secondary flex items-center justify-center text-[#3B82F6]">
-                      <CreativeTypeIcon type={creative.type} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#F8FAFC]">{creative.name}</h3>
-                      <p className="text-xs text-[#64748B] font-mono">{getCreativeDimensions(creative)}</p>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#F8FAFC]">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="surface-primary border-panel">
-                      <DropdownMenuItem 
-                        onClick={() => setPreviewCreative(creative)}
-                        className="text-[#94A3B8] focus:text-[#F8FAFC]"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => setDeleteId(creative.id)}
-                        className="text-[#EF4444] focus:text-[#EF4444]"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#64748B]">Type</span>
-                    <div className="flex items-center gap-1">
-                      <CreativeTypeBadge type={creative.type} />
-                      {creative.format && <CreativeFormatBadge format={creative.format} />}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#64748B]">Status</span>
-                    <span className="text-xs text-[#10B981]">{creative.status}</span>
-                  </div>
-                  {creative.adomain?.length > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#64748B]">Domain</span>
-                      <span className="text-xs text-[#94A3B8] font-mono">{creative.adomain[0]}</span>
-                    </div>
-                  )}
-                  {creative.cat?.length > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#64748B]">Categories</span>
-                      <span className="text-xs text-[#94A3B8] font-mono">{creative.cat.slice(0, 2).join(', ')}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-3 pt-3 border-t border-[#2D3B55] flex items-center justify-between">
-                  <p className="text-[10px] text-[#64748B] font-mono truncate">ID: {creative.id}</p>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setPreviewCreative(creative)}
-                    className="text-[#3B82F6] hover:text-[#60A5FA] text-xs h-6 px-2"
-                  >
-                    <Eye className="w-3 h-3 mr-1" />
-                    Preview
+      {/* Format Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full justify-start bg-[#0A0F1C] mb-6 p-1 h-auto">
+          <TabsTrigger 
+            value="all" 
+            className="data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white px-4 py-2"
+          >
+            <Layers className="w-4 h-4 mr-2" />
+            All ({counts.all})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="display" 
+            className="data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white px-4 py-2"
+          >
+            <Monitor className="w-4 h-4 mr-2" />
+            Display ({counts.display})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="video" 
+            className="data-[state=active]:bg-[#10B981] data-[state=active]:text-white px-4 py-2"
+          >
+            <Film className="w-4 h-4 mr-2" />
+            Video ({counts.video})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="native" 
+            className="data-[state=active]:bg-[#F59E0B] data-[state=active]:text-white px-4 py-2"
+          >
+            <Smartphone className="w-4 h-4 mr-2" />
+            Native ({counts.native})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="jstag" 
+            className="data-[state=active]:bg-[#8B5CF6] data-[state=active]:text-white px-4 py-2"
+          >
+            <Code className="w-4 h-4 mr-2" />
+            JS Tags ({counts.jstag})
+          </TabsTrigger>
+        </TabsList>
+
+        {/* All Creatives */}
+        <TabsContent value="all" className="mt-0">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-[#64748B]">Loading creatives...</div>
+            </div>
+          ) : filterCreatives("all").length === 0 ? (
+            <Card className="surface-primary border-panel">
+              <CardContent className="empty-state py-16">
+                <Image className="empty-state-icon" />
+                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No creatives yet</h3>
+                <p className="text-sm text-[#94A3B8] mb-4">Create creatives to use in your campaigns</p>
+                <Link to="/creatives/new">
+                  <Button className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Creative
                   </Button>
-                </div>
+                </Link>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-testid="creatives-grid">
+              {filterCreatives("all").map(renderCreativeCard)}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Display Creatives */}
+        <TabsContent value="display" className="mt-0">
+          {filterCreatives("display").length === 0 ? (
+            <Card className="surface-primary border-panel">
+              <CardContent className="empty-state py-16">
+                <Monitor className="empty-state-icon text-[#3B82F6]" />
+                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No display creatives</h3>
+                <p className="text-sm text-[#94A3B8] mb-4">Create banner ads for display campaigns</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filterCreatives("display").map(renderCreativeCard)}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Video Creatives */}
+        <TabsContent value="video" className="mt-0 space-y-6">
+          {filterCreatives("video").length === 0 ? (
+            <Card className="surface-primary border-panel">
+              <CardContent className="empty-state py-16">
+                <Film className="empty-state-icon text-[#10B981]" />
+                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No video creatives</h3>
+                <p className="text-sm text-[#94A3B8] mb-4">Create video ads for video campaigns</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Pre-roll 15s */}
+              {filterCreatives("video").filter(c => c.video_data?.duration === 15).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                    <Play className="w-4 h-4 text-[#10B981]" />
+                    Pre-roll 15s
+                    <Badge className="bg-[#10B981]/20 text-[#10B981] ml-2">
+                      {filterCreatives("video").filter(c => c.video_data?.duration === 15).length}
+                    </Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filterCreatives("video").filter(c => c.video_data?.duration === 15).map(renderCreativeCard)}
+                  </div>
+                </div>
+              )}
+
+              {/* Pre-roll 30s */}
+              {filterCreatives("video").filter(c => c.video_data?.duration === 30).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                    <Play className="w-4 h-4 text-[#10B981]" />
+                    Pre-roll 30s
+                    <Badge className="bg-[#10B981]/20 text-[#10B981] ml-2">
+                      {filterCreatives("video").filter(c => c.video_data?.duration === 30).length}
+                    </Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filterCreatives("video").filter(c => c.video_data?.duration === 30).map(renderCreativeCard)}
+                  </div>
+                </div>
+              )}
+
+              {/* Mid-roll / Other */}
+              {filterCreatives("video").filter(c => c.video_data?.duration && c.video_data.duration !== 15 && c.video_data.duration !== 30).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                    <Play className="w-4 h-4 text-[#F59E0B]" />
+                    Mid-roll / Other
+                    <Badge className="bg-[#F59E0B]/20 text-[#F59E0B] ml-2">
+                      {filterCreatives("video").filter(c => c.video_data?.duration && c.video_data.duration !== 15 && c.video_data.duration !== 30).length}
+                    </Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filterCreatives("video").filter(c => c.video_data?.duration && c.video_data.duration !== 15 && c.video_data.duration !== 30).map(renderCreativeCard)}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        {/* Native Creatives */}
+        <TabsContent value="native" className="mt-0">
+          {filterCreatives("native").length === 0 ? (
+            <Card className="surface-primary border-panel">
+              <CardContent className="empty-state py-16">
+                <Smartphone className="empty-state-icon text-[#F59E0B]" />
+                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No native creatives</h3>
+                <p className="text-sm text-[#94A3B8] mb-4">Create native ads that blend with content</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filterCreatives("native").map(renderCreativeCard)}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* JS Tags */}
+        <TabsContent value="jstag" className="mt-0">
+          {filterCreatives("jstag").length === 0 ? (
+            <Card className="surface-primary border-panel">
+              <CardContent className="empty-state py-16">
+                <Code className="empty-state-icon text-[#8B5CF6]" />
+                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No JS tag creatives</h3>
+                <p className="text-sm text-[#94A3B8] mb-4">Create JavaScript tag based creatives</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filterCreatives("jstag").map(renderCreativeCard)}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Delete Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
