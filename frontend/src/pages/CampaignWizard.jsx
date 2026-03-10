@@ -70,17 +70,23 @@ const KPI_TYPES = [
   { value: "cpc", label: "CPC", desc: "Cost per click" },
   { value: "cpa", label: "CPA", desc: "Cost per acquisition" },
   { value: "cpv", label: "CPV", desc: "Cost per view" },
+  { value: "cpcv", label: "CPCV", desc: "Cost per completed view" },
+  { value: "cps", label: "CPS", desc: "Cost per session/visit" },
+  { value: "cptv", label: "CPTV", desc: "Cost per true view" },
   { value: "vcpm", label: "vCPM", desc: "Viewable CPM" },
   { value: "roas", label: "ROAS", desc: "Return on ad spend" },
 ];
 
 const BIDDING_STRATEGIES = [
-  { value: "manual_cpm", label: "Manual CPM", desc: "Set your own CPM bid" },
-  { value: "manual_cpc", label: "Manual CPC", desc: "Set your own CPC bid" },
-  { value: "target_cpa", label: "Target CPA", desc: "Optimize for conversions" },
-  { value: "target_roas", label: "Target ROAS", desc: "Optimize for return" },
-  { value: "maximize_conversions", label: "Maximize Conversions", desc: "Auto-optimize for conversions" },
-  { value: "maximize_clicks", label: "Maximize Clicks", desc: "Auto-optimize for clicks" },
+  { value: "manual_cpm", label: "Manual CPM", desc: "Set your own CPM bid", basis: "cpm" },
+  { value: "manual_cpc", label: "Manual CPC", desc: "Set your own CPC bid", basis: "cpc" },
+  { value: "target_cpa", label: "Target CPA", desc: "Optimize for conversions", basis: "cpm" },
+  { value: "target_roas", label: "Target ROAS", desc: "Optimize for return", basis: "cpm" },
+  { value: "target_cpcv", label: "Target CPCV", desc: "Optimize for video completions", basis: "cpm" },
+  { value: "target_cps", label: "Target CPS", desc: "Optimize for sessions/visits", basis: "cpm" },
+  { value: "maximize_conversions", label: "Maximize Conversions", desc: "Auto-optimize for conversions", basis: "cpm" },
+  { value: "maximize_clicks", label: "Maximize Clicks", desc: "Auto-optimize for clicks", basis: "cpm" },
+  { value: "maximize_completed_views", label: "Maximize Completed Views", desc: "Auto-optimize for video completions", basis: "cpm" },
 ];
 
 const INVENTORY_SOURCES = [
