@@ -99,97 +99,198 @@ function CreativeFormatBadge({ format }) {
 }
 
 function CreativePreview({ creative, onClose }) {
+  const [iframeKey, setIframeKey] = useState(0);
+  
   const renderPreview = () => {
     switch (creative.type) {
       case "banner":
+        const width = creative.banner_data?.width || 300;
+        const height = creative.banner_data?.height || 250;
+        
         if (creative.banner_data?.image_url) {
           return (
-            <div className="flex items-center justify-center p-4 surface-secondary rounded">
-              <img 
-                src={creative.banner_data.image_url} 
-                alt={creative.name}
-                className="max-w-full max-h-[400px] object-contain rounded"
-              />
+            <div className="flex flex-col items-center gap-4">
+              {/* Live Preview */}
+              <div className="p-4 surface-secondary rounded-lg">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Live Preview ({width}x{height})</p>
+                <div 
+                  className="border border-[#2D3B55] rounded overflow-hidden bg-white mx-auto"
+                  style={{ width: Math.min(width, 600), height: Math.min(height, 400) }}
+                >
+                  <img 
+                    src={creative.banner_data.image_url} 
+                    alt={creative.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+              </div>
+              {/* Size Badge */}
+              <Badge className="bg-[#3B82F6]/20 text-[#3B82F6]">{width} x {height} px</Badge>
             </div>
           );
         } else if (creative.banner_data?.ad_markup) {
+          // Render HTML markup in iframe for proper preview
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                body { margin: 0; padding: 0; background: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+                * { box-sizing: border-box; }
+              </style>
+            </head>
+            <body>
+              ${creative.banner_data.ad_markup.replace(/\${CLICK_URL}/g, '#')}
+            </body>
+            </html>
+          `;
           return (
-            <div className="p-4 surface-secondary rounded">
-              <p className="text-xs text-[#64748B] mb-2">HTML Markup Preview:</p>
-              <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
-                {creative.banner_data.ad_markup.substring(0, 500)}...
-              </pre>
+            <div className="flex flex-col items-center gap-4">
+              {/* Live Preview in iframe */}
+              <div className="p-4 surface-secondary rounded-lg">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Live Preview ({width}x{height})</p>
+                <div 
+                  className="border border-[#2D3B55] rounded overflow-hidden bg-white mx-auto"
+                  style={{ width: Math.min(width, 600), height: Math.min(height, 400) }}
+                >
+                  <iframe
+                    key={iframeKey}
+                    srcDoc={htmlContent}
+                    title="Banner Preview"
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                    sandbox="allow-same-origin"
+                  />
+                </div>
+              </div>
+              {/* Size Badge */}
+              <Badge className="bg-[#3B82F6]/20 text-[#3B82F6]">{width} x {height} px</Badge>
+              {/* HTML Code */}
+              <div className="w-full">
+                <p className="text-xs text-[#64748B] mb-2">HTML Markup:</p>
+                <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[150px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                  {creative.banner_data.ad_markup}
+                </pre>
+              </div>
             </div>
           );
         }
         break;
       case "video":
+        const videoWidth = creative.video_data?.width || 640;
+        const videoHeight = creative.video_data?.height || 360;
+        const duration = creative.video_data?.duration || 15;
+        
         if (creative.video_data?.video_url) {
           return (
-            <div className="flex items-center justify-center p-4 surface-secondary rounded">
-              <video 
-                src={creative.video_data.video_url} 
-                controls 
-                className="max-w-full max-h-[400px] rounded"
-              />
+            <div className="flex flex-col items-center gap-4">
+              {/* Video Preview */}
+              <div className="p-4 surface-secondary rounded-lg w-full max-w-2xl">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Video Preview ({videoWidth}x{videoHeight}, {duration}s)</p>
+                <video 
+                  src={creative.video_data.video_url} 
+                  controls 
+                  className="w-full rounded border border-[#2D3B55]"
+                  style={{ maxHeight: 400 }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className="flex gap-2">
+                <Badge className="bg-[#10B981]/20 text-[#10B981]">{videoWidth}x{videoHeight}</Badge>
+                <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">{duration}s</Badge>
+              </div>
             </div>
           );
         } else if (creative.video_data?.vast_url) {
           return (
-            <div className="p-4 surface-secondary rounded space-y-3">
-              <p className="text-xs text-[#64748B]">VAST URL:</p>
-              <code className="text-xs text-[#3B82F6] font-mono block break-all bg-[#020408] p-2 rounded">
-                {creative.video_data.vast_url}
-              </code>
-              <a 
-                href={creative.video_data.vast_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-[#3B82F6] hover:underline"
-              >
-                Open VAST URL in new tab →
-              </a>
+            <div className="flex flex-col items-center gap-4">
+              {/* VAST URL Preview */}
+              <div className="p-4 surface-secondary rounded-lg w-full">
+                <p className="text-xs text-[#64748B] mb-3">VAST Tag URL ({duration}s video)</p>
+                <div className="p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                  <code className="text-xs text-[#3B82F6] font-mono break-all">
+                    {creative.video_data.vast_url}
+                  </code>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <a 
+                    href={creative.video_data.vast_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#3B82F6] hover:underline"
+                  >
+                    Open VAST in new tab →
+                  </a>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Badge className="bg-[#10B981]/20 text-[#10B981]">{videoWidth}x{videoHeight}</Badge>
+                <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">{duration}s</Badge>
+                <Badge className="bg-[#8B5CF6]/20 text-[#8B5CF6]">VAST</Badge>
+              </div>
             </div>
           );
         } else if (creative.video_data?.vast_xml) {
           return (
-            <div className="p-4 surface-secondary rounded">
-              <p className="text-xs text-[#64748B] mb-2">VAST XML Preview:</p>
-              <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
-                {creative.video_data.vast_xml.substring(0, 1000)}...
-              </pre>
+            <div className="flex flex-col items-center gap-4">
+              {/* VAST XML Preview */}
+              <div className="p-4 surface-secondary rounded-lg w-full">
+                <p className="text-xs text-[#64748B] mb-3">VAST XML ({duration}s video)</p>
+                <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[250px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                  {creative.video_data.vast_xml}
+                </pre>
+              </div>
+              <div className="flex gap-2">
+                <Badge className="bg-[#10B981]/20 text-[#10B981]">{videoWidth}x{videoHeight}</Badge>
+                <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">{duration}s</Badge>
+                <Badge className="bg-[#8B5CF6]/20 text-[#8B5CF6]">VAST XML</Badge>
+              </div>
             </div>
           );
         }
         break;
       case "native":
         if (creative.native_data) {
+          const nd = creative.native_data;
           return (
-            <div className="p-4 surface-secondary rounded space-y-3">
-              {creative.native_data.image_url && (
-                <img 
-                  src={creative.native_data.image_url} 
-                  alt={creative.native_data.title}
-                  className="w-full max-h-[200px] object-cover rounded"
-                />
-              )}
-              <div className="flex items-start gap-3">
-                {creative.native_data.icon_url && (
-                  <img 
-                    src={creative.native_data.icon_url} 
-                    alt="icon"
-                    className="w-12 h-12 rounded"
-                  />
-                )}
-                <div>
-                  <h4 className="text-sm font-semibold text-[#F8FAFC]">{creative.native_data.title}</h4>
-                  <p className="text-xs text-[#94A3B8]">{creative.native_data.description}</p>
-                  {creative.native_data.sponsored_by && (
-                    <p className="text-[10px] text-[#64748B] mt-1">Sponsored by: {creative.native_data.sponsored_by}</p>
+            <div className="flex flex-col items-center gap-4">
+              {/* Native Ad Preview - Card Style */}
+              <div className="p-4 surface-secondary rounded-lg">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Native Ad Preview</p>
+                <div className="w-[350px] bg-white rounded-lg shadow-lg overflow-hidden border">
+                  {nd.image_url && (
+                    <img 
+                      src={nd.image_url} 
+                      alt={nd.title}
+                      className="w-full h-[180px] object-cover"
+                    />
                   )}
+                  <div className="p-4">
+                    <div className="flex items-start gap-3">
+                      {nd.icon_url && (
+                        <img 
+                          src={nd.icon_url} 
+                          alt="icon"
+                          className="w-10 h-10 rounded-lg border"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-gray-900">{nd.title}</h4>
+                        {nd.description && (
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-2">{nd.description}</p>
+                        )}
+                        {nd.sponsored_by && (
+                          <p className="text-[10px] text-gray-400 mt-1">Sponsored by {nd.sponsored_by}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="mt-3 w-full py-2 px-4 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors">
+                      {nd.cta_text || "Learn More"}
+                    </button>
+                  </div>
                 </div>
               </div>
-              <Button size="sm" className="w-full bg-[#3B82F6]">{creative.native_data.cta_text}</Button>
+              <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">Native Ad</Badge>
             </div>
           );
         }
@@ -197,17 +298,16 @@ function CreativePreview({ creative, onClose }) {
       case "audio":
         if (creative.audio_data?.audio_url) {
           return (
-            <div className="p-4 surface-secondary rounded">
-              <audio src={creative.audio_data.audio_url} controls className="w-full" />
-            </div>
-          );
-        } else if (creative.audio_data?.vast_url) {
-          return (
-            <div className="p-4 surface-secondary rounded space-y-3">
-              <p className="text-xs text-[#64748B]">Audio VAST URL:</p>
-              <code className="text-xs text-[#8B5CF6] font-mono block break-all bg-[#020408] p-2 rounded">
-                {creative.audio_data.vast_url}
-              </code>
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 surface-secondary rounded-lg w-full max-w-md">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Audio Preview ({creative.audio_data?.duration || 30}s)</p>
+                <audio 
+                  src={creative.audio_data.audio_url} 
+                  controls 
+                  className="w-full"
+                />
+              </div>
+              <Badge className="bg-[#8B5CF6]/20 text-[#8B5CF6]">Audio Ad</Badge>
             </div>
           );
         }
@@ -216,53 +316,42 @@ function CreativePreview({ creative, onClose }) {
         break;
     }
     
-    if (creative.js_tag) {
-      return (
-        <div className="p-4 surface-secondary rounded">
-          <p className="text-xs text-[#64748B] mb-2">JavaScript Tag:</p>
-          <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[300px] p-2 bg-[#020408] rounded">
-            {creative.js_tag.substring(0, 500)}...
-          </pre>
-        </div>
-      );
-    }
-    
     return (
-      <div className="p-8 text-center text-[#64748B]">
+      <div className="text-center p-8 text-[#64748B]">
         <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p>No preview available for this creative</p>
+        <p className="text-xs mt-1">Creative type: {creative.type}</p>
       </div>
     );
   };
-
+  
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="surface-primary border-panel max-w-2xl">
+      <DialogContent className="surface-primary border-panel max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-[#F8FAFC] flex items-center gap-3">
-            <CreativeTypeIcon type={creative.type} />
-            {creative.name}
+          <DialogTitle className="text-[#F8FAFC] flex items-center gap-2">
+            <Eye className="w-5 h-5" />
+            Preview: {creative.name}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <CreativeTypeBadge type={creative.type} />
-            {creative.format && <CreativeFormatBadge format={creative.format} />}
-          </div>
+        <div className="mt-4">
           {renderPreview()}
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            {creative.adomain?.length > 0 && (
-              <div>
-                <span className="text-[#64748B]">Domains: </span>
-                <span className="text-[#94A3B8] font-mono">{creative.adomain.join(', ')}</span>
-              </div>
-            )}
-            {creative.cat?.length > 0 && (
-              <div>
-                <span className="text-[#64748B]">Categories: </span>
-                <span className="text-[#94A3B8] font-mono">{creative.cat.join(', ')}</span>
-              </div>
-            )}
+        </div>
+        {/* Creative Info */}
+        <div className="mt-4 pt-4 border-t border-[#2D3B55]">
+          <div className="grid grid-cols-3 gap-4 text-xs">
+            <div>
+              <span className="text-[#64748B]">Type:</span>
+              <span className="text-[#F8FAFC] ml-2 capitalize">{creative.type}</span>
+            </div>
+            <div>
+              <span className="text-[#64748B]">Format:</span>
+              <span className="text-[#F8FAFC] ml-2">{creative.format || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="text-[#64748B]">ID:</span>
+              <span className="text-[#3B82F6] ml-2 font-mono">{creative.id?.substring(0, 8)}...</span>
+            </div>
           </div>
         </div>
       </DialogContent>

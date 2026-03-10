@@ -32,7 +32,7 @@ async def broadcast_new_bid(bid_data: dict):
     """Broadcast new bid to all connected WebSocket clients"""
     await ws_manager.broadcast({
         "type": "new_bid",
-        "data": bid_data
+        "bid": bid_data
     })
 
 
@@ -164,10 +164,10 @@ async def websocket_bid_stream(websocket: WebSocket):
     """WebSocket endpoint for real-time bid stream"""
     await ws_manager.connect(websocket)
     try:
-        # Send recent bids on connection
+        # Send recent bids on connection (use "initial" type for frontend compatibility)
         await websocket.send_json({
-            "type": "history",
-            "data": recent_bids[-20:]
+            "type": "initial",
+            "bids": recent_bids[-20:]
         })
         
         # Keep connection alive
@@ -196,7 +196,6 @@ async def _process_bid_request_internal(
 ):
     """Internal bid request processor - shared logic for all bid endpoints"""
     global recent_bids
-    start_time = time.time()
     
     try:
         bid_request = await request.json()
@@ -292,7 +291,7 @@ async def handle_bid_request_by_token(
     )
     
     if not endpoint:
-        raise HTTPException(status_code=404, detail=f"SSP endpoint not found")
+        raise HTTPException(status_code=404, detail="SSP endpoint not found")
     
     if endpoint.get("status") != "active":
         raise HTTPException(status_code=403, detail="SSP endpoint is inactive")
@@ -300,24 +299,22 @@ async def handle_bid_request_by_token(
     # Process the bid request
     response = await _process_bid_request_internal(request, x_openrtb_version, endpoint.get("id"))
     
-    # Update performance metrics
+    # Update performance metrics (only response time, request count is handled in _process_bid_request_internal)
     response_time_ms = (time.time() - start_time) * 1000
     await db.ssp_endpoints.update_one(
         {"id": endpoint.get("id")},
-        {
-            "$set": {"last_request_at": datetime.now(timezone.utc).isoformat()},
-            "$inc": {"total_requests": 1}
-        }
+        {"$set": {"last_request_at": datetime.now(timezone.utc).isoformat()}}
     )
     
     # Update avg response time (rolling average)
     current_avg = endpoint.get("avg_response_time_ms", 0)
-    total_reqs = endpoint.get("total_requests", 0) + 1
-    new_avg = ((current_avg * (total_reqs - 1)) + response_time_ms) / total_reqs
-    await db.ssp_endpoints.update_one(
-        {"id": endpoint.get("id")},
-        {"$set": {"avg_response_time_ms": round(new_avg, 2)}}
-    )
+    total_reqs = endpoint.get("total_requests", 0)
+    if total_reqs > 0:
+        new_avg = ((current_avg * (total_reqs - 1)) + response_time_ms) / total_reqs
+        await db.ssp_endpoints.update_one(
+            {"id": endpoint.get("id")},
+            {"$set": {"avg_response_time_ms": round(new_avg, 2)}}
+        )
     
     return response
 
