@@ -535,6 +535,91 @@ const BID_PRICING_TYPES = [
   { value: "cpc", label: "CPC", desc: "Cost per click" },
   { value: "cpa", label: "CPA", desc: "Cost per acquisition" },
   { value: "cpv", label: "CPV", desc: "Cost per view" },
+  { value: "cpcv", label: "CPCV", desc: "Cost per completed view" },
+  { value: "cps", label: "CPS", desc: "Cost per session/visit" },
+];
+
+// Ad Placement Positions
+const AD_POSITIONS = [
+  { value: "above_fold", label: "Above the Fold", desc: "Visible without scrolling" },
+  { value: "below_fold", label: "Below the Fold", desc: "Requires scrolling to view" },
+  { value: "sidebar", label: "Sidebar", desc: "Side column placement" },
+  { value: "in_content", label: "In-Content", desc: "Within article/content" },
+  { value: "sticky", label: "Sticky", desc: "Fixed position while scrolling" },
+  { value: "interstitial", label: "Interstitial", desc: "Full-screen overlay" },
+  { value: "native", label: "Native", desc: "Matches surrounding content" },
+];
+
+// Supply Sources (SSPs)
+const SUPPLY_SOURCES = [
+  { value: "google_adx", label: "Google AdX", desc: "Google Ad Exchange" },
+  { value: "openx", label: "OpenX", desc: "OpenX Exchange" },
+  { value: "pubmatic", label: "PubMatic", desc: "PubMatic Exchange" },
+  { value: "rubicon", label: "Magnite (Rubicon)", desc: "Magnite SSP" },
+  { value: "appnexus", label: "Xandr (AppNexus)", desc: "Microsoft Xandr" },
+  { value: "index_exchange", label: "Index Exchange", desc: "Index Exchange SSP" },
+  { value: "triplelift", label: "TripleLift", desc: "TripleLift Native SSP" },
+  { value: "sovrn", label: "Sovrn", desc: "Sovrn Exchange" },
+  { value: "amazon_tam", label: "Amazon TAM", desc: "Amazon Publisher Services" },
+  { value: "verizon_media", label: "Yahoo SSP", desc: "Yahoo/Verizon Media" },
+  { value: "sharethrough", label: "Sharethrough", desc: "Sharethrough Native" },
+  { value: "spotx", label: "SpotX", desc: "SpotX Video SSP" },
+  { value: "teads", label: "Teads", desc: "Teads Outstream" },
+  { value: "33across", label: "33Across", desc: "33Across Exchange" },
+];
+
+// OS Versions by OS
+const OS_VERSIONS = {
+  "Android": ["14", "13", "12", "11", "10", "9", "8"],
+  "iOS": ["18", "17", "16", "15", "14", "13"],
+  "Windows": ["11", "10", "8.1", "8", "7"],
+  "macOS": ["15 Sequoia", "14 Sonoma", "13 Ventura", "12 Monterey", "11 Big Sur"],
+  "Chrome OS": ["120+", "115-119", "110-114", "100-109"],
+};
+
+// Affinity Segments
+const AFFINITY_SEGMENTS = [
+  { value: "tech_enthusiasts", label: "Technology Enthusiasts", category: "Technology" },
+  { value: "auto_enthusiasts", label: "Auto Enthusiasts", category: "Automotive" },
+  { value: "luxury_shoppers", label: "Luxury Shoppers", category: "Shopping" },
+  { value: "sports_fans", label: "Sports Fans", category: "Sports" },
+  { value: "travel_buffs", label: "Travel Buffs", category: "Travel" },
+  { value: "fitness_enthusiasts", label: "Fitness Enthusiasts", category: "Health" },
+  { value: "foodies", label: "Foodies", category: "Food" },
+  { value: "gamers", label: "Gamers", category: "Entertainment" },
+  { value: "music_lovers", label: "Music Lovers", category: "Entertainment" },
+  { value: "movie_lovers", label: "Movie Lovers", category: "Entertainment" },
+  { value: "news_junkies", label: "News Junkies", category: "News" },
+  { value: "fashionistas", label: "Fashionistas", category: "Fashion" },
+  { value: "pet_lovers", label: "Pet Lovers", category: "Pets" },
+  { value: "diy_enthusiasts", label: "DIY Enthusiasts", category: "Home" },
+  { value: "finance_enthusiasts", label: "Finance Enthusiasts", category: "Finance" },
+];
+
+// In-Market Segments
+const IN_MARKET_SEGMENTS = [
+  { value: "im_auto_new", label: "Autos - New Vehicles", category: "Automotive" },
+  { value: "im_auto_used", label: "Autos - Used Vehicles", category: "Automotive" },
+  { value: "im_real_estate", label: "Real Estate", category: "Real Estate" },
+  { value: "im_travel_flights", label: "Travel - Flights", category: "Travel" },
+  { value: "im_travel_hotels", label: "Travel - Hotels", category: "Travel" },
+  { value: "im_electronics", label: "Consumer Electronics", category: "Electronics" },
+  { value: "im_mobile_phones", label: "Mobile Phones", category: "Electronics" },
+  { value: "im_computers", label: "Computers & Peripherals", category: "Electronics" },
+  { value: "im_software", label: "Software", category: "Technology" },
+  { value: "im_education", label: "Education", category: "Education" },
+  { value: "im_financial_services", label: "Financial Services", category: "Finance" },
+  { value: "im_insurance", label: "Insurance", category: "Finance" },
+  { value: "im_jobs", label: "Employment", category: "Employment" },
+  { value: "im_baby_children", label: "Baby & Children Products", category: "Family" },
+  { value: "im_home_improvement", label: "Home Improvement", category: "Home" },
+  { value: "im_apparel", label: "Apparel & Accessories", category: "Fashion" },
+];
+
+// Parental Status
+const PARENTAL_STATUS = [
+  { value: "parent", label: "Parent" },
+  { value: "not_parent", label: "Not a Parent" },
 ];
 
 const DEVICE_TYPES = [
@@ -592,6 +677,7 @@ export default function CampaignWizard() {
     bidding_strategy: "manual_cpm",
     bid_pricing_type: "cpm",
     bid_floor: 0.5,
+    bid_price: 2.0,
     currency: "USD",
     daily_budget: 100,
     total_budget: 3000,
@@ -601,16 +687,22 @@ export default function CampaignWizard() {
     inventory_sources: ["open_exchange"],
     environments: ["web", "app"],
     
-    // Geographic Targeting
+    // Geographic Targeting - Include
     geo_countries: [],
     geo_states: [],
     geo_cities: [],
     geo_pincodes: [],
+    // Geographic Targeting - Exclude
+    geo_countries_exclude: [],
+    geo_states_exclude: [],
+    geo_cities_exclude: [],
+    // Lat/Long Targeting
     lat_long_targeting: false,
-    lat_long_points: [],
+    lat_long_points: [], // {lat, lon, radius_km, type: "include" | "exclude"}
     geo_latitude: "",
     geo_longitude: "",
     radius_km: 10,
+    lat_long_type: "include", // include or exclude for new point
     
     // Telecom
     telecom_operators: [],
@@ -618,6 +710,7 @@ export default function CampaignWizard() {
     // Device Targeting
     device_types: [],
     os_list: [],
+    os_versions: [], // NEW: OS version targeting
     browsers: [],
     carriers: [],
     connection_types: [],
@@ -626,17 +719,33 @@ export default function CampaignWizard() {
     age_ranges: [],
     genders: [],
     income_segments: [],
+    parental_status: [], // NEW: parental status
     languages: [],
+    languages_exclude: [], // NEW: exclude languages
     
     // Contextual Targeting
     contextual_keywords: [],
     contextual_categories: [],
     keyword_match_type: "broad",
     
+    // Audience Segments (NEW)
+    affinity_segments: [],
+    in_market_segments: [],
+    
     // Placement & Viewability
     ad_positions: [],
     viewability_threshold: 50,
     exclude_non_viewable: false,
+    
+    // Inventory Control (NEW)
+    domain_allowlist: [],
+    domain_blocklist: [],
+    app_allowlist: [],
+    app_blocklist: [],
+    
+    // Supply Source Control (NEW)
+    supply_sources_include: [],
+    supply_sources_exclude: [],
     
     // Time Targeting
     time_targeting_enabled: false,
@@ -669,10 +778,13 @@ export default function CampaignWizard() {
     start_date: new Date().toISOString().split('T')[0],
     end_date: "",
     
-    // Frequency
+    // Frequency Capping (Enhanced)
     frequency_cap_enabled: false,
     frequency_cap_count: 5,
     frequency_cap_period: "day",
+    frequency_cap_type: "user", // user or campaign
+    frequency_cap_daily: 0, // max per user per day
+    frequency_cap_lifetime: 0, // max per user lifetime
     
     // Insertion Order & Line Items
     io_enabled: false,
@@ -918,6 +1030,7 @@ export default function CampaignWizard() {
       const campaignData = {
         name: form.name,
         bid_floor: form.bid_floor,
+        bid_pricing_type: form.bid_pricing_type,
         currency: form.currency,
         priority: form.priority,
         placements: [],
@@ -932,26 +1045,59 @@ export default function CampaignWizard() {
           enabled: form.frequency_cap_enabled,
           max_impressions: form.frequency_cap_count,
           period: form.frequency_cap_period,
+          type: form.frequency_cap_type,
+          daily_cap: form.frequency_cap_daily,
+          lifetime_cap: form.frequency_cap_lifetime,
         },
         spo: { enabled: form.spo_enabled },
         ml_prediction: { enabled: form.ml_prediction_enabled },
         targeting: {
           geo: { 
             countries: form.geo_countries, 
+            countries_exclude: form.geo_countries_exclude,
             states: form.geo_states,
+            states_exclude: form.geo_states_exclude,
             cities: form.geo_cities, 
+            cities_exclude: form.geo_cities_exclude,
             pincodes: form.geo_pincodes,
+            lat_long_targeting: form.lat_long_targeting,
+            lat_long_points: form.lat_long_points,
             latitude: form.geo_latitude,
             longitude: form.geo_longitude,
             radius_km: form.radius_km,
           },
-          device: { device_types: form.device_types, os_list: form.os_list },
+          device: { 
+            device_types: form.device_types, 
+            os_list: form.os_list,
+            os_versions: form.os_versions,
+          },
           telecom: { operators: form.telecom_operators },
           demographics: {
             age_ranges: form.age_ranges,
             genders: form.genders,
             income_segments: form.income_segments,
+            parental_status: form.parental_status,
             languages: form.languages,
+            languages_exclude: form.languages_exclude,
+          },
+          audiences: {
+            affinity_segments: form.affinity_segments,
+            in_market_segments: form.in_market_segments,
+            first_party_audiences: form.first_party_audiences,
+            third_party_audiences: form.third_party_audiences,
+            lookalike_enabled: form.lookalike_enabled,
+            lookalike_expansion: form.lookalike_expansion,
+            audience_exclusions: form.audience_exclusions,
+          },
+          inventory: {
+            domain_allowlist: form.domain_allowlist,
+            domain_blocklist: form.domain_blocklist,
+            app_allowlist: form.app_allowlist,
+            app_blocklist: form.app_blocklist,
+          },
+          supply: {
+            sources_include: form.supply_sources_include,
+            sources_exclude: form.supply_sources_exclude,
           },
           brand_safety: {
             level: form.brand_safety_level,
@@ -985,12 +1131,11 @@ export default function CampaignWizard() {
         start_date: form.start_date || null,
         end_date: form.end_date || null,
         // Extended fields
-        business_product: form.business_product,
+        iab_categories: form.iab_categories,
         description: form.description,
         primary_goal: form.primary_goal,
         kpi_type: form.kpi_type,
         kpi_target: form.kpi_target,
-        target_audience_description: form.target_audience_description,
         bidding_strategy: form.bidding_strategy,
         inventory_sources: form.inventory_sources,
         environments: form.environments,
@@ -1413,179 +1558,280 @@ export default function CampaignWizard() {
     const availableCities = form.geo_countries.length === 1 ? (CITIES_BY_COUNTRY[form.geo_countries[0]] || []) : [];
     const availableOperators = form.geo_countries.length === 1 ? (TELECOM_OPERATORS[form.geo_countries[0]] || []) : [];
     
+    // Get available OS versions based on selected OS
+    const availableOSVersions = form.os_list.flatMap(os => 
+      (OS_VERSIONS[os] || []).map(v => ({ os, version: v, label: `${os} ${v}` }))
+    );
+
+    // Add lat/long point helper
+    const addLatLongPoint = () => {
+      if (form.geo_latitude && form.geo_longitude) {
+        const newPoint = {
+          id: Date.now().toString(),
+          lat: parseFloat(form.geo_latitude),
+          lon: parseFloat(form.geo_longitude),
+          radius_km: form.radius_km,
+          type: form.lat_long_type
+        };
+        updateField("lat_long_points", [...form.lat_long_points, newPoint]);
+        updateField("geo_latitude", "");
+        updateField("geo_longitude", "");
+      }
+    };
+    
     return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Targeting</h2>
-        <p className="text-sm text-[#64748B]">Define geographic, device, and technical targeting</p>
+        <p className="text-sm text-[#64748B]">Define geographic, device, inventory, and technical targeting</p>
       </div>
 
       <Tabs defaultValue="geo" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-[#0A0F1C]">
-          <TabsTrigger value="geo" className="data-[state=active]:bg-[#3B82F6]">Geography</TabsTrigger>
-          <TabsTrigger value="device" className="data-[state=active]:bg-[#3B82F6]">Device</TabsTrigger>
-          <TabsTrigger value="contextual" className="data-[state=active]:bg-[#3B82F6]">Contextual</TabsTrigger>
-          <TabsTrigger value="technical" className="data-[state=active]:bg-[#3B82F6]">Technical</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6 bg-[#0A0F1C]">
+          <TabsTrigger value="geo" className="data-[state=active]:bg-[#3B82F6] text-xs">Geography</TabsTrigger>
+          <TabsTrigger value="device" className="data-[state=active]:bg-[#3B82F6] text-xs">Device</TabsTrigger>
+          <TabsTrigger value="inventory" className="data-[state=active]:bg-[#3B82F6] text-xs">Inventory</TabsTrigger>
+          <TabsTrigger value="supply" className="data-[state=active]:bg-[#3B82F6] text-xs">Supply</TabsTrigger>
+          <TabsTrigger value="contextual" className="data-[state=active]:bg-[#3B82F6] text-xs">Contextual</TabsTrigger>
+          <TabsTrigger value="technical" className="data-[state=active]:bg-[#3B82F6] text-xs">Technical</TabsTrigger>
         </TabsList>
 
         {/* Geographic Targeting */}
         <TabsContent value="geo" className="space-y-4 mt-4">
-          {/* Countries Dropdown */}
-          <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Countries</Label>
-            <Select 
-              value={form.geo_countries[0] || ""} 
-              onValueChange={(v) => {
-                if (v && !form.geo_countries.includes(v)) {
-                  updateField("geo_countries", [...form.geo_countries, v]);
-                  // Reset states and cities when country changes
-                  updateField("geo_states", []);
-                  updateField("geo_cities", []);
-                  updateField("telecom_operators", []);
-                }
-              }}
-            >
-              <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
-                <SelectValue placeholder="Select country" />
-              </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
-                {COUNTRIES.map((country) => (
-                  <SelectItem key={country.code} value={country.code} className="text-[#F8FAFC]">
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {form.geo_countries.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {form.geo_countries.map((code) => (
-                  <Badge key={code} variant="secondary" className="bg-[#3B82F6]/20 text-[#3B82F6]">
-                    {COUNTRIES.find(c => c.code === code)?.name || code}
-                    <button onClick={() => {
-                      updateField("geo_countries", form.geo_countries.filter(c => c !== code));
+          {/* Include Section */}
+          <Card className="surface-secondary border-[#10B981]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#10B981] flex items-center gap-2">
+                <Check className="w-4 h-4" /> Include Locations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Countries Dropdown - Include */}
+              <div className="space-y-2">
+                <Label className="text-[#94A3B8]">Countries</Label>
+                <Select 
+                  value={form.geo_countries[0] || ""} 
+                  onValueChange={(v) => {
+                    if (v && !form.geo_countries.includes(v)) {
+                      updateField("geo_countries", [...form.geo_countries, v]);
                       updateField("geo_states", []);
                       updateField("geo_cities", []);
-                    }} className="ml-2">×</button>
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* States Dropdown */}
-          {availableStates.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-[#94A3B8]">States / Regions</Label>
-              <Select 
-                value={form.geo_states[0] || ""} 
-                onValueChange={(v) => {
-                  if (v && !form.geo_states.includes(v)) {
-                    updateField("geo_states", [...form.geo_states, v]);
-                  }
-                }}
-              >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
-                  <SelectValue placeholder="Select state/region" />
-                </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
-                  {availableStates.map((state) => (
-                    <SelectItem key={state} value={state} className="text-[#F8FAFC]">{state}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.geo_states.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {form.geo_states.map((state) => (
-                    <Badge key={state} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
-                      {state}
-                      <button onClick={() => updateField("geo_states", form.geo_states.filter(s => s !== state))} className="ml-2">×</button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Cities Dropdown */}
-          {availableCities.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Cities</Label>
-              <Select 
-                value={form.geo_cities[0] || ""} 
-                onValueChange={(v) => {
-                  if (v && !form.geo_cities.includes(v)) {
-                    updateField("geo_cities", [...form.geo_cities, v]);
-                  }
-                }}
-              >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
-                  <SelectValue placeholder="Select city" />
-                </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
-                  {availableCities.map((city) => (
-                    <SelectItem key={city} value={city} className="text-[#F8FAFC]">{city}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.geo_cities.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {form.geo_cities.map((city) => (
-                    <Badge key={city} variant="secondary" className="bg-[#F59E0B]/20 text-[#F59E0B]">
-                      {city}
-                      <button onClick={() => updateField("geo_cities", form.geo_cities.filter(c => c !== city))} className="ml-2">×</button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Pincode */}
-          <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Pincodes / ZIP Codes</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter pincode and press Enter"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim()) {
-                    const pincode = e.target.value.trim();
-                    if (!form.geo_pincodes.includes(pincode)) {
-                      updateField("geo_pincodes", [...form.geo_pincodes, pincode]);
+                      updateField("telecom_operators", []);
                     }
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-            {form.geo_pincodes.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {form.geo_pincodes.map((pin) => (
-                  <Badge key={pin} variant="secondary" className="bg-[#8B5CF6]/20 text-[#8B5CF6]">
-                    {pin}
-                    <button onClick={() => updateField("geo_pincodes", form.geo_pincodes.filter(p => p !== pin))} className="ml-2">×</button>
-                  </Badge>
-                ))}
+                  }}
+                >
+                  <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                    <SelectValue placeholder="Select country to include" />
+                  </SelectTrigger>
+                  <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                    {COUNTRIES.map((country) => (
+                      <SelectItem key={country.code} value={country.code} className="text-[#F8FAFC]">
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.geo_countries.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.geo_countries.map((code) => (
+                      <Badge key={code} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                        {COUNTRIES.find(c => c.code === code)?.name || code}
+                        <button onClick={() => {
+                          updateField("geo_countries", form.geo_countries.filter(c => c !== code));
+                          updateField("geo_states", []);
+                          updateField("geo_cities", []);
+                        }} className="ml-2">×</button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Lat/Long with Radius */}
+              {/* States Dropdown - Include */}
+              {availableStates.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-[#94A3B8]">States / Regions</Label>
+                  <Select 
+                    value={form.geo_states[0] || ""} 
+                    onValueChange={(v) => {
+                      if (v && !form.geo_states.includes(v)) {
+                        updateField("geo_states", [...form.geo_states, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                      <SelectValue placeholder="Select state/region" />
+                    </SelectTrigger>
+                    <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                      {availableStates.map((state) => (
+                        <SelectItem key={state} value={state} className="text-[#F8FAFC]">{state}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.geo_states.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {form.geo_states.map((state) => (
+                        <Badge key={state} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                          {state}
+                          <button onClick={() => updateField("geo_states", form.geo_states.filter(s => s !== state))} className="ml-2">×</button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Cities Dropdown - Include */}
+              {availableCities.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-[#94A3B8]">Cities</Label>
+                  <Select 
+                    value={form.geo_cities[0] || ""} 
+                    onValueChange={(v) => {
+                      if (v && !form.geo_cities.includes(v)) {
+                        updateField("geo_cities", [...form.geo_cities, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                      <SelectValue placeholder="Select city" />
+                    </SelectTrigger>
+                    <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                      {availableCities.map((city) => (
+                        <SelectItem key={city} value={city} className="text-[#F8FAFC]">{city}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.geo_cities.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {form.geo_cities.map((city) => (
+                        <Badge key={city} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                          {city}
+                          <button onClick={() => updateField("geo_cities", form.geo_cities.filter(c => c !== city))} className="ml-2">×</button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pincode */}
+              <div className="space-y-2">
+                <Label className="text-[#94A3B8]">Pincodes / ZIP Codes</Label>
+                <Input
+                  placeholder="Enter pincode and press Enter"
+                  className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                      const pincode = e.target.value.trim();
+                      if (!form.geo_pincodes.includes(pincode)) {
+                        updateField("geo_pincodes", [...form.geo_pincodes, pincode]);
+                      }
+                      e.target.value = '';
+                    }
+                  }}
+                />
+                {form.geo_pincodes.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.geo_pincodes.map((pin) => (
+                      <Badge key={pin} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                        {pin}
+                        <button onClick={() => updateField("geo_pincodes", form.geo_pincodes.filter(p => p !== pin))} className="ml-2">×</button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Exclude Section */}
+          <Card className="surface-secondary border-[#EF4444]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#EF4444] flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Exclude Locations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Countries Dropdown - Exclude */}
+              <div className="space-y-2">
+                <Label className="text-[#94A3B8]">Exclude Countries</Label>
+                <Select 
+                  onValueChange={(v) => {
+                    if (v && !form.geo_countries_exclude.includes(v)) {
+                      updateField("geo_countries_exclude", [...form.geo_countries_exclude, v]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                    <SelectValue placeholder="Select country to exclude" />
+                  </SelectTrigger>
+                  <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                    {COUNTRIES.map((country) => (
+                      <SelectItem key={country.code} value={country.code} className="text-[#F8FAFC]">
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.geo_countries_exclude.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.geo_countries_exclude.map((code) => (
+                      <Badge key={code} variant="secondary" className="bg-[#EF4444]/20 text-[#EF4444]">
+                        {COUNTRIES.find(c => c.code === code)?.name || code}
+                        <button onClick={() => updateField("geo_countries_exclude", form.geo_countries_exclude.filter(c => c !== code))} className="ml-2">×</button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Cities Exclude */}
+              <div className="space-y-2">
+                <Label className="text-[#94A3B8]">Exclude Cities</Label>
+                <Input
+                  placeholder="Enter city name and press Enter"
+                  className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                      const city = e.target.value.trim();
+                      if (!form.geo_cities_exclude.includes(city)) {
+                        updateField("geo_cities_exclude", [...form.geo_cities_exclude, city]);
+                      }
+                      e.target.value = '';
+                    }
+                  }}
+                />
+                {form.geo_cities_exclude.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.geo_cities_exclude.map((city) => (
+                      <Badge key={city} variant="secondary" className="bg-[#EF4444]/20 text-[#EF4444]">
+                        {city}
+                        <button onClick={() => updateField("geo_cities_exclude", form.geo_cities_exclude.filter(c => c !== city))} className="ml-2">×</button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Lat/Long Radius Targeting */}
           <Card className="surface-secondary border-[#2D3B55]">
-            <CardContent className="p-4 space-y-4">
-              <div className="flex items-center gap-4">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm text-[#F8FAFC] flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> Hyper-Local Radius Targeting
+                </CardTitle>
                 <Switch
                   checked={form.lat_long_targeting}
                   onCheckedChange={(v) => updateField("lat_long_targeting", v)}
                 />
-                <div>
-                  <p className="text-sm text-[#F8FAFC]">Radius-based Targeting</p>
-                  <p className="text-xs text-[#64748B]">Target users within a specific distance from coordinates</p>
-                </div>
               </div>
-              
-              {form.lat_long_targeting && (
-                <div className="grid grid-cols-3 gap-4">
+            </CardHeader>
+            {form.lat_long_targeting && (
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-4 gap-3">
                   <div className="space-y-2">
                     <Label className="text-[#94A3B8]">Latitude</Label>
                     <Input
@@ -1609,7 +1855,7 @@ export default function CampaignWizard() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Radius (km)</Label>
+                    <Label className="text-[#94A3B8]">Radius</Label>
                     <Select value={form.radius_km.toString()} onValueChange={(v) => updateField("radius_km", parseInt(v))}>
                       <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
                         <SelectValue />
@@ -1621,9 +1867,47 @@ export default function CampaignWizard() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Type</Label>
+                    <Select value={form.lat_long_type} onValueChange={(v) => updateField("lat_long_type", v)}>
+                      <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="surface-primary border-[#2D3B55]">
+                        <SelectItem value="include" className="text-[#10B981]">Include</SelectItem>
+                        <SelectItem value="exclude" className="text-[#EF4444]">Exclude</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              )}
-            </CardContent>
+                <Button 
+                  size="sm" 
+                  onClick={addLatLongPoint}
+                  disabled={!form.geo_latitude || !form.geo_longitude}
+                  className="bg-[#3B82F6] hover:bg-[#2563EB]"
+                >
+                  <Plus className="w-3 h-3 mr-1" /> Add Location Point
+                </Button>
+
+                {form.lat_long_points.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Location Points</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {form.lat_long_points.map((point) => (
+                        <Badge 
+                          key={point.id} 
+                          variant="secondary" 
+                          className={point.type === "include" ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}
+                        >
+                          {point.type === "include" ? "+" : "-"} {point.lat.toFixed(4)}, {point.lon.toFixed(4)} ({point.radius_km}km)
+                          <button onClick={() => updateField("lat_long_points", form.lat_long_points.filter(p => p.id !== point.id))} className="ml-2">×</button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            )}
           </Card>
 
           {/* Telecom Operators */}
@@ -1631,7 +1915,6 @@ export default function CampaignWizard() {
             <div className="space-y-2">
               <Label className="text-[#94A3B8]">Telecom Operators</Label>
               <Select 
-                value={form.telecom_operators[0] || ""} 
                 onValueChange={(v) => {
                   if (v && !form.telecom_operators.includes(v)) {
                     updateField("telecom_operators", [...form.telecom_operators, v]);
@@ -1700,6 +1983,294 @@ export default function CampaignWizard() {
               ))}
             </div>
           </div>
+
+          {/* OS Version Targeting */}
+          {availableOSVersions.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-[#94A3B8]">OS Versions (Minimum)</Label>
+              <Select 
+                onValueChange={(v) => {
+                  if (v && !form.os_versions.includes(v)) {
+                    updateField("os_versions", [...form.os_versions, v]);
+                  }
+                }}
+              >
+                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectValue placeholder="Select minimum OS version" />
+                </SelectTrigger>
+                <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                  {availableOSVersions.map((item) => (
+                    <SelectItem key={item.label} value={item.label} className="text-[#F8FAFC]">
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.os_versions.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.os_versions.map((ver) => (
+                    <Badge key={ver} variant="secondary" className="bg-[#8B5CF6]/20 text-[#8B5CF6]">
+                      {ver}+
+                      <button onClick={() => updateField("os_versions", form.os_versions.filter(v => v !== ver))} className="ml-2">×</button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Language Targeting - Include */}
+          <Card className="surface-secondary border-[#10B981]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#10B981]">Include Languages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select 
+                onValueChange={(v) => {
+                  if (v && !form.languages.includes(v)) {
+                    updateField("languages", [...form.languages, v]);
+                  }
+                }}
+              >
+                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectValue placeholder="Select language to include" />
+                </SelectTrigger>
+                <SelectContent className="surface-primary border-[#2D3B55]">
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code} className="text-[#F8FAFC]">{lang.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.languages.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.languages.map((code) => (
+                    <Badge key={code} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                      {LANGUAGES.find(l => l.code === code)?.name || code}
+                      <button onClick={() => updateField("languages", form.languages.filter(l => l !== code))} className="ml-2">×</button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Language Targeting - Exclude */}
+          <Card className="surface-secondary border-[#EF4444]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#EF4444]">Exclude Languages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select 
+                onValueChange={(v) => {
+                  if (v && !form.languages_exclude.includes(v)) {
+                    updateField("languages_exclude", [...form.languages_exclude, v]);
+                  }
+                }}
+              >
+                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectValue placeholder="Select language to exclude" />
+                </SelectTrigger>
+                <SelectContent className="surface-primary border-[#2D3B55]">
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code} className="text-[#F8FAFC]">{lang.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.languages_exclude.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.languages_exclude.map((code) => (
+                    <Badge key={code} variant="secondary" className="bg-[#EF4444]/20 text-[#EF4444]">
+                      {LANGUAGES.find(l => l.code === code)?.name || code}
+                      <button onClick={() => updateField("languages_exclude", form.languages_exclude.filter(l => l !== code))} className="ml-2">×</button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Inventory Targeting (NEW) */}
+        <TabsContent value="inventory" className="space-y-4 mt-4">
+          {/* Domain/URL Allowlist */}
+          <Card className="surface-secondary border-[#10B981]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#10B981] flex items-center gap-2">
+                <Check className="w-4 h-4" /> Domain/URL Allowlist
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Only show ads on these domains</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="Enter domains (one per line)&#10;example.com&#10;news.example.com"
+                value={form.domain_allowlist.join("\n")}
+                onChange={(e) => updateField("domain_allowlist", e.target.value.split("\n").filter(d => d.trim()))}
+                className="surface-primary border-[#2D3B55] text-[#F8FAFC] min-h-[80px]"
+              />
+              <p className="text-xs text-[#64748B] mt-2">{form.domain_allowlist.length} domains added</p>
+            </CardContent>
+          </Card>
+
+          {/* Domain/URL Blocklist */}
+          <Card className="surface-secondary border-[#EF4444]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#EF4444] flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Domain/URL Blocklist
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Never show ads on these domains</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="Enter domains to block (one per line)"
+                value={form.domain_blocklist.join("\n")}
+                onChange={(e) => updateField("domain_blocklist", e.target.value.split("\n").filter(d => d.trim()))}
+                className="surface-primary border-[#2D3B55] text-[#F8FAFC] min-h-[80px]"
+              />
+              <p className="text-xs text-[#64748B] mt-2">{form.domain_blocklist.length} domains blocked</p>
+            </CardContent>
+          </Card>
+
+          {/* App Allowlist */}
+          <Card className="surface-secondary border-[#10B981]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#10B981] flex items-center gap-2">
+                <Smartphone className="w-4 h-4" /> App Allowlist
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Only show ads in these apps (bundle IDs)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="Enter app bundle IDs (one per line)&#10;com.example.app&#10;com.news.app"
+                value={form.app_allowlist.join("\n")}
+                onChange={(e) => updateField("app_allowlist", e.target.value.split("\n").filter(a => a.trim()))}
+                className="surface-primary border-[#2D3B55] text-[#F8FAFC] min-h-[80px]"
+              />
+              <p className="text-xs text-[#64748B] mt-2">{form.app_allowlist.length} apps added</p>
+            </CardContent>
+          </Card>
+
+          {/* App Blocklist */}
+          <Card className="surface-secondary border-[#EF4444]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#EF4444] flex items-center gap-2">
+                <Smartphone className="w-4 h-4" /> App Blocklist
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Never show ads in these apps</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="Enter app bundle IDs to block (one per line)"
+                value={form.app_blocklist.join("\n")}
+                onChange={(e) => updateField("app_blocklist", e.target.value.split("\n").filter(a => a.trim()))}
+                className="surface-primary border-[#2D3B55] text-[#F8FAFC] min-h-[80px]"
+              />
+              <p className="text-xs text-[#64748B] mt-2">{form.app_blocklist.length} apps blocked</p>
+            </CardContent>
+          </Card>
+
+          {/* Ad Placement Positions */}
+          <div className="space-y-2">
+            <Label className="text-[#94A3B8]">Ad Placement Positions</Label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {AD_POSITIONS.map((pos) => (
+                <div
+                  key={pos.value}
+                  onClick={() => toggleArrayItem("ad_positions", pos.value)}
+                  className={`p-3 rounded-lg cursor-pointer border transition-all ${
+                    form.ad_positions.includes(pos.value)
+                      ? "bg-[#3B82F6]/20 border-[#3B82F6]"
+                      : "surface-primary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                  }`}
+                >
+                  <p className="text-sm font-medium text-[#F8FAFC]">{pos.label}</p>
+                  <p className="text-xs text-[#64748B] mt-1">{pos.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Supply Source Targeting (NEW) */}
+        <TabsContent value="supply" className="space-y-4 mt-4">
+          {/* Include SSPs */}
+          <Card className="surface-secondary border-[#10B981]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#10B981] flex items-center gap-2">
+                <Check className="w-4 h-4" /> Include Supply Sources (SSPs)
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Only bid on inventory from these SSPs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select 
+                onValueChange={(v) => {
+                  if (v && !form.supply_sources_include.includes(v)) {
+                    updateField("supply_sources_include", [...form.supply_sources_include, v]);
+                  }
+                }}
+              >
+                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectValue placeholder="Select SSP to include" />
+                </SelectTrigger>
+                <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                  {SUPPLY_SOURCES.map((ssp) => (
+                    <SelectItem key={ssp.value} value={ssp.value} className="text-[#F8FAFC]">
+                      {ssp.label} - {ssp.desc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.supply_sources_include.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.supply_sources_include.map((ssp) => (
+                    <Badge key={ssp} variant="secondary" className="bg-[#10B981]/20 text-[#10B981]">
+                      {SUPPLY_SOURCES.find(s => s.value === ssp)?.label || ssp}
+                      <button onClick={() => updateField("supply_sources_include", form.supply_sources_include.filter(s => s !== ssp))} className="ml-2">×</button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Exclude SSPs */}
+          <Card className="surface-secondary border-[#EF4444]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#EF4444] flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Exclude Supply Sources (SSPs)
+              </CardTitle>
+              <CardDescription className="text-xs text-[#64748B]">Never bid on inventory from these SSPs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select 
+                onValueChange={(v) => {
+                  if (v && !form.supply_sources_exclude.includes(v)) {
+                    updateField("supply_sources_exclude", [...form.supply_sources_exclude, v]);
+                  }
+                }}
+              >
+                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectValue placeholder="Select SSP to exclude" />
+                </SelectTrigger>
+                <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                  {SUPPLY_SOURCES.map((ssp) => (
+                    <SelectItem key={ssp.value} value={ssp.value} className="text-[#F8FAFC]">
+                      {ssp.label} - {ssp.desc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.supply_sources_exclude.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.supply_sources_exclude.map((ssp) => (
+                    <Badge key={ssp} variant="secondary" className="bg-[#EF4444]/20 text-[#EF4444]">
+                      {SUPPLY_SOURCES.find(s => s.value === ssp)?.label || ssp}
+                      <button onClick={() => updateField("supply_sources_exclude", form.supply_sources_exclude.filter(s => s !== ssp))} className="ml-2">×</button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Contextual Targeting */}
@@ -1799,8 +2370,88 @@ export default function CampaignWizard() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Audience</h2>
-        <p className="text-sm text-[#64748B]">Define demographic and audience targeting</p>
+        <p className="text-sm text-[#64748B]">Define demographic, interest, and audience targeting</p>
       </div>
+
+      {/* Affinity Segments (NEW) */}
+      <Card className="surface-primary border-panel">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#F59E0B]" /> Affinity Segments
+          </CardTitle>
+          <p className="text-xs text-[#64748B]">Target users based on long-term interests and lifestyles</p>
+        </CardHeader>
+        <CardContent>
+          <Select 
+            onValueChange={(v) => {
+              if (v && !form.affinity_segments.includes(v)) {
+                updateField("affinity_segments", [...form.affinity_segments, v]);
+              }
+            }}
+          >
+            <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectValue placeholder="Select affinity segment" />
+            </SelectTrigger>
+            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+              {AFFINITY_SEGMENTS.map((segment) => (
+                <SelectItem key={segment.value} value={segment.value} className="text-[#F8FAFC]">
+                  {segment.label} ({segment.category})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {form.affinity_segments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {form.affinity_segments.map((seg) => (
+                <Badge key={seg} variant="secondary" className="bg-[#F59E0B]/20 text-[#F59E0B]">
+                  {AFFINITY_SEGMENTS.find(s => s.value === seg)?.label || seg}
+                  <button onClick={() => updateField("affinity_segments", form.affinity_segments.filter(s => s !== seg))} className="ml-2">×</button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* In-Market Segments (NEW) */}
+      <Card className="surface-primary border-panel">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+            <Target className="w-4 h-4 text-[#3B82F6]" /> In-Market Segments
+          </CardTitle>
+          <p className="text-xs text-[#64748B]">Target users actively researching or comparing products/services</p>
+        </CardHeader>
+        <CardContent>
+          <Select 
+            onValueChange={(v) => {
+              if (v && !form.in_market_segments.includes(v)) {
+                updateField("in_market_segments", [...form.in_market_segments, v]);
+              }
+            }}
+          >
+            <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectValue placeholder="Select in-market segment" />
+            </SelectTrigger>
+            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+              {IN_MARKET_SEGMENTS.map((segment) => (
+                <SelectItem key={segment.value} value={segment.value} className="text-[#F8FAFC]">
+                  {segment.label} ({segment.category})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {form.in_market_segments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {form.in_market_segments.map((seg) => (
+                <Badge key={seg} variant="secondary" className="bg-[#3B82F6]/20 text-[#3B82F6]">
+                  {IN_MARKET_SEGMENTS.find(s => s.value === seg)?.label || seg}
+                  <button onClick={() => updateField("in_market_segments", form.in_market_segments.filter(s => s !== seg))} className="ml-2">×</button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* First Party Audiences */}
       <Card className="surface-primary border-panel">
@@ -1858,7 +2509,7 @@ export default function CampaignWizard() {
           {form.first_party_audiences.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {form.first_party_audiences.map((aud) => (
-                <Badge key={aud} variant="secondary" className="bg-[#3B82F6]/20 text-[#3B82F6]">
+                <Badge key={aud} variant="secondary" className="bg-[#8B5CF6]/20 text-[#8B5CF6]">
                   {aud}
                   <button onClick={() => updateField("first_party_audiences", form.first_party_audiences.filter(a => a !== aud))} className="ml-2">×</button>
                 </Badge>
@@ -2029,29 +2680,29 @@ export default function CampaignWizard() {
             )}
           </div>
 
-          {/* Languages */}
+          {/* Parental Status (NEW) */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Languages</Label>
+            <Label className="text-[#94A3B8]">Parental Status</Label>
             <Select onValueChange={(v) => {
-              if (v && !form.languages.includes(v)) {
-                updateField("languages", [...form.languages, v]);
+              if (v && !form.parental_status.includes(v)) {
+                updateField("parental_status", [...form.parental_status, v]);
               }
             }}>
               <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
-                <SelectValue placeholder="Select language" />
+                <SelectValue placeholder="Select parental status" />
               </SelectTrigger>
               <SelectContent className="surface-primary border-[#2D3B55]">
-                {LANGUAGES.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code} className="text-[#F8FAFC]">{lang.name}</SelectItem>
+                {PARENTAL_STATUS.map((status) => (
+                  <SelectItem key={status.value} value={status.value} className="text-[#F8FAFC]">{status.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {form.languages.length > 0 && (
+            {form.parental_status.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {form.languages.map((code) => (
-                  <Badge key={code} variant="secondary" className="bg-[#F59E0B]/20 text-[#F59E0B]">
-                    {LANGUAGES.find(l => l.code === code)?.name || code}
-                    <button onClick={() => updateField("languages", form.languages.filter(l => l !== code))} className="ml-2">×</button>
+                {form.parental_status.map((status) => (
+                  <Badge key={status} variant="secondary" className="bg-[#EC4899]/20 text-[#EC4899]">
+                    {PARENTAL_STATUS.find(s => s.value === status)?.label || status}
+                    <button onClick={() => updateField("parental_status", form.parental_status.filter(s => s !== status))} className="ml-2">×</button>
                   </Badge>
                 ))}
               </div>
@@ -2209,7 +2860,12 @@ export default function CampaignWizard() {
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base text-[#F8FAFC]">Frequency Capping</CardTitle>
+            <div>
+              <CardTitle className="text-base text-[#F8FAFC]">Frequency Capping</CardTitle>
+              <CardDescription className="text-[#64748B]">
+                Control how often users see your ads
+              </CardDescription>
+            </div>
             <Switch
               checked={form.frequency_cap_enabled}
               onCheckedChange={(v) => updateField("frequency_cap_enabled", v)}
@@ -2217,9 +2873,39 @@ export default function CampaignWizard() {
           </div>
         </CardHeader>
         {form.frequency_cap_enabled && (
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 space-y-2">
+          <CardContent className="space-y-4">
+            {/* Capping Type */}
+            <div className="space-y-2">
+              <Label className="text-[#94A3B8]">Capping Level</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div
+                  onClick={() => updateField("frequency_cap_type", "user")}
+                  className={`p-3 rounded-lg cursor-pointer border transition-all ${
+                    form.frequency_cap_type === "user"
+                      ? "bg-[#3B82F6]/20 border-[#3B82F6]"
+                      : "surface-secondary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                  }`}
+                >
+                  <p className="text-sm font-medium text-[#F8FAFC]">User Level</p>
+                  <p className="text-xs text-[#64748B]">Cap impressions per unique user (recommended)</p>
+                </div>
+                <div
+                  onClick={() => updateField("frequency_cap_type", "campaign")}
+                  className={`p-3 rounded-lg cursor-pointer border transition-all ${
+                    form.frequency_cap_type === "campaign"
+                      ? "bg-[#8B5CF6]/20 border-[#8B5CF6]"
+                      : "surface-secondary border-[#2D3B55] hover:border-[#8B5CF6]/50"
+                  }`}
+                >
+                  <p className="text-sm font-medium text-[#F8FAFC]">Campaign Level</p>
+                  <p className="text-xs text-[#64748B]">Cap total impressions for campaign</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Primary Cap */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label className="text-[#94A3B8]">Max Impressions</Label>
                 <Input
                   type="number"
@@ -2229,7 +2915,7 @@ export default function CampaignWizard() {
                   className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
                 />
               </div>
-              <div className="flex-1 space-y-2">
+              <div className="space-y-2">
                 <Label className="text-[#94A3B8]">Per</Label>
                 <Select 
                   value={form.frequency_cap_period} 
@@ -2248,6 +2934,41 @@ export default function CampaignWizard() {
                 </Select>
               </div>
             </div>
+
+            {/* Additional User-Level Caps */}
+            {form.frequency_cap_type === "user" && (
+              <Card className="surface-secondary border-[#2D3B55]">
+                <CardContent className="p-4 space-y-4">
+                  <h4 className="text-sm font-medium text-[#F8FAFC]">Additional User-Level Caps</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[#94A3B8]">Daily Cap (per user)</Label>
+                      <Input
+                        type="number"
+                        value={form.frequency_cap_daily}
+                        onChange={(e) => updateField("frequency_cap_daily", parseInt(e.target.value) || 0)}
+                        min={0}
+                        placeholder="0 = no limit"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      />
+                      <p className="text-xs text-[#64748B]">0 = no additional daily limit</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[#94A3B8]">Lifetime Cap (per user)</Label>
+                      <Input
+                        type="number"
+                        value={form.frequency_cap_lifetime}
+                        onChange={(e) => updateField("frequency_cap_lifetime", parseInt(e.target.value) || 0)}
+                        min={0}
+                        placeholder="0 = no limit"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      />
+                      <p className="text-xs text-[#64748B]">0 = no lifetime limit</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </CardContent>
         )}
       </Card>
