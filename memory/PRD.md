@@ -26,7 +26,7 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - Automated Bid Optimization
 - Cross-Campaign Attribution
 - WebSocket Real-time Bid Stream
-- Campaign Creation Wizard (9-step)
+- Campaign Creation Wizard (8-step) - IO step removed
 
 ### Campaign Wizard Enhancements (December 2025)
 
@@ -35,22 +35,27 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - Bid Pricing Type dropdown with CPM, CPC, CPA, CPV, CPCV, CPS options
 
 **Advanced Geographic Targeting:**
-- Include/Exclude logic for countries, states, cities
+- Include/Exclude logic for countries, states, cities, regions, postal codes
 - Hyper-Local Radius Targeting with lat/lon coordinates
 - Include/Exclude type for each radius point
+- Enhanced Exclude Location tab matching Include functionality
 
 **Audience Segments:**
 - Affinity Segments (15 categories: Tech Enthusiasts, Auto Enthusiasts, etc.)
 - In-Market Segments (16 categories: Autos, Real Estate, Travel, etc.)
 
 **Inventory & Supply Control:**
-- Domain/URL Allowlist and Blocklist
-- App Allowlist and Blocklist (bundle IDs)
-- Ad Placement Position targeting (Above Fold, Below Fold, Sticky, etc.)
+- Domain/URL Allowlist and Blocklist with bulk input (CSV upload, comma-separated, line-by-line)
+- App Allowlist and Blocklist (bundle IDs) with bulk input
+- Enhanced Ad Placement Controls:
+  - Display Placements: Above Fold, Below Fold, Unknown (Include/Exclude)
+  - Display in Content: In-article, In-feed, Interstitial, In-banner, Unknown (Include/Exclude)
+  - Native Placements: In-article, In-feed, Peripheral, Recommendation, Unknown (Include/Exclude)
 - Supply Source filtering with Include/Exclude SSPs (14 SSPs)
 
 **Device & Tech Targeting:**
 - OS Version targeting (Android 8-14, iOS 13-18, Windows 7-11, etc.)
+- Browser Include/Exclude targeting (10 browsers: Chrome, Safari, Firefox, Edge, Opera, Samsung Internet, UC Browser, Brave, IE, Other/Unknown)
 - Language Include/Exclude with full language list
 
 **Demographics:**
@@ -60,6 +65,27 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - User Level vs Campaign Level capping
 - Daily and Lifetime caps per user
 - Flexible period options (hour, day, week, month, lifetime)
+
+**Workflow Simplification:**
+- Removed Insertion Orders (IOs) and Line Items from campaign creation
+- Campaign Wizard reduced from 9 to 8 steps
+- IO page removed from platform sidebar and routes
+
+### Creative Management (December 2025)
+
+**Format-Based Organization:**
+- Tabbed interface: All, Display, Video, Native, JS Tags
+- Count badges showing creatives per format
+- Video sub-categories: Pre-roll 15s, Pre-roll 30s, Mid-roll/Other
+
+**Visual Previews:**
+- Card-based layout with aspect-ratio preview areas
+- Display: HTML Banner icons, image previews
+- Video: Play button with duration badge (15s, 30s, etc.)
+- Native: Card preview with icon and title
+- JS Tags: Code icon preview
+- Size badges on all creatives
+- Hover effects with Preview button overlay
 
 ### UI/UX Improvements (Phase 10 - December 2025)
 
@@ -121,10 +147,10 @@ Budget Pacing | Insights | ML Models | Bid Optimizer | A/B Testing |
 Fraud | Audiences | Attribution | Migration
 
 ## Routes
-- `/campaigns/new` - DV360-style Campaign Wizard (9 steps, create)
-- `/campaigns/:id/edit` - DV360-style Campaign Wizard (9 steps, edit)
+- `/campaigns/new` - DV360-style Campaign Wizard (8 steps, create)
+- `/campaigns/:id/edit` - DV360-style Campaign Wizard (8 steps, edit)
 - `/media-planner` - Media Planning & Forecasting
-- `/insertion-orders` - Insertion Orders & Line Items Management
+- `/creatives` - Creative Management with format tabs
 
 ## Campaign Wizard Steps
 1. **Campaign Overview** - Name, IAB Categories, Goals, KPIs
@@ -133,9 +159,8 @@ Fraud | Audiences | Attribution | Migration
 4. **Audience** - Affinity, In-Market, 1st/3rd Party Audiences, Demographics, Lookalike
 5. **Creatives** - Creative Selection
 6. **Schedule & Pacing** - Flight Dates, Frequency Capping, Dayparting
-7. **IO & Line Items** - Insertion Order Configuration, Line Item Management
-8. **Brand Safety** - Safety Level, Blocked Categories/Keywords/Domains
-9. **Measurement** - Conversion Tracking, Attribution Model
+7. **Brand Safety** - Safety Level, Blocked Categories/Keywords/Domains
+8. **Measurement** - Conversion Tracking, Attribution Model
 
 ## Tech Stack
 - **Backend**: FastAPI, Motor, Pydantic, WebSockets
