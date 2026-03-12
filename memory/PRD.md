@@ -361,12 +361,19 @@ Fraud | Audiences | Attribution | Migration
     - Third Party Audiences: Create/Import input + Data Provider segments dropdown
     - All demographic selections converted to dropdowns (Age, Gender, Income, Languages)
 
+### Bug Fixes (March 2026)
+- [x] **Campaign Validation Errors Fixed** - Resolved two validation issues:
+  1. Added missing `bid_price` field to campaign payload (was causing "Field required" error)
+  2. Fixed `latitude`/`longitude` empty string issue - now converts empty strings to `null` (was causing "Input should be a valid number" error)
+
 ### P1 - Upcoming
 - [ ] **Real YouTube & GDN API Integration** - Replace mock forecasting data
 - [ ] CDN integration for video hosting (currently local storage)
+- [ ] **Refactor CampaignWizard.jsx** - Break down 4000+ line file into smaller components
 
 ### P2 - Future
 - [ ] Advanced fraud detection algorithms
+- [ ] Scheduled report delivery (daily/weekly emails)
 
 ## Files Deleted (Phase 11)
 - `/app/frontend/src/pages/CampaignForm.jsx` - Replaced by CampaignWizard.jsx

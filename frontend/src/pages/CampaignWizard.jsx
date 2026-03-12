@@ -1053,6 +1053,7 @@ export default function CampaignWizard() {
     try {
       const campaignData = {
         name: form.name,
+        bid_price: parseFloat(form.bid_price) || 2.0,
         bid_floor: form.bid_floor,
         bid_pricing_type: form.bid_pricing_type,
         currency: form.currency,
@@ -1089,8 +1090,8 @@ export default function CampaignWizard() {
             regions_exclude: form.geo_regions_exclude,
             lat_long_targeting: form.lat_long_targeting,
             lat_long_points: form.lat_long_points,
-            latitude: form.geo_latitude,
-            longitude: form.geo_longitude,
+            latitude: form.geo_latitude ? parseFloat(form.geo_latitude) : null,
+            longitude: form.geo_longitude ? parseFloat(form.geo_longitude) : null,
             radius_km: form.radius_km,
           },
           device: { 
