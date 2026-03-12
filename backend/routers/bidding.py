@@ -453,14 +453,25 @@ async def billing_notification(bid_id: str, price: float = 0.0):
     if bid_log.get("billing_notified"):
         return {"status": "already_notified", "bid_id": bid_id}
     
+    # Get campaign and SSP info for updating stats
+    campaign_id = bid_log.get("campaign_id")
+    ssp_id = bid_log.get("ssp_id")
+    
     await db.bid_logs.update_one(
         {"id": bid_log["id"]},
         {"$set": {"billing_notified": True}}
     )
     
-    logger.info(f"Billing notification processed: bid_id={bid_id}")
+    # Update SSP total_impressions (burl = actual ad render = impression)
+    if ssp_id:
+        await db.ssp_endpoints.update_one(
+            {"id": ssp_id},
+            {"$inc": {"total_impressions": 1}}
+        )
     
-    return {"status": "success", "bid_id": bid_id}
+    logger.info(f"Billing notification processed: bid_id={bid_id}, campaign_id={campaign_id}, ssp_id={ssp_id}")
+    
+    return {"status": "success", "bid_id": bid_id, "campaign_id": campaign_id}
 
 
 # ==================== MIGRATION MATRIX ====================

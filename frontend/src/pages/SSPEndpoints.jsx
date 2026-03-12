@@ -234,7 +234,7 @@ export default function SSPEndpoints() {
                       </Button>
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-4 mt-2 pt-2 border-t border-[#2D3B55]">
+                    <div className="grid grid-cols-5 gap-4 mt-2 pt-2 border-t border-[#2D3B55]">
                       <div>
                         <p className="text-[10px] text-[#64748B] uppercase">Requests</p>
                         <p className="text-sm font-mono text-[#F8FAFC]">{formatNumber(endpoint.total_requests)}</p>
@@ -246,6 +246,10 @@ export default function SSPEndpoints() {
                       <div>
                         <p className="text-[10px] text-[#64748B] uppercase">Wins</p>
                         <p className="text-sm font-mono text-[#10B981]">{formatNumber(endpoint.total_wins)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#64748B] uppercase">Impressions</p>
+                        <p className="text-sm font-mono text-[#8B5CF6]">{formatNumber(endpoint.total_impressions || 0)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#64748B] uppercase">Spend</p>

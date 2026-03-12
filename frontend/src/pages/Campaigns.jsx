@@ -129,6 +129,10 @@ export default function Campaigns() {
           aVal = a.wins || 0;
           bVal = b.wins || 0;
           break;
+        case "impressions":
+          aVal = a.impressions || 0;
+          bVal = b.impressions || 0;
+          break;
         case "created_at":
         default:
           aVal = new Date(a.created_at || 0).getTime();
@@ -381,6 +385,9 @@ export default function Campaigns() {
             <div className="w-20 text-right">
               <SortableHeader label="Wins" sortKey="wins" currentSort={sort} onSort={handleSort} />
             </div>
+            <div className="w-24 text-right">
+              <SortableHeader label="Impressions" sortKey="impressions" currentSort={sort} onSort={handleSort} />
+            </div>
             <div className="w-32 text-right">Actions</div>
           </div>
 
@@ -433,6 +440,11 @@ export default function Campaigns() {
                   {/* Wins */}
                   <div className="w-20 text-right">
                     <p className="text-sm font-mono text-[#10B981]">{formatNumber(campaign.wins)}</p>
+                  </div>
+                  
+                  {/* Impressions */}
+                  <div className="w-24 text-right">
+                    <p className="text-sm font-mono text-[#8B5CF6]">{formatNumber(campaign.impressions || 0)}</p>
                   </div>
                   
                   {/* Actions */}

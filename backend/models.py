@@ -897,6 +897,7 @@ class SSPEndpoint(BaseModel):
     total_requests: int = Field(default=0)
     total_bids: int = Field(default=0)
     total_wins: int = Field(default=0)
+    total_impressions: int = Field(default=0)  # Actual ad renders (burl callbacks)
     total_spend: float = Field(default=0.0)
     
     # Performance metrics
