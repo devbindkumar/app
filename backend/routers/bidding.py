@@ -424,10 +424,10 @@ async def win_notification(bid_id: str, price: float = 0.0):
         impression_cost = win_price / 1000
         await db.ssp_endpoints.update_one(
             {"id": ssp_id},
-            {"$inc": {"total_wins": 1, "total_spend": impression_cost}}
+            {"$inc": {"total_wins": 1, "total_impressions": 1, "total_spend": impression_cost}}
         )
     
-    logger.info(f"Win notification processed: bid_id={bid_id}, price={win_price}")
+    logger.info(f"Win notification processed: bid_id={bid_id}, price={win_price}, campaign={campaign_id}, ssp={ssp_id}")
     
     return {"status": "success", "bid_id": bid_id, "win_price": win_price, "campaign_id": campaign_id}
 
@@ -472,6 +472,135 @@ async def billing_notification(bid_id: str, price: float = 0.0):
     logger.info(f"Billing notification processed: bid_id={bid_id}, campaign_id={campaign_id}, ssp_id={ssp_id}")
     
     return {"status": "success", "bid_id": bid_id, "campaign_id": campaign_id}
+
+
+# ==================== IMPRESSION TRACKING ====================
+
+@router.get("/pixel/{bid_id}")
+async def impression_pixel(bid_id: str, price: float = 0.0):
+    """
+    Impression tracking pixel - embed this in your creative ad markup.
+    Returns a 1x1 transparent GIF.
+    
+    Usage in creative HTML:
+    <img src="https://your-domain/api/pixel/{bid_id}?price={win_price}" width="1" height="1" style="display:none" />
+    """
+    # First try to find by bid_id field
+    bid_log = await db.bid_logs.find_one({"bid_id": bid_id}, {"_id": 0})
+    if not bid_log:
+        bid_log = await db.bid_logs.find_one({"id": bid_id}, {"_id": 0})
+    
+    if bid_log and not bid_log.get("impression_tracked"):
+        campaign_id = bid_log.get("campaign_id")
+        ssp_id = bid_log.get("ssp_id")
+        
+        # Mark impression as tracked
+        await db.bid_logs.update_one(
+            {"id": bid_log["id"]},
+            {"$set": {"impression_tracked": True, "impression_time": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        # Update campaign impressions if not already counted via nurl
+        if campaign_id and not bid_log.get("win_notified"):
+            await db.campaigns.update_one(
+                {"id": campaign_id},
+                {"$inc": {"impressions": 1}}
+            )
+        
+        # Update SSP impressions
+        if ssp_id and not bid_log.get("win_notified"):
+            await db.ssp_endpoints.update_one(
+                {"id": ssp_id},
+                {"$inc": {"total_impressions": 1}}
+            )
+        
+        logger.info(f"Impression tracked via pixel: bid_id={bid_id}, campaign={campaign_id}")
+    
+    # Return 1x1 transparent GIF
+    gif_data = b'GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
+    return Response(content=gif_data, media_type="image/gif")
+
+
+@router.post("/track/impression")
+async def track_impression(bid_id: str, campaign_id: str = None, ssp_id: str = None, price: float = 0.0):
+    """
+    Alternative impression tracking endpoint for server-to-server calls.
+    Can be called with just campaign_id if bid_id is not available.
+    """
+    if bid_id:
+        # Try to find the bid log
+        bid_log = await db.bid_logs.find_one({"bid_id": bid_id}, {"_id": 0})
+        if not bid_log:
+            bid_log = await db.bid_logs.find_one({"id": bid_id}, {"_id": 0})
+        
+        if bid_log:
+            campaign_id = bid_log.get("campaign_id") or campaign_id
+            ssp_id = bid_log.get("ssp_id") or ssp_id
+            
+            await db.bid_logs.update_one(
+                {"id": bid_log["id"]},
+                {"$set": {"impression_tracked": True}}
+            )
+    
+    result = {"status": "success", "bid_id": bid_id}
+    
+    if campaign_id:
+        await db.campaigns.update_one(
+            {"id": campaign_id},
+            {"$inc": {"impressions": 1}}
+        )
+        result["campaign_id"] = campaign_id
+    
+    if ssp_id:
+        await db.ssp_endpoints.update_one(
+            {"id": ssp_id},
+            {"$inc": {"total_impressions": 1}}
+        )
+        result["ssp_id"] = ssp_id
+    
+    logger.info(f"Impression tracked: bid_id={bid_id}, campaign={campaign_id}, ssp={ssp_id}")
+    return result
+
+
+@router.post("/track/bulk-impressions")
+async def track_bulk_impressions(impressions: List[dict]):
+    """
+    Bulk impression tracking for batch processing.
+    
+    Request body:
+    [
+        {"campaign_id": "xxx", "count": 100, "ssp_id": "yyy"},
+        {"campaign_id": "zzz", "count": 50}
+    ]
+    """
+    results = []
+    
+    for imp in impressions:
+        campaign_id = imp.get("campaign_id")
+        ssp_id = imp.get("ssp_id")
+        count = imp.get("count", 1)
+        
+        if campaign_id:
+            await db.campaigns.update_one(
+                {"id": campaign_id},
+                {"$inc": {"impressions": count}}
+            )
+        
+        if ssp_id:
+            await db.ssp_endpoints.update_one(
+                {"id": ssp_id},
+                {"$inc": {"total_impressions": count}}
+            )
+        
+        results.append({
+            "campaign_id": campaign_id,
+            "ssp_id": ssp_id,
+            "count": count,
+            "status": "success"
+        })
+    
+    logger.info(f"Bulk impressions tracked: {len(impressions)} records")
+    return {"status": "success", "results": results}
 
 
 # ==================== MIGRATION MATRIX ====================
