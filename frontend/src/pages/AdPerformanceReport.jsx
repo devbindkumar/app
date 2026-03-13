@@ -3,7 +3,8 @@ import {
   Download, FileSpreadsheet, BarChart3, RefreshCw, Calendar, Filter, Eye, Video,
   MousePointerClick, Users, Target, Layers, Globe, CheckCircle, Loader2,
   AlertCircle, Save, Trash2, Server, Image, Database, BookMarked, Plus,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, Search
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, Search,
+  MapPin, Smartphone, Package, Monitor, Wifi
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -29,29 +30,38 @@ import {
   getCampaigns, getCreatives
 } from "../lib/api";
 
-// Dimensions configuration
+// Dimensions configuration - Extended
 const DIMENSIONS = [
   { id: "campaign_name", label: "Campaign Name", icon: Target, description: "Campaign identifier" },
   { id: "creative_name", label: "Creative Name", icon: Image, description: "Creative asset name" },
   { id: "source", label: "Source", icon: Server, description: "SSP/Exchange source" },
   { id: "domain", label: "Domain", icon: Globe, description: "Publisher domain" },
+  { id: "bundle", label: "Bundle", icon: Package, description: "App bundle ID" },
+  { id: "app_name", label: "App Name", icon: Smartphone, description: "Application name" },
+  { id: "country", label: "Country", icon: Globe, description: "User country" },
+  { id: "city", label: "City", icon: MapPin, description: "User city" },
+  { id: "ip", label: "IP Address", icon: Wifi, description: "User IP address" },
+  { id: "os", label: "OS", icon: Monitor, description: "Operating system" },
+  { id: "make", label: "Make", icon: Smartphone, description: "Device manufacturer" },
 ];
 
-// Metrics configuration
+// Metrics configuration - Selectable
 const PERFORMANCE_METRICS = [
-  { id: "impressions", label: "Impressions", icon: Eye, color: "#3B82F6" },
-  { id: "clicks", label: "Clicks", icon: MousePointerClick, color: "#F59E0B" },
-  { id: "ctr", label: "CTR", icon: Target, color: "#8B5CF6" },
-  { id: "conversions", label: "Conversions", icon: CheckCircle, color: "#EC4899" },
+  { id: "impressions", label: "Impressions", icon: Eye, color: "#3B82F6", default: true },
+  { id: "clicks", label: "Clicks", icon: MousePointerClick, color: "#F59E0B", default: true },
+  { id: "ctr", label: "CTR", icon: Target, color: "#8B5CF6", default: true },
+  { id: "conversions", label: "Conversions", icon: CheckCircle, color: "#EC4899", default: true },
 ];
 
 const VIDEO_METRICS = [
-  { id: "video_q1_25", label: "Q1 (25%)", color: "#06B6D4" },
-  { id: "video_q2_50", label: "Q2 (50%)", color: "#14B8A6" },
-  { id: "video_q3_75", label: "Q3 (75%)", color: "#22C55E" },
-  { id: "video_completed_100", label: "Completed (100%)", color: "#10B981" },
-  { id: "video_completion_rate", label: "Completion Rate", color: "#059669" },
+  { id: "video_q1_25", label: "Q1 (25%)", color: "#06B6D4", default: true },
+  { id: "video_q2_50", label: "Q2 (50%)", color: "#14B8A6", default: true },
+  { id: "video_q3_75", label: "Q3 (75%)", color: "#22C55E", default: true },
+  { id: "video_completed_100", label: "Completed (100%)", color: "#10B981", default: true },
+  { id: "video_completion_rate", label: "Completion Rate", color: "#059669", default: true },
 ];
+
+const ALL_METRICS = [...PERFORMANCE_METRICS, ...VIDEO_METRICS];
 
 const TEMPLATE_ICONS = {
   BarChart3, Video, Globe, Image, Server, Target, Users,
@@ -126,6 +136,7 @@ function TemplateCard({ template, onApply, onDelete, isCustom }) {
 export default function AdPerformanceReport() {
   // State
   const [selectedDimensions, setSelectedDimensions] = useState(["campaign_name", "creative_name", "source", "domain"]);
+  const [selectedMetrics, setSelectedMetrics] = useState(ALL_METRICS.map(m => m.id));
   const [startDate, setStartDate] = useState(() => {
     const d = new Date(); d.setDate(d.getDate() - 30);
     return d.toISOString().split('T')[0];
@@ -190,8 +201,25 @@ export default function AdPerformanceReport() {
     }
   };
 
+  const toggleMetric = (metricId) => {
+    if (selectedMetrics.includes(metricId)) {
+      if (selectedMetrics.length > 1) {
+        setSelectedMetrics(selectedMetrics.filter(m => m !== metricId));
+      }
+    } else {
+      setSelectedMetrics([...selectedMetrics, metricId]);
+    }
+  };
+
+  const selectAllMetrics = () => setSelectedMetrics(ALL_METRICS.map(m => m.id));
+  const selectPerformanceMetrics = () => setSelectedMetrics(PERFORMANCE_METRICS.map(m => m.id));
+  const selectVideoMetrics = () => setSelectedMetrics(VIDEO_METRICS.map(m => m.id));
+
   const applyTemplate = (template) => {
     setSelectedDimensions(template.dimensions);
+    if (template.metrics) {
+      setSelectedMetrics(template.metrics);
+    }
     setActiveTab("config");
     toast.success(`Applied template: ${template.name}`);
   };
@@ -202,7 +230,7 @@ export default function AdPerformanceReport() {
       return;
     }
     try {
-      await saveReportTemplate(newTemplateName, newTemplateDesc || `Custom template`, selectedDimensions);
+      await saveReportTemplate(newTemplateName, newTemplateDesc || `Custom template`, selectedDimensions, selectedMetrics);
       toast.success("Template saved");
       setShowSaveDialog(false);
       setNewTemplateName("");
@@ -230,6 +258,7 @@ export default function AdPerformanceReport() {
       setLoading(true);
       const response = await generateAdPerformanceReport(
         selectedDimensions,
+        selectedMetrics,
         startDate,
         endDate,
         10000, // Get all rows
@@ -338,23 +367,26 @@ export default function AdPerformanceReport() {
     return `${(num * 100).toFixed(2)}%`;
   };
 
-  // Column headers for the table
-  const columns = [
-    ...selectedDimensions.map(dim => ({
+  // Column headers for the table - dynamically based on selected metrics
+  const columns = useMemo(() => {
+    const dimCols = selectedDimensions.map(dim => ({
       key: dim,
       label: DIMENSIONS.find(d => d.id === dim)?.label || dim,
       sortable: true
-    })),
-    { key: "impressions", label: "Impressions", sortable: true },
-    { key: "clicks", label: "Clicks", sortable: true },
-    { key: "ctr", label: "CTR", sortable: true, format: formatPercent },
-    { key: "conversions", label: "Conversions", sortable: true },
-    { key: "video_q1_25", label: "Q1 (25%)", sortable: true },
-    { key: "video_q2_50", label: "Q2 (50%)", sortable: true },
-    { key: "video_q3_75", label: "Q3 (75%)", sortable: true },
-    { key: "video_completed_100", label: "Completed", sortable: true },
-    { key: "video_completion_rate", label: "Completion Rate", sortable: true, format: formatPercent },
-  ];
+    }));
+    
+    const metricCols = selectedMetrics.map(metricId => {
+      const metric = ALL_METRICS.find(m => m.id === metricId);
+      return {
+        key: metricId,
+        label: metric?.label || metricId,
+        sortable: true,
+        format: metricId.includes('rate') || metricId === 'ctr' ? formatPercent : null
+      };
+    });
+    
+    return [...dimCols, ...metricCols];
+  }, [selectedDimensions, selectedMetrics]);
 
   return (
     <div className="p-6" data-testid="ad-performance-report-page">
