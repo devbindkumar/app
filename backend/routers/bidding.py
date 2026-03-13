@@ -357,9 +357,9 @@ async def adjust_bid_shading(campaign_id: str, current_win_rate: float, shading_
     )
 
 
-@router.post("/notify/win/{bid_id}")
+@router.api_route("/notify/win/{bid_id}", methods=["GET", "POST"])
 async def win_notification(bid_id: str, price: float = 0.0):
-    """Handle win notification (nurl callback)"""
+    """Handle win notification (nurl callback) - Supports both GET and POST"""
     # First try to find by bid_id field
     bid_log = await db.bid_logs.find_one({"bid_id": bid_id}, {"_id": 0})
     if not bid_log:
@@ -432,9 +432,9 @@ async def win_notification(bid_id: str, price: float = 0.0):
     return {"status": "success", "bid_id": bid_id, "win_price": win_price, "campaign_id": campaign_id}
 
 
-@router.post("/notify/billing/{bid_id}")
+@router.api_route("/notify/billing/{bid_id}", methods=["GET", "POST"])
 async def billing_notification(bid_id: str, price: float = 0.0):
-    """Handle billing notification (burl callback)"""
+    """Handle billing notification (burl callback) - Supports both GET and POST"""
     # First try to find by bid_id field
     bid_log = await db.bid_logs.find_one({"bid_id": bid_id}, {"_id": 0})
     if not bid_log:
@@ -521,10 +521,11 @@ async def impression_pixel(bid_id: str, price: float = 0.0):
     return Response(content=gif_data, media_type="image/gif")
 
 
-@router.post("/track/impression")
-async def track_impression(bid_id: str, campaign_id: str = None, ssp_id: str = None, price: float = 0.0):
+@router.api_route("/track/impression", methods=["GET", "POST"])
+async def track_impression(bid_id: str = None, campaign_id: str = None, ssp_id: str = None, price: float = 0.0):
     """
     Alternative impression tracking endpoint for server-to-server calls.
+    Supports both GET and POST methods.
     Can be called with just campaign_id if bid_id is not available.
     """
     if bid_id:
