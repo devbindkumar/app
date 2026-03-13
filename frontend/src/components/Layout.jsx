@@ -30,7 +30,7 @@ import { Switch } from "./ui/switch";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/campaigns", icon: Megaphone, label: "Campaigns" },
+  { to: "/campaigns", icon: Megaphone, label: "Campaigns", end: true },
   { to: "/campaigns/compare", icon: Scale, label: "Compare" },
   { to: "/media-planner", icon: Target, label: "Media Planner" },
   { to: "/creatives", icon: Image, label: "Creatives" },
@@ -38,7 +38,7 @@ const navItems = [
   { to: "/ssp-analytics", icon: PieChart, label: "SSP Analytics" },
   { to: "/bid-logs", icon: ScrollText, label: "Bid Logs" },
   { to: "/bid-stream", icon: Activity, label: "Bid Stream" },
-  { to: "/reports", icon: BarChart3, label: "Reports" },
+  { to: "/reports", icon: BarChart3, label: "Reports", end: true },
   { to: "/reports/ad-performance", icon: FileSpreadsheet, label: "Ad Performance" },
   { to: "/pacing", icon: Gauge, label: "Budget Pacing" },
   { to: "/insights", icon: Lightbulb, label: "Insights" },
@@ -88,6 +88,7 @@ export default function Layout() {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
               className={({ isActive }) =>
                 cn(
