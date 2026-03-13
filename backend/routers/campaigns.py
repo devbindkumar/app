@@ -11,7 +11,7 @@ from routers.shared import db
 router = APIRouter(tags=["Campaigns"])
 
 
-@router.get("/campaigns", response_model=List[Campaign])
+@router.get("/campaigns")
 async def get_campaigns(status: Optional[str] = None):
     """Get all campaigns"""
     query = {}

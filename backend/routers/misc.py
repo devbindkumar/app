@@ -920,14 +920,23 @@ async def seed_sample_data():
         {"id": str(uuid.uuid4()), "name": "Display Prospecting", "status": "active", "goal": "prospecting"},
     ]
     
-    for campaign in campaigns:
+    for i, campaign in enumerate(campaigns):
+        # Assign a creative to each campaign
+        creative = creatives[i % len(creatives)] if creatives else {"id": "default"}
+        campaign["creative_id"] = creative.get("id", "default")
         campaign["budget"] = {"total_budget": 10000, "daily_budget": 500, "total_spend": 0, "daily_spend": 0}
-        campaign["bid_price"] = random.uniform(1.5, 5.0)
+        campaign["bid_price"] = round(random.uniform(1.5, 5.0), 2)
+        campaign["bid_floor"] = 0.1
+        campaign["currency"] = "USD"
+        campaign["priority"] = 1
+        campaign["placements"] = []
+        campaign["targeting"] = {}
         campaign["impressions"] = 0
         campaign["clicks"] = 0
         campaign["bids"] = 0
         campaign["wins"] = 0
         campaign["created_at"] = datetime.now(timezone.utc).isoformat()
+        campaign["updated_at"] = datetime.now(timezone.utc).isoformat()
         existing = await db.campaigns.find_one({"name": campaign["name"]})
         if not existing:
             await db.campaigns.insert_one(campaign)

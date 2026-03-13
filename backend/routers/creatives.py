@@ -10,7 +10,7 @@ from routers.shared import db
 router = APIRouter(tags=["Creatives"])
 
 
-@router.get("/creatives", response_model=List[Creative])
+@router.get("/creatives")
 async def get_creatives(type: Optional[str] = None):
     """Get all creatives"""
     query = {}
