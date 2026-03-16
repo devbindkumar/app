@@ -328,27 +328,10 @@ export default function AdPerformanceReport() {
       );
     }
     
-    // Apply campaign filter (only if not already filtered by API)
-    // Note: If selectedCampaign was passed to API, data is already filtered
-    // This is for client-side filtering of "all" data or post-fetch filtering
-    if (selectedCampaign !== "all") {
-      const campaignName = campaigns.find(c => c.id === selectedCampaign)?.name;
-      filtered = filtered.filter(row => 
-        row.campaign_id === selectedCampaign || 
-        row.campaign_name === selectedCampaign ||
-        row.campaign_name === campaignName
-      );
-    }
-    
-    // Apply creative filter (only if not already filtered by API)
-    if (selectedCreative !== "all") {
-      const creativeName = creatives.find(c => c.id === selectedCreative)?.name;
-      filtered = filtered.filter(row => 
-        row.creative_id === selectedCreative || 
-        row.creative_name === selectedCreative ||
-        row.creative_name === creativeName
-      );
-    }
+    // Note: Campaign and Creative filters are already applied server-side via API params
+    // We only need client-side filtering if user changes filter AFTER generating report
+    // But since we regenerate on filter change, we can skip client-side filtering
+    // This prevents double-filtering issues where campaign lookup might fail
     
     // Sort
     filtered.sort((a, b) => {
@@ -363,7 +346,7 @@ export default function AdPerformanceReport() {
     });
     
     return filtered;
-  }, [reportData, searchTerm, selectedCampaign, selectedCreative, sortColumn, sortDirection, campaigns, creatives]);
+  }, [reportData, searchTerm, sortColumn, sortDirection]);
 
   // Calculate totals from filtered data
   const totals = useMemo(() => {
@@ -742,7 +725,7 @@ export default function AdPerformanceReport() {
                       <SelectContent className="surface-primary border-[#2D3B55]">
                         <SelectItem value="all" className="text-[#F8FAFC]">All Campaigns</SelectItem>
                         {campaigns.map((c) => (
-                          <SelectItem key={c.id} value={c.name} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -755,7 +738,7 @@ export default function AdPerformanceReport() {
                       <SelectContent className="surface-primary border-[#2D3B55]">
                         <SelectItem value="all" className="text-[#F8FAFC]">All Creatives</SelectItem>
                         {creatives.map((c) => (
-                          <SelectItem key={c.id} value={c.name} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
