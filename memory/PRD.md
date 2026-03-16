@@ -388,6 +388,13 @@ Fraud | Audiences | Attribution | Migration
 - [x] **Campaign Validation Errors Fixed** - Resolved two validation issues:
   1. Added missing `bid_price` field to campaign payload (was causing "Field required" error)
   2. Fixed `latitude`/`longitude` empty string issue - now converts empty strings to `null` (was causing "Input should be a valid number" error)
+- [x] **Integer Input '0' Prefix Bug Fixed** - Created custom NumberInput component (`/app/frontend/src/components/ui/number-input.jsx`) to handle numeric inputs correctly without prepending '0'
+- [x] **India Geo-Targeting Enhancement** - Implemented comprehensive India states and tiered cities (Tier 1/2/3) in targeting step
+- [x] **Creative Preview Not Working** - Fixed preview modal to handle missing `ad_markup` or `image_url` gracefully
+- [x] **Campaign KPI Not Saving** - Fixed form hook to properly load `kpi_target` value for existing campaigns
+- [x] **Bid Stream Total Requests Bug Fixed (P0)** - Added global `bid_stream_stats` counter that syncs from `ssp_endpoints` collection. Frontend now uses server-provided stats instead of local array length. Shows accurate total requests (47,588 vs previous stuck ~50)
+- [x] **SSP Analytics Spend Calculation Fixed (P1)** - Fixed corrupt spend data ($561.25 → $0.59). Added `POST /api/ssp-analytics/recalculate-stats` endpoint to recalculate from bid_logs using correct formula: `sum(win_price/1000)`. Old bug was adding full CPM value instead of CPM/1000 per impression
+- [x] **Ad Performance Report Data Accuracy Verified (P2)** - Confirmed dimensions (source, domain, bundle, app_name, ip, device_ifa) are correctly pulled from `request_summary` in bid_logs. "Unknown" domain for app inventory is expected (apps have bundles, not domains)
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
