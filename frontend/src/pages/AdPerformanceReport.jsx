@@ -391,6 +391,16 @@ export default function AdPerformanceReport() {
     return `${num.toFixed(2)}%`;
   };
 
+  const formatSpend = (num) => {
+    if (num === undefined || num === null) return '$0.00000';
+    return `$${num.toFixed(5)}`;
+  };
+
+  const formatCurrency = (num) => {
+    if (num === undefined || num === null) return '$0.00';
+    return `$${num.toFixed(2)}`;
+  };
+
   // Column headers for the table - dynamically based on selected metrics
   const columns = useMemo(() => {
     const dimCols = selectedDimensions.map(dim => ({
@@ -401,11 +411,22 @@ export default function AdPerformanceReport() {
     
     const metricCols = selectedMetrics.map(metricId => {
       const metric = ALL_METRICS.find(m => m.id === metricId);
+      let format = null;
+      
+      // Apply appropriate format based on metric type
+      if (metricId.includes('rate') || metricId === 'ctr' || metricId === 'vtr') {
+        format = formatPercent;
+      } else if (metricId === 'spend') {
+        format = formatSpend;
+      } else if (metricId === 'ecpm' || metricId === 'cpc' || metricId === 'cpv') {
+        format = formatCurrency;
+      }
+      
       return {
         key: metricId,
         label: metric?.label || metricId,
         sortable: true,
-        format: metricId.includes('rate') || metricId === 'ctr' ? formatPercent : null
+        format
       };
     });
     
@@ -718,7 +739,29 @@ export default function AdPerformanceReport() {
                     </div>
 
                     {/* Campaign Filter */}
-                    <Select value={selectedCampaign} onValueChange={(v) => { setSelectedCampaign(v); setCurrentPage(1); }}>
+                    <Select value={selectedCampaign} onValueChange={async (v) => { 
+                      setSelectedCampaign(v); 
+                      setCurrentPage(1);
+                      // Auto-regenerate report with new filter
+                      try {
+                        setLoading(true);
+                        const response = await generateAdPerformanceReport(
+                          selectedDimensions,
+                          selectedMetrics,
+                          startDate,
+                          endDate,
+                          10000,
+                          useRealData,
+                          v !== "all" ? v : null,
+                          selectedCreative !== "all" ? selectedCreative : null
+                        );
+                        setReportData(response.data);
+                      } catch (error) {
+                        toast.error("Failed to refresh report");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}>
                       <SelectTrigger className="w-[200px] surface-primary border-[#2D3B55] text-[#F8FAFC]">
                         <SelectValue placeholder="All Campaigns" />
                       </SelectTrigger>
@@ -731,7 +774,29 @@ export default function AdPerformanceReport() {
                     </Select>
 
                     {/* Creative Filter */}
-                    <Select value={selectedCreative} onValueChange={(v) => { setSelectedCreative(v); setCurrentPage(1); }}>
+                    <Select value={selectedCreative} onValueChange={async (v) => { 
+                      setSelectedCreative(v); 
+                      setCurrentPage(1);
+                      // Auto-regenerate report with new filter
+                      try {
+                        setLoading(true);
+                        const response = await generateAdPerformanceReport(
+                          selectedDimensions,
+                          selectedMetrics,
+                          startDate,
+                          endDate,
+                          10000,
+                          useRealData,
+                          selectedCampaign !== "all" ? selectedCampaign : null,
+                          v !== "all" ? v : null
+                        );
+                        setReportData(response.data);
+                      } catch (error) {
+                        toast.error("Failed to refresh report");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}>
                       <SelectTrigger className="w-[200px] surface-primary border-[#2D3B55] text-[#F8FAFC]">
                         <SelectValue placeholder="All Creatives" />
                       </SelectTrigger>
