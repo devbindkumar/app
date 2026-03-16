@@ -2,6 +2,7 @@ import { Lightbulb } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { NumberInput } from "../../../components/ui/number-input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Badge } from "../../../components/ui/badge";
@@ -115,11 +116,11 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
             </div>
             <div className="space-y-2">
               <Label className="text-[#94A3B8]">Target {form.kpi_type.toUpperCase()}</Label>
-              <Input
-                type="number"
+              <NumberInput
                 value={form.kpi_target}
                 onChange={(e) => updateField("kpi_target", parseFloat(e.target.value) || 0)}
                 className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                min={0}
               />
             </div>
           </div>

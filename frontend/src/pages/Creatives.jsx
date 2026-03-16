@@ -337,6 +337,15 @@ function CreativePreview({ creative, onClose }) {
         <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p>No preview available for this creative</p>
         <p className="text-xs mt-1">Creative type: {creative.type}</p>
+        <p className="text-xs mt-1 text-[#F59E0B]">Missing: {
+          creative.type === 'banner' ? 
+            (!creative.banner_data?.image_url && !creative.banner_data?.ad_markup ? 'image_url or ad_markup' : 'creative data') :
+          creative.type === 'video' ?
+            (!creative.video_data?.video_url && !creative.video_data?.vast_tag ? 'video_url or vast_tag' : 'video data') :
+          creative.type === 'native' ?
+            (!creative.native_data ? 'native data' : 'native content') :
+          'creative content'
+        }</p>
       </div>
     );
   };

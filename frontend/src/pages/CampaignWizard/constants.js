@@ -187,10 +187,204 @@ export const COUNTRIES = [
 
 export const COUNTRY_STATES = {
   USA: ["California", "Texas", "Florida", "New York", "Illinois", "Pennsylvania", "Ohio", "Georgia", "North Carolina", "Michigan"],
-  IND: ["Maharashtra", "Karnataka", "Tamil Nadu", "Uttar Pradesh", "Gujarat", "Rajasthan", "West Bengal", "Andhra Pradesh", "Telangana", "Kerala"],
+  IND: [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", 
+    "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
+    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", 
+    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
+    "Uttar Pradesh", "Uttarakhand", "West Bengal",
+    // Union Territories
+    "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", 
+    "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  ],
   GBR: ["England", "Scotland", "Wales", "Northern Ireland"],
   CAN: ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba", "Saskatchewan"],
   AUS: ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia"],
+};
+
+// India State-wise Cities with Tier Classification
+export const INDIA_STATE_CITIES = {
+  "Andhra Pradesh": {
+    tier1: ["Visakhapatnam", "Vijayawada"],
+    tier2: ["Guntur", "Nellore", "Kurnool", "Rajahmundry", "Tirupati", "Kakinada"],
+    tier3: ["Kadapa", "Anantapur", "Eluru", "Ongole", "Vizianagaram", "Machilipatnam"]
+  },
+  "Arunachal Pradesh": {
+    tier1: [],
+    tier2: ["Itanagar"],
+    tier3: ["Naharlagun", "Pasighat", "Tawang"]
+  },
+  "Assam": {
+    tier1: ["Guwahati"],
+    tier2: ["Silchar", "Dibrugarh", "Jorhat", "Nagaon"],
+    tier3: ["Tezpur", "Tinsukia", "Bongaigaon", "Dhubri"]
+  },
+  "Bihar": {
+    tier1: ["Patna"],
+    tier2: ["Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"],
+    tier3: ["Purnia", "Arrah", "Begusarai", "Katihar", "Munger", "Chhapra"]
+  },
+  "Chhattisgarh": {
+    tier1: ["Raipur"],
+    tier2: ["Bhilai", "Bilaspur", "Korba", "Durg"],
+    tier3: ["Rajnandgaon", "Raigarh", "Jagdalpur", "Ambikapur"]
+  },
+  "Goa": {
+    tier1: [],
+    tier2: ["Panaji", "Margao", "Vasco da Gama"],
+    tier3: ["Mapusa", "Ponda", "Bicholim"]
+  },
+  "Gujarat": {
+    tier1: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+    tier2: ["Bhavnagar", "Jamnagar", "Junagadh", "Gandhinagar", "Anand"],
+    tier3: ["Nadiad", "Morbi", "Mehsana", "Bharuch", "Vapi", "Navsari", "Veraval"]
+  },
+  "Haryana": {
+    tier1: ["Gurugram", "Faridabad"],
+    tier2: ["Panipat", "Ambala", "Yamunanagar", "Rohtak", "Hisar", "Karnal"],
+    tier3: ["Sonipat", "Panchkula", "Bhiwani", "Sirsa", "Bahadurgarh", "Jind"]
+  },
+  "Himachal Pradesh": {
+    tier1: [],
+    tier2: ["Shimla", "Dharamshala", "Solan"],
+    tier3: ["Mandi", "Palampur", "Baddi", "Nahan", "Kullu", "Hamirpur"]
+  },
+  "Jharkhand": {
+    tier1: ["Ranchi", "Jamshedpur"],
+    tier2: ["Dhanbad", "Bokaro", "Hazaribagh"],
+    tier3: ["Deoghar", "Giridih", "Ramgarh", "Phusro", "Medininagar"]
+  },
+  "Karnataka": {
+    tier1: ["Bengaluru", "Mysuru"],
+    tier2: ["Hubli-Dharwad", "Mangaluru", "Belagavi", "Davangere", "Ballari"],
+    tier3: ["Shimoga", "Tumkur", "Gulbarga", "Udupi", "Hassan", "Bidar", "Raichur"]
+  },
+  "Kerala": {
+    tier1: ["Kochi", "Thiruvananthapuram"],
+    tier2: ["Kozhikode", "Thrissur", "Kollam", "Kannur", "Alappuzha"],
+    tier3: ["Kottayam", "Palakkad", "Malappuram", "Kasaragod", "Pathanamthitta"]
+  },
+  "Madhya Pradesh": {
+    tier1: ["Indore", "Bhopal"],
+    tier2: ["Jabalpur", "Gwalior", "Ujjain", "Sagar"],
+    tier3: ["Dewas", "Satna", "Ratlam", "Rewa", "Murwara", "Singrauli", "Burhanpur"]
+  },
+  "Maharashtra": {
+    tier1: ["Mumbai", "Pune", "Nagpur"],
+    tier2: ["Nashik", "Aurangabad", "Solapur", "Thane", "Kolhapur", "Navi Mumbai"],
+    tier3: ["Amravati", "Nanded", "Sangli", "Malegaon", "Jalgaon", "Akola", "Latur", "Dhule", "Ahmednagar"]
+  },
+  "Manipur": {
+    tier1: [],
+    tier2: ["Imphal"],
+    tier3: ["Thoubal", "Bishnupur", "Churachandpur"]
+  },
+  "Meghalaya": {
+    tier1: [],
+    tier2: ["Shillong"],
+    tier3: ["Tura", "Jowai", "Nongstoin"]
+  },
+  "Mizoram": {
+    tier1: [],
+    tier2: ["Aizawl"],
+    tier3: ["Lunglei", "Champhai", "Serchhip"]
+  },
+  "Nagaland": {
+    tier1: [],
+    tier2: ["Dimapur", "Kohima"],
+    tier3: ["Mokokchung", "Tuensang", "Wokha"]
+  },
+  "Odisha": {
+    tier1: ["Bhubaneswar"],
+    tier2: ["Cuttack", "Rourkela", "Berhampur", "Sambalpur"],
+    tier3: ["Puri", "Balasore", "Bhadrak", "Baripada", "Jharsuguda", "Jeypore", "Angul"]
+  },
+  "Punjab": {
+    tier1: ["Ludhiana", "Amritsar"],
+    tier2: ["Jalandhar", "Patiala", "Bathinda"],
+    tier3: ["Mohali", "Pathankot", "Hoshiarpur", "Moga", "Batala", "Abohar", "Malerkotla"]
+  },
+  "Rajasthan": {
+    tier1: ["Jaipur", "Jodhpur"],
+    tier2: ["Kota", "Bikaner", "Ajmer", "Udaipur", "Bhilwara"],
+    tier3: ["Alwar", "Bharatpur", "Sikar", "Pali", "Sri Ganganagar", "Beawar", "Kishangarh"]
+  },
+  "Sikkim": {
+    tier1: [],
+    tier2: ["Gangtok"],
+    tier3: ["Namchi", "Gyalshing", "Mangan"]
+  },
+  "Tamil Nadu": {
+    tier1: ["Chennai", "Coimbatore", "Madurai"],
+    tier2: ["Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Vellore"],
+    tier3: ["Erode", "Thoothukudi", "Dindigul", "Thanjavur", "Ranipet", "Sivakasi", "Karur", "Hosur"]
+  },
+  "Telangana": {
+    tier1: ["Hyderabad"],
+    tier2: ["Warangal", "Nizamabad", "Karimnagar", "Khammam"],
+    tier3: ["Ramagundam", "Mahbubnagar", "Nalgonda", "Adilabad", "Suryapet", "Miryalaguda"]
+  },
+  "Tripura": {
+    tier1: [],
+    tier2: ["Agartala"],
+    tier3: ["Udaipur", "Dharmanagar", "Kailashahar"]
+  },
+  "Uttar Pradesh": {
+    tier1: ["Lucknow", "Kanpur", "Noida", "Ghaziabad"],
+    tier2: ["Agra", "Varanasi", "Meerut", "Allahabad", "Bareilly", "Aligarh", "Moradabad"],
+    tier3: ["Gorakhpur", "Saharanpur", "Jhansi", "Firozabad", "Muzaffarnagar", "Mathura", "Rampur", "Shahjahanpur"]
+  },
+  "Uttarakhand": {
+    tier1: ["Dehradun"],
+    tier2: ["Haridwar", "Roorkee", "Haldwani"],
+    tier3: ["Rudrapur", "Kashipur", "Rishikesh", "Nainital", "Mussoorie"]
+  },
+  "West Bengal": {
+    tier1: ["Kolkata"],
+    tier2: ["Asansol", "Siliguri", "Durgapur", "Howrah"],
+    tier3: ["Bardhaman", "Malda", "Baharampur", "Habra", "Kharagpur", "Shantipur", "Dankuni"]
+  },
+  "Delhi": {
+    tier1: ["New Delhi", "Delhi"],
+    tier2: [],
+    tier3: []
+  },
+  "Chandigarh": {
+    tier1: ["Chandigarh"],
+    tier2: [],
+    tier3: []
+  },
+  "Puducherry": {
+    tier1: [],
+    tier2: ["Puducherry"],
+    tier3: ["Karaikal", "Mahe", "Yanam"]
+  },
+  "Jammu and Kashmir": {
+    tier1: [],
+    tier2: ["Srinagar", "Jammu"],
+    tier3: ["Anantnag", "Baramulla", "Sopore", "Kathua", "Udhampur"]
+  },
+  "Ladakh": {
+    tier1: [],
+    tier2: ["Leh"],
+    tier3: ["Kargil"]
+  },
+  "Andaman and Nicobar Islands": {
+    tier1: [],
+    tier2: ["Port Blair"],
+    tier3: []
+  },
+  "Dadra and Nagar Haveli and Daman and Diu": {
+    tier1: [],
+    tier2: ["Silvassa", "Daman"],
+    tier3: ["Diu"]
+  },
+  "Lakshadweep": {
+    tier1: [],
+    tier2: ["Kavaratti"],
+    tier3: []
+  }
 };
 
 export const COUNTRY_CITIES = {

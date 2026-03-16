@@ -45,6 +45,7 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
           description: c.description || "",
           primary_goal: c.primary_goal || "brand_awareness",
           kpi_type: c.kpi_type || "cpm",
+          kpi_target: c.kpi_target || 0,
           bid_price: c.bid_price || 2.0,
           bid_floor: c.bid_floor || 0.5,
           currency: c.currency || "USD",

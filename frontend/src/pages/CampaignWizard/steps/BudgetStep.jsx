@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
+import { NumberInput } from "../../../components/ui/number-input";
 import { Label } from "../../../components/ui/label";
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
@@ -51,21 +52,21 @@ export function BudgetStep({ form, updateField, forecast }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label className="text-[#94A3B8]">Daily Budget ($) *</Label>
-          <Input
-            type="number"
+          <NumberInput
             value={form.daily_budget}
             onChange={(e) => updateField("daily_budget", parseFloat(e.target.value) || 0)}
             className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
             data-testid="daily-budget-input"
+            min={0}
           />
         </div>
         <div className="space-y-2">
           <Label className="text-[#94A3B8]">Total Budget ($)</Label>
-          <Input
-            type="number"
+          <NumberInput
             value={form.total_budget}
             onChange={(e) => updateField("total_budget", parseFloat(e.target.value) || 0)}
             className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+            min={0}
           />
         </div>
       </div>
@@ -90,12 +91,12 @@ export function BudgetStep({ form, updateField, forecast }) {
       {/* Bid Floor */}
       <div className="space-y-2">
         <Label className="text-[#94A3B8]">Bid Floor ({form.currency})</Label>
-        <Input
-          type="number"
+        <NumberInput
           step="0.01"
           value={form.bid_floor}
           onChange={(e) => updateField("bid_floor", parseFloat(e.target.value) || 0)}
           className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+          min={0}
         />
         <p className="text-xs text-[#64748B]">Minimum price to participate in auctions</p>
       </div>
@@ -103,12 +104,12 @@ export function BudgetStep({ form, updateField, forecast }) {
       {/* Bid Price (Hidden but important for submission) */}
       <div className="space-y-2">
         <Label className="text-[#94A3B8]">Bid Price ({form.currency})</Label>
-        <Input
-          type="number"
+        <NumberInput
           step="0.01"
           value={form.bid_price}
           onChange={(e) => updateField("bid_price", parseFloat(e.target.value) || 0)}
           className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+          min={0}
         />
         <p className="text-xs text-[#64748B]">Your maximum bid for impressions</p>
       </div>

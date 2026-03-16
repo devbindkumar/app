@@ -3,6 +3,7 @@ import { Check, Trash2, Plus, Upload, X, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { NumberInput } from "../../../components/ui/number-input";
 import { Label } from "../../../components/ui/label";
 import { Badge } from "../../../components/ui/badge";
 import { Switch } from "../../../components/ui/switch";
@@ -13,7 +14,7 @@ import {
 } from "../../../components/ui/select";
 import { toast } from "sonner";
 import { 
-  COUNTRIES, COUNTRY_STATES, COUNTRY_CITIES, TELECOM_OPERATORS,
+  COUNTRIES, COUNTRY_STATES, COUNTRY_CITIES, INDIA_STATE_CITIES, TELECOM_OPERATORS,
   DEVICE_TYPES, OS_LIST, OS_VERSIONS, BROWSERS, CONNECTION_SPEEDS,
   AD_PLACEMENTS_DISPLAY, AD_PLACEMENTS_INCONTENT, AD_PLACEMENTS_NATIVE,
   SUPPLY_SOURCES
@@ -115,7 +116,38 @@ function GeoSelector({ form, updateField, type = "include" }) {
   const pincodes = form[pincodesField] || [];
   
   const availableStates = countries.length === 1 ? (COUNTRY_STATES[countries[0]] || []) : [];
-  const availableCities = countries.length === 1 ? (COUNTRY_CITIES[countries[0]] || []) : [];
+  
+  // For India, get cities based on selected states with tier classification
+  const getAvailableCities = () => {
+    if (countries.length === 1 && countries[0] === "IND" && states.length > 0) {
+      // Get cities for selected Indian states
+      const allCities = [];
+      states.forEach(state => {
+        const stateCities = INDIA_STATE_CITIES[state];
+        if (stateCities) {
+          if (stateCities.tier1?.length > 0) {
+            allCities.push({ tier: "Tier 1", cities: stateCities.tier1, state });
+          }
+          if (stateCities.tier2?.length > 0) {
+            allCities.push({ tier: "Tier 2", cities: stateCities.tier2, state });
+          }
+          if (stateCities.tier3?.length > 0) {
+            allCities.push({ tier: "Tier 3", cities: stateCities.tier3, state });
+          }
+        }
+      });
+      return allCities;
+    }
+    // For other countries, return flat list
+    if (countries.length === 1) {
+      const countryCities = COUNTRY_CITIES[countries[0]] || [];
+      return countryCities.length > 0 ? [{ tier: "All Cities", cities: countryCities }] : [];
+    }
+    return [];
+  };
+  
+  const availableCitiesByTier = getAvailableCities();
+  const hasAvailableCities = availableCitiesByTier.length > 0;
   
   const colorClass = type === "include" ? "10B981" : "EF4444";
   
@@ -165,6 +197,10 @@ function GeoSelector({ form, updateField, type = "include" }) {
           <Select onValueChange={(v) => {
             if (v && !states.includes(v)) {
               updateField(statesField, [...states, v]);
+              // Clear cities when state changes for India
+              if (countries[0] === "IND") {
+                updateField(citiesField, []);
+              }
             }
           }}>
             <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
@@ -189,26 +225,85 @@ function GeoSelector({ form, updateField, type = "include" }) {
         </div>
       )}
 
-      {/* Cities */}
-      {availableCities.length > 0 && (
+      {/* Cities - With Tier Classification for India */}
+      {hasAvailableCities && (
         <div className="space-y-2">
-          <Label className="text-[#94A3B8]">Cities</Label>
-          <Select onValueChange={(v) => {
-            if (v && !cities.includes(v)) {
-              updateField(citiesField, [...cities, v]);
-            }
-          }}>
-            <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
-              <SelectValue placeholder="Select city" />
-            </SelectTrigger>
-            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
-              {availableCities.map((city) => (
-                <SelectItem key={city} value={city} className="text-[#F8FAFC]">{city}</SelectItem>
+          <Label className="text-[#94A3B8]">
+            Cities {countries[0] === "IND" && states.length > 0 && `(${states.join(", ")})`}
+          </Label>
+          
+          {/* Tier-wise city selection for India */}
+          {countries[0] === "IND" && states.length > 0 ? (
+            <div className="space-y-3">
+              {availableCitiesByTier.map((tierGroup, idx) => (
+                <div key={idx} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${
+                      tierGroup.tier === "Tier 1" ? "bg-[#10B981]/20 text-[#10B981]" :
+                      tierGroup.tier === "Tier 2" ? "bg-[#3B82F6]/20 text-[#3B82F6]" :
+                      "bg-[#F59E0B]/20 text-[#F59E0B]"
+                    }`}>
+                      {tierGroup.tier}
+                    </span>
+                    {tierGroup.state && <span className="text-xs text-[#64748B]">({tierGroup.state})</span>}
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="text-xs h-6 px-2"
+                      onClick={() => {
+                        const newCities = [...cities, ...tierGroup.cities.filter(c => !cities.includes(c))];
+                        updateField(citiesField, newCities);
+                      }}
+                    >
+                      Select All
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tierGroup.cities.map((city) => {
+                      const isSelected = cities.includes(city);
+                      return (
+                        <Badge 
+                          key={city} 
+                          variant="secondary" 
+                          className={`cursor-pointer ${isSelected ? `bg-[#${colorClass}]/20 text-[#${colorClass}]` : "bg-[#1E293B] text-[#94A3B8] hover:bg-[#2D3B55]"}`}
+                          onClick={() => {
+                            if (isSelected) {
+                              updateField(citiesField, cities.filter(c => c !== city));
+                            } else {
+                              updateField(citiesField, [...cities, city]);
+                            }
+                          }}
+                        >
+                          {isSelected && <Check className="w-3 h-3 mr-1" />}
+                          {city}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                </div>
               ))}
-            </SelectContent>
-          </Select>
+            </div>
+          ) : (
+            /* Standard city dropdown for other countries */
+            <Select onValueChange={(v) => {
+              if (v && !cities.includes(v)) {
+                updateField(citiesField, [...cities, v]);
+              }
+            }}>
+              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+                {availableCitiesByTier[0]?.cities.map((city) => (
+                  <SelectItem key={city} value={city} className="text-[#F8FAFC]">{city}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          
           {cities.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
+              <span className="text-xs text-[#64748B]">Selected ({cities.length}):</span>
               {cities.map((city) => (
                 <Badge key={city} variant="secondary" className={`bg-[#${colorClass}]/20 text-[#${colorClass}]`}>
                   {city}
@@ -348,8 +443,7 @@ export function TargetingStep({ form, updateField }) {
                 <div className="grid grid-cols-4 gap-3">
                   <div className="space-y-1">
                     <Label className="text-[#94A3B8] text-xs">Latitude</Label>
-                    <Input
-                      type="number"
+                    <NumberInput
                       step="0.0001"
                       value={form.geo_latitude}
                       onChange={(e) => updateField("geo_latitude", e.target.value)}
@@ -359,8 +453,7 @@ export function TargetingStep({ form, updateField }) {
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[#94A3B8] text-xs">Longitude</Label>
-                    <Input
-                      type="number"
+                    <NumberInput
                       step="0.0001"
                       value={form.geo_longitude}
                       onChange={(e) => updateField("geo_longitude", e.target.value)}
@@ -370,11 +463,11 @@ export function TargetingStep({ form, updateField }) {
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[#94A3B8] text-xs">Radius (km)</Label>
-                    <Input
-                      type="number"
+                    <NumberInput
                       value={form.radius_km}
                       onChange={(e) => updateField("radius_km", parseInt(e.target.value) || 10)}
                       className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      min={1}
                     />
                   </div>
                   <div className="space-y-1">
