@@ -395,6 +395,10 @@ Fraud | Audiences | Attribution | Migration
 - [x] **Bid Stream Total Requests Bug Fixed (P0)** - Added global `bid_stream_stats` counter that syncs from `ssp_endpoints` collection. Frontend now uses server-provided stats instead of local array length. Shows accurate total requests (47,588 vs previous stuck ~50)
 - [x] **SSP Analytics Spend Calculation Fixed (P1)** - Fixed corrupt spend data ($561.25 → $0.59). Added `POST /api/ssp-analytics/recalculate-stats` endpoint to recalculate from bid_logs using correct formula: `sum(win_price/1000)`. Old bug was adding full CPM value instead of CPM/1000 per impression
 - [x] **Ad Performance Report Data Accuracy Verified (P2)** - Confirmed dimensions (source, domain, bundle, app_name, ip, device_ifa) are correctly pulled from `request_summary` in bid_logs. "Unknown" domain for app inventory is expected (apps have bundles, not domains)
+- [x] **Ad Performance Report Campaign Filter Fixed** - Fixed frontend filter logic that was comparing campaign_id (UUID) with campaign_name (string). Now correctly looks up campaign name from ID before filtering
+- [x] **Ad Performance Report Spend Calculation Fixed** - Fixed spend formula in `analytics.py` to use `win_price/1000` (correct) instead of raw `win_price` (was inflating spend by 1000x)
+- [x] **Ad Performance Report Win Rate Display Fixed** - Fixed `formatPercent` function that was multiplying already-calculated percentages by 100 again (turning 25% into 2500%)
+- [x] **Ad Performance Report Impressions Filter** - Now only shows rows where impressions > 0, filtering out bid-only entries without wins
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:

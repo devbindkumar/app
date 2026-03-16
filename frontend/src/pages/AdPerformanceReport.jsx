@@ -328,14 +328,26 @@ export default function AdPerformanceReport() {
       );
     }
     
-    // Apply campaign filter
+    // Apply campaign filter (only if not already filtered by API)
+    // Note: If selectedCampaign was passed to API, data is already filtered
+    // This is for client-side filtering of "all" data or post-fetch filtering
     if (selectedCampaign !== "all") {
-      filtered = filtered.filter(row => row.campaign_name === selectedCampaign || row.campaign_id === selectedCampaign);
+      const campaignName = campaigns.find(c => c.id === selectedCampaign)?.name;
+      filtered = filtered.filter(row => 
+        row.campaign_id === selectedCampaign || 
+        row.campaign_name === selectedCampaign ||
+        row.campaign_name === campaignName
+      );
     }
     
-    // Apply creative filter
+    // Apply creative filter (only if not already filtered by API)
     if (selectedCreative !== "all") {
-      filtered = filtered.filter(row => row.creative_name === selectedCreative || row.creative_id === selectedCreative);
+      const creativeName = creatives.find(c => c.id === selectedCreative)?.name;
+      filtered = filtered.filter(row => 
+        row.creative_id === selectedCreative || 
+        row.creative_name === selectedCreative ||
+        row.creative_name === creativeName
+      );
     }
     
     // Sort
@@ -351,7 +363,7 @@ export default function AdPerformanceReport() {
     });
     
     return filtered;
-  }, [reportData, searchTerm, selectedCampaign, selectedCreative, sortColumn, sortDirection]);
+  }, [reportData, searchTerm, selectedCampaign, selectedCreative, sortColumn, sortDirection, campaigns, creatives]);
 
   // Calculate totals from filtered data
   const totals = useMemo(() => {
@@ -392,7 +404,8 @@ export default function AdPerformanceReport() {
 
   const formatPercent = (num) => {
     if (num === undefined || num === null) return '0%';
-    return `${(num * 100).toFixed(2)}%`;
+    // Backend already returns percentages (e.g., 25.19 for 25.19%)
+    return `${num.toFixed(2)}%`;
   };
 
   // Column headers for the table - dynamically based on selected metrics

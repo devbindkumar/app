@@ -805,9 +805,10 @@ async def get_real_ad_performance_data(
                 aggregated[key]["wins"] += 1
                 aggregated[key]["impressions"] += 1
                 
-                # Track spend from win price (already in dollars, not micros)
+                # Track spend from win price - win_price is in CPM (per 1000 impressions)
+                # For 1 impression, cost = win_price / 1000
                 win_price = log.get("win_price") or 0
-                aggregated[key]["spend"] += win_price
+                aggregated[key]["spend"] += win_price / 1000
                 
                 # Track unique users for reach
                 user_id = (log.get("request_summary") or {}).get("user_id") or log.get("request_id", "")[:8]
@@ -824,8 +825,13 @@ async def get_real_ad_performance_data(
                 aggregated[key]["video_completed_100"] += 1
         
         # Convert to list and calculate derived metrics
+        # Only include rows where impressions > 0 (filter out non-winning entries)
         data = []
         for key, row in aggregated.items():
+            # Skip rows with no impressions
+            if row["impressions"] == 0:
+                continue
+                
             row["reach"] = len(row["_unique_users"])
             del row["_unique_users"]
             
