@@ -70,6 +70,9 @@ export default function CreativeEditor() {
   
   const [creativeType, setCreativeType] = useState("banner");
   const [selectedSize, setSelectedSize] = useState(BANNER_SIZES[0]);
+  const [useCustomSize, setUseCustomSize] = useState(false);
+  const [customWidth, setCustomWidth] = useState(300);
+  const [customHeight, setCustomHeight] = useState(250);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploadedVideo, setUploadedVideo] = useState(null);
   const [uploadedAudio, setUploadedAudio] = useState(null);
@@ -81,7 +84,6 @@ export default function CreativeEditor() {
   
   const [form, setForm] = useState({
     name: "",
-    adomain: "",
     clickUrl: "",
     cat: "",
     // Banner
@@ -94,6 +96,8 @@ export default function CreativeEditor() {
     nativeDescription: "",
     nativeIconUrl: "",
     nativeImageUrl: "",
+    nativeCtaText: "Learn More",
+    nativeClickUrl: "",
     // Video
     vastUrl: "",
     vastVersion: "4.2",
@@ -156,8 +160,19 @@ export default function CreativeEditor() {
     
     setUploading(true);
     try {
-      // For now, create object URL for preview (in production, would upload to server)
       const videoUrl = URL.createObjectURL(file);
+      
+      // Auto-detect video duration
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        const duration = Math.round(video.duration);
+        updateField("videoDuration", duration);
+        toast.success(`Video loaded (${duration}s)`);
+      };
+      video.src = videoUrl;
+      
       setUploadedVideo({
         name: file.name,
         size: file.size,
@@ -165,7 +180,6 @@ export default function CreativeEditor() {
         url: videoUrl
       });
       updateField("videoUrl", videoUrl);
-      toast.success("Video loaded for preview");
     } catch (error) {
       toast.error("Failed to load video");
     } finally {
@@ -187,6 +201,18 @@ export default function CreativeEditor() {
     setUploading(true);
     try {
       const audioUrl = URL.createObjectURL(file);
+      
+      // Auto-detect audio duration
+      const audio = document.createElement('audio');
+      audio.preload = 'metadata';
+      audio.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(audio.src);
+        const duration = Math.round(audio.duration);
+        updateField("audioDuration", duration);
+        toast.success(`Audio loaded (${duration}s)`);
+      };
+      audio.src = audioUrl;
+      
       setUploadedAudio({
         name: file.name,
         size: file.size,
@@ -225,15 +251,14 @@ export default function CreativeEditor() {
       const payload = {
         name: form.name,
         type: creativeType,
-        adomain: form.adomain.split(',').map(s => s.trim()).filter(Boolean),
         iurl: form.imageUrl || form.nativeImageUrl || null,
         cat: form.cat.split(',').map(s => s.trim()).filter(Boolean)
       };
       
       if (creativeType === "banner") {
         payload.banner_data = {
-          width: selectedSize.w,
-          height: selectedSize.h,
+          width: useCustomSize ? customWidth : selectedSize.w,
+          height: useCustomSize ? customHeight : selectedSize.h,
           mimes: ["image/jpeg", "image/png", "image/gif"],
           adm: generateBannerMarkup()
         };
@@ -243,8 +268,8 @@ export default function CreativeEditor() {
           desc: form.nativeDescription,
           icon_url: form.nativeIconUrl,
           main_image_url: form.nativeImageUrl,
-          cta_text: form.ctaText,
-          click_url: form.clickUrl
+          cta_text: form.nativeCtaText || "Learn More",
+          click_url: form.nativeClickUrl || form.clickUrl
         };
       } else if (creativeType === "video") {
         payload.video_data = {
@@ -343,12 +368,16 @@ export default function CreativeEditor() {
             <img src={form.nativeImageUrl} alt="Main" className="w-full h-40 object-cover mt-3 rounded" />
           )}
           <p className="text-sm text-gray-700 mt-2">{form.nativeDescription || "Ad description..."}</p>
-          <button 
-            className="mt-3 w-full py-2 rounded text-white text-sm"
+          <a 
+            href={form.nativeClickUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-3 w-full py-2 rounded text-white text-sm text-center cursor-pointer hover:opacity-90 transition-opacity"
             style={{ background: form.ctaColor }}
+            onClick={(e) => !form.nativeClickUrl && e.preventDefault()}
           >
-            {form.ctaText}
-          </button>
+            {form.nativeCtaText || "Learn More"}
+          </a>
         </div>
       );
     }
@@ -530,25 +559,14 @@ export default function CreativeEditor() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Advertiser Domain</Label>
-                  <Input
-                    value={form.adomain}
-                    onChange={(e) => updateField("adomain", e.target.value)}
-                    placeholder="example.com"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Click URL</Label>
-                  <Input
-                    value={form.clickUrl}
-                    onChange={(e) => updateField("clickUrl", e.target.value)}
-                    placeholder="https://..."
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label className="text-[#94A3B8]">Click URL</Label>
+                <Input
+                  value={form.clickUrl}
+                  onChange={(e) => updateField("clickUrl", e.target.value)}
+                  placeholder="https://..."
+                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                />
               </div>
             </CardContent>
           </Card>
@@ -562,24 +580,67 @@ export default function CreativeEditor() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-[#94A3B8]">Banner Size</Label>
-                  <Select 
-                    value={`${selectedSize.w}x${selectedSize.h}`}
-                    onValueChange={(v) => {
-                      const [w, h] = v.split('x').map(Number);
-                      setSelectedSize({ w, h, label: BANNER_SIZES.find(s => s.w === w && s.h === h)?.label || 'Custom' });
-                    }}
-                  >
-                    <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
-                      {BANNER_SIZES.map(size => (
-                        <SelectItem key={`${size.w}x${size.h}`} value={`${size.w}x${size.h}`} className="text-[#F8FAFC]">
-                          {size.label} ({size.w}x{size.h})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-4 mb-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useCustomSize}
+                        onChange={(e) => setUseCustomSize(e.target.checked)}
+                        className="w-4 h-4 rounded border-[#2D3B55] bg-[#0F172A] text-[#3B82F6]"
+                      />
+                      <span className="text-sm text-[#94A3B8]">Use Custom Size</span>
+                    </label>
+                  </div>
+                  
+                  {!useCustomSize ? (
+                    <Select 
+                      value={`${selectedSize.w}x${selectedSize.h}`}
+                      onValueChange={(v) => {
+                        const [w, h] = v.split('x').map(Number);
+                        setSelectedSize({ w, h, label: BANNER_SIZES.find(s => s.w === w && s.h === h)?.label || 'Custom' });
+                      }}
+                    >
+                      <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
+                        {BANNER_SIZES.map(size => (
+                          <SelectItem key={`${size.w}x${size.h}`} value={`${size.w}x${size.h}`} className="text-[#F8FAFC]">
+                            {size.label} ({size.w}x{size.h})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-[#64748B]">Width (px)</Label>
+                        <Input
+                          type="number"
+                          value={customWidth}
+                          onChange={(e) => {
+                            const w = parseInt(e.target.value) || 300;
+                            setCustomWidth(w);
+                            setSelectedSize({ w, h: customHeight, label: 'Custom' });
+                          }}
+                          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-[#64748B]">Height (px)</Label>
+                        <Input
+                          type="number"
+                          value={customHeight}
+                          onChange={(e) => {
+                            const h = parseInt(e.target.value) || 250;
+                            setCustomHeight(h);
+                            setSelectedSize({ w: customWidth, h, label: 'Custom' });
+                          }}
+                          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -679,6 +740,27 @@ export default function CreativeEditor() {
                     <Input
                       value={form.nativeImageUrl}
                       onChange={(e) => updateField("nativeImageUrl", e.target.value)}
+                      placeholder="https://..."
+                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    />
+                  </div>
+                </div>
+                {/* CTA Button Settings */}
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#2D3B55]">
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Button Text</Label>
+                    <Input
+                      value={form.nativeCtaText}
+                      onChange={(e) => updateField("nativeCtaText", e.target.value)}
+                      placeholder="Learn More"
+                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[#94A3B8]">Button Click URL *</Label>
+                    <Input
+                      value={form.nativeClickUrl}
+                      onChange={(e) => updateField("nativeClickUrl", e.target.value)}
                       placeholder="https://..."
                       className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
                     />
@@ -911,17 +993,14 @@ export default function CreativeEditor() {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Duration (sec)</Label>
-                        <Select value={form.audioDuration.toString()} onValueChange={(v) => updateField("audioDuration", parseInt(v))}>
-                          <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
-                            <SelectItem value="15" className="text-[#F8FAFC]">15 seconds</SelectItem>
-                            <SelectItem value="30" className="text-[#F8FAFC]">30 seconds</SelectItem>
-                            <SelectItem value="60" className="text-[#F8FAFC]">60 seconds</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label className="text-[#94A3B8]">Duration (seconds)</Label>
+                        <Input
+                          type="number"
+                          value={form.audioDuration}
+                          onChange={(e) => updateField("audioDuration", parseInt(e.target.value) || 0)}
+                          placeholder="30"
+                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[#94A3B8]">MIME Types</Label>
@@ -977,17 +1056,14 @@ export default function CreativeEditor() {
                     )}
                     
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Duration (sec)</Label>
-                      <Select value={form.audioDuration.toString()} onValueChange={(v) => updateField("audioDuration", parseInt(v))}>
-                        <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
-                          <SelectItem value="15" className="text-[#F8FAFC]">15 seconds</SelectItem>
-                          <SelectItem value="30" className="text-[#F8FAFC]">30 seconds</SelectItem>
-                          <SelectItem value="60" className="text-[#F8FAFC]">60 seconds</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label className="text-[#94A3B8]">Duration (seconds) <span className="text-xs text-[#64748B]">- Auto-detected on upload</span></Label>
+                      <Input
+                        type="number"
+                        value={form.audioDuration}
+                        onChange={(e) => updateField("audioDuration", parseInt(e.target.value) || 0)}
+                        placeholder="30"
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      />
                     </div>
                   </div>
                 )}
