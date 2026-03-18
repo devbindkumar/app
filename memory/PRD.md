@@ -427,6 +427,10 @@ Fraud | Audiences | Attribution | Migration
   - Preview reflects the adjusted banner size with "Banner: WxHpx" label
   - Upload Companion Banner button with file input
   - Companion banner URL input with dimension detection button
+- [x] **Creative Preview Fixes (March 2026)** - Fixed preview issues in Creatives.jsx:
+  - Video preview: Added onError handler with fallback message for expired blob URLs (was showing infinite loading)
+  - Audio preview: Corrected layout order - companion banner displays FIRST (on top), audio player BELOW
+  - Both previews now show user-friendly "session expired" messages with re-upload instructions
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
