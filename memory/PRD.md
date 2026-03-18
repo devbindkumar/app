@@ -414,6 +414,11 @@ Fraud | Audiences | Attribution | Migration
   - Rating field (1-5)
   - Price field
 - [x] **Creatives List Audio Tab** - Added Audio tab to creatives listing page with pink/magenta color scheme
+- [x] **Campaign KPI Fields Fixed (CRITICAL)** - Added kpi_type and kpi_target fields to Campaign model (were missing). Now properly saved to database during create/update operations
+- [x] **Unified Create Creative Button** - Merged "Advanced Editor" and "Create Creative" buttons into single dropdown with:
+  - Standard Creatives: Banner/Display, Video, Native, Audio
+  - Advanced: JS Tag / Code Editor
+- [x] **Enhanced Creative Preview** - Fixed preview modal for all types including audio (VAST URL/XML display, audio player), native (with rating/price), and proper fallbacks
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
