@@ -64,6 +64,7 @@ export default function CreativeEditor() {
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
   const audioInputRef = useRef(null);
+  const companionInputRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -226,6 +227,56 @@ export default function CreativeEditor() {
     } finally {
       setUploading(false);
     }
+  };
+
+  // Handle companion banner upload for audio ads - auto-detect dimensions
+  const handleCompanionUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please select a valid image file");
+      return;
+    }
+    
+    setUploading(true);
+    try {
+      const imageUrl = URL.createObjectURL(file);
+      
+      // Auto-detect image dimensions
+      const img = document.createElement('img');
+      img.onload = () => {
+        updateField("companionWidth", img.naturalWidth);
+        updateField("companionHeight", img.naturalHeight);
+        toast.success(`Banner loaded (${img.naturalWidth}x${img.naturalHeight})`);
+      };
+      img.onerror = () => {
+        toast.error("Failed to load image dimensions");
+      };
+      img.src = imageUrl;
+      
+      updateField("companionBannerUrl", imageUrl);
+    } catch (error) {
+      toast.error("Failed to load companion banner");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Auto-detect dimensions when companion banner URL changes
+  const detectCompanionDimensions = (url) => {
+    if (!url) return;
+    
+    const img = document.createElement('img');
+    img.onload = () => {
+      updateField("companionWidth", img.naturalWidth);
+      updateField("companionHeight", img.naturalHeight);
+      toast.success(`Dimensions detected: ${img.naturalWidth}x${img.naturalHeight}`);
+    };
+    img.onerror = () => {
+      // Silent fail for URL detection - user can manually set dimensions
+    };
+    img.src = url;
   };
 
   const generateBannerMarkup = () => {
@@ -424,62 +475,89 @@ export default function CreativeEditor() {
     }
     
     if (creativeType === "audio") {
+      const previewWidth = parseInt(form.companionWidth) || 300;
+      const previewHeight = parseInt(form.companionHeight) || 250;
+      
       return (
-        <div className="w-full max-w-[400px] p-6 bg-gradient-to-br from-[#EC4899]/10 to-[#8B5CF6]/10 rounded-lg border border-[#2D3B55]">
-          {audioSourceType === "upload" && form.audioUrl ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-[#EC4899]/20 flex items-center justify-center">
-                  <Music className="w-10 h-10 text-[#EC4899]" />
-                </div>
-              </div>
-              <p className="text-center text-[#F8FAFC] font-medium">Audio Preview</p>
-              <audio src={form.audioUrl} controls className="w-full" />
-              <p className="text-xs text-[#94A3B8] text-center">Duration: {form.audioDuration}s</p>
-            </div>
-          ) : audioSourceType === "vast" && (form.audioVastUrl || form.audioVastXml) ? (
-            <div className="space-y-4 text-center">
-              <div className="flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-[#EC4899]/20 flex items-center justify-center">
-                  <Music className="w-10 h-10 text-[#EC4899]" />
-                </div>
-              </div>
-              <p className="text-[#F8FAFC] font-medium">Audio VAST Tag</p>
-              <Badge className="bg-[#EC4899]/20 text-[#EC4899]">
-                {form.audioDuration}s Audio
-              </Badge>
-              {form.audioVastUrl && (
-                <p className="text-xs text-[#64748B] break-all">
-                  {form.audioVastUrl.length > 50 ? form.audioVastUrl.substring(0, 50) + "..." : form.audioVastUrl}
-                </p>
-              )}
-              {form.audioVastUrl && (
-                <Button
-                  size="sm"
-                  className="bg-[#EC4899] hover:bg-[#EC4899]/90"
-                  onClick={() => window.open(form.audioVastUrl, '_blank')}
-                >
-                  Test VAST Tag
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-[#64748B]">
-              <Music className="w-12 h-12 mb-2" />
-              <p className="text-sm">Configure audio settings</p>
-            </div>
-          )}
-          {/* Companion Banner Preview */}
+        <div className="w-full max-w-[400px] space-y-4">
+          {/* Companion Banner Preview - Shown First */}
           {form.companionBannerUrl && (
-            <div className="mt-4 pt-4 border-t border-[#2D3B55]">
-              <p className="text-xs text-[#94A3B8] mb-2">Companion Banner:</p>
+            <div 
+              className="rounded-lg border border-[#2D3B55] overflow-hidden bg-[#0F172A]"
+              style={{ 
+                width: Math.min(previewWidth, 380), 
+                height: Math.min(previewHeight, 300),
+                margin: '0 auto'
+              }}
+            >
               <img 
                 src={form.companionBannerUrl} 
-                alt="Companion" 
-                className="rounded border border-[#2D3B55]"
-                style={{ maxWidth: form.companionWidth, maxHeight: form.companionHeight }}
+                alt="Companion Banner" 
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain' 
+                }}
               />
             </div>
+          )}
+          
+          {/* Audio Player Section - Below Banner */}
+          <div className="p-4 bg-gradient-to-br from-[#EC4899]/10 to-[#8B5CF6]/10 rounded-lg border border-[#2D3B55]">
+            {audioSourceType === "upload" && form.audioUrl ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#EC4899]/20 flex items-center justify-center shrink-0">
+                    <Music className="w-6 h-6 text-[#EC4899]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-[#F8FAFC] font-medium">Audio Preview</p>
+                    <p className="text-xs text-[#94A3B8]">Duration: {form.audioDuration}s</p>
+                  </div>
+                </div>
+                <audio src={form.audioUrl} controls className="w-full" />
+              </div>
+            ) : audioSourceType === "vast" && (form.audioVastUrl || form.audioVastXml) ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#EC4899]/20 flex items-center justify-center shrink-0">
+                    <Music className="w-6 h-6 text-[#EC4899]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-[#F8FAFC] font-medium">Audio VAST Tag</p>
+                    <Badge className="mt-1 bg-[#EC4899]/20 text-[#EC4899]">
+                      {form.audioDuration}s Audio
+                    </Badge>
+                  </div>
+                </div>
+                {form.audioVastUrl && (
+                  <>
+                    <p className="text-xs text-[#64748B] break-all">
+                      {form.audioVastUrl.length > 50 ? form.audioVastUrl.substring(0, 50) + "..." : form.audioVastUrl}
+                    </p>
+                    <Button
+                      size="sm"
+                      className="w-full bg-[#EC4899] hover:bg-[#EC4899]/90"
+                      onClick={() => window.open(form.audioVastUrl, '_blank')}
+                    >
+                      Test VAST Tag
+                    </Button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-6 text-[#64748B]">
+                <Music className="w-10 h-10 mb-2" />
+                <p className="text-sm">Configure audio settings</p>
+              </div>
+            )}
+          </div>
+          
+          {/* Size info display */}
+          {form.companionBannerUrl && (
+            <p className="text-xs text-center text-[#64748B]">
+              Banner: {previewWidth}x{previewHeight}px
+            </p>
           )}
         </div>
       );
@@ -1071,35 +1149,73 @@ export default function CreativeEditor() {
                 {/* Companion Banner */}
                 <div className="space-y-3 pt-4 border-t border-[#2D3B55]">
                   <Label className="text-[#94A3B8]">Companion Banner (Optional)</Label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-xs text-[#64748B]">Width</Label>
-                      <Input
-                        type="number"
-                        value={form.companionWidth}
-                        onChange={(e) => updateField("companionWidth", e.target.value)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-[#64748B]">Height</Label>
-                      <Input
-                        type="number"
-                        value={form.companionHeight}
-                        onChange={(e) => updateField("companionHeight", e.target.value)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
-                      />
-                    </div>
-                    <div className="space-y-1 col-span-3">
-                      <Label className="text-xs text-[#64748B]">Banner URL</Label>
+                  
+                  {/* Companion Banner Upload */}
+                  <input
+                    type="file"
+                    ref={companionInputRef}
+                    onChange={handleCompanionUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={() => companionInputRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full border-dashed border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6]/10"
+                  >
+                    {uploading ? (
+                      <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Uploading...</>
+                    ) : (
+                      <><Upload className="w-4 h-4 mr-2" /> Upload Companion Banner</>
+                    )}
+                  </Button>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs text-[#64748B]">Or Enter Banner URL</Label>
+                    <div className="flex gap-2">
                       <Input
                         value={form.companionBannerUrl}
                         onChange={(e) => updateField("companionBannerUrl", e.target.value)}
                         placeholder="https://..."
                         className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
                       />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => detectCompanionDimensions(form.companionBannerUrl)}
+                        disabled={!form.companionBannerUrl}
+                        className="border-[#2D3B55] text-[#94A3B8] hover:bg-[#1E293B] shrink-0"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-[#64748B]">Click refresh to auto-detect dimensions from URL</p>
+                  </div>
+                  
+                  {/* Size Adjustment */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-[#64748B]">Width (px)</Label>
+                      <Input
+                        type="number"
+                        value={form.companionWidth}
+                        onChange={(e) => updateField("companionWidth", parseInt(e.target.value) || 300)}
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-[#64748B]">Height (px)</Label>
+                      <Input
+                        type="number"
+                        value={form.companionHeight}
+                        onChange={(e) => updateField("companionHeight", parseInt(e.target.value) || 250)}
+                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      />
                     </div>
                   </div>
+                  <p className="text-xs text-[#64748B]">Dimensions auto-detected on upload. Adjust as needed.</p>
                 </div>
               </CardContent>
             </Card>
