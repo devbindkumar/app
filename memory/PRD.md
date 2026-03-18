@@ -419,6 +419,14 @@ Fraud | Audiences | Attribution | Migration
   - Standard Creatives: Banner/Display, Video, Native, Audio
   - Advanced: JS Tag / Code Editor
 - [x] **Enhanced Creative Preview** - Fixed preview modal for all types including audio (VAST URL/XML display, audio player), native (with rating/price), and proper fallbacks
+- [x] **Audio Creative Live Preview Enhancements (March 2026)** - Enhanced Audio creative editor with:
+  - Live preview shows companion banner first (on top), then audio player below
+  - Auto-capture height/width from uploaded companion banner image
+  - Auto-detect dimensions from banner URL via refresh button
+  - Width/Height input fields allow manual size adjustment
+  - Preview reflects the adjusted banner size with "Banner: WxHpx" label
+  - Upload Companion Banner button with file input
+  - Companion banner URL input with dimension detection button
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
