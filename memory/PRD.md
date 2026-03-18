@@ -431,6 +431,13 @@ Fraud | Audiences | Attribution | Migration
   - Video preview: Added onError handler with fallback message for expired blob URLs (was showing infinite loading)
   - Audio preview: Corrected layout order - companion banner displays FIRST (on top), audio player BELOW
   - Both previews now show user-friendly "session expired" messages with re-upload instructions
+- [x] **Creative List & Editor Fixes (March 2026)** - Multiple bug fixes:
+  - Fixed creative card preview - added isValidUrl helper that properly detects null, 'None', empty strings, and blob URLs
+  - Banner cards show actual image if image_url exists, or 'HTML Banner' with code icon if only ad_markup exists
+  - Video cards show play icon with duration
+  - Audio cards show music icon with duration (with fallback for expired blob URLs)
+  - Removed "Learn More" CTA Text and CTA Color fields from Banner creative form
+  - Added sorting by created_at descending (newest first) in fetchCreatives
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
