@@ -1,0 +1,69 @@
+{
+  "summary": "Bug fix verification complete. Both issues resolved: 1) Video preview shows user-friendly fallback for expired blob URLs instead of infinite loading, 2) Audio preview layout corrected - companion banner displays first (on top), audio player below.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/pages/Creatives.jsx"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Video preview onError handler correctly hides video element and shows fallback div",
+    "Video fallback shows meaningful messages: 'Video unavailable', 'The video file session has expired', 'Re-upload the video to preview'",
+    "Audio preview layout correctly renders companion banner section BEFORE audio player section (line 351-369 before line 371-415)",
+    "Audio fallback also handles session expiry with user-friendly message",
+    "Both previews display dimensions and duration badges correctly"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "None - tested with existing creatives with expired blob URLs",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Video and Audio preview fallback fixes verified. Video shows fallback for expired blob URLs with onError handler. Audio preview displays companion banner first, then audio player below. Both show session expiry messages.",
+  "features_verified": {
+    "video_fallback_for_expired_blob": {
+      "status": "VERIFIED",
+      "description": "Video preview shows fallback instead of infinite loading when blob URL expires",
+      "evidence": "Screenshot shows 'Video unavailable', 'The video file session has expired', 'Re-upload the video to preview' messages"
+    },
+    "video_dimensions_badge": {
+      "status": "VERIFIED",
+      "description": "Video preview displays dimensions badge",
+      "evidence": "Badge showing '1920x1080' visible in preview"
+    },
+    "video_duration_badge": {
+      "status": "VERIFIED",
+      "description": "Video preview displays duration badge",
+      "evidence": "Badge showing '15s' visible in preview"
+    },
+    "audio_layout_order": {
+      "status": "VERIFIED",
+      "description": "Audio preview shows companion banner FIRST (on top), audio player BELOW",
+      "evidence": "Screenshot confirms 'Companion Banner (300x250)' appears above 'Audio Preview (42s)' section"
+    },
+    "audio_companion_dimensions": {
+      "status": "VERIFIED",
+      "description": "Audio preview shows companion banner dimensions",
+      "evidence": "Text showing 'Companion Banner (300x250)' visible in preview"
+    },
+    "audio_duration": {
+      "status": "VERIFIED",
+      "description": "Audio preview shows duration",
+      "evidence": "Text showing 'Audio Preview (42s)' visible in preview"
+    },
+    "audio_fallback_for_expired_blob": {
+      "status": "VERIFIED",
+      "description": "Audio preview shows fallback when audio blob URL expires",
+      "evidence": "Screenshot shows 'Audio file unavailable (session expired)' and 'Re-upload the audio file to preview' messages"
+    }
+  }
+}

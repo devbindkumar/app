@@ -211,9 +211,25 @@ function CreativePreview({ creative, onClose }) {
                   controls 
                   className="w-full rounded border border-[#2D3B55]"
                   style={{ maxHeight: 400 }}
+                  onError={(e) => {
+                    // Hide video player and show fallback
+                    e.target.style.display = 'none';
+                    const fallback = e.target.nextSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
                 >
                   Your browser does not support the video tag.
                 </video>
+                {/* Fallback for invalid blob URLs */}
+                <div 
+                  className="hidden flex-col items-center justify-center py-8 rounded border border-[#F59E0B]/30 bg-[#F59E0B]/5"
+                  style={{ minHeight: 200 }}
+                >
+                  <Video className="w-12 h-12 text-[#F59E0B] mb-3 opacity-60" />
+                  <p className="text-sm text-[#F59E0B]">Video unavailable</p>
+                  <p className="text-xs text-[#64748B] mt-1">The video file session has expired</p>
+                  <p className="text-xs text-[#64748B]">Re-upload the video to preview</p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Badge className="bg-[#10B981]/20 text-[#10B981]">{videoWidth}x{videoHeight}</Badge>
@@ -325,68 +341,80 @@ function CreativePreview({ creative, onClose }) {
         }
         break;
       case "audio":
-        if (creative.audio_data?.audio_url) {
+        if (creative.audio_data?.audio_url || creative.audio_data?.vast_url || creative.audio_data?.vast_xml) {
+          const companionUrl = creative.audio_data?.companion_banner_url;
+          const companionWidth = creative.audio_data?.companion_width || 300;
+          const companionHeight = creative.audio_data?.companion_height || 250;
+          
           return (
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 surface-secondary rounded-lg w-full max-w-md">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Audio Preview ({creative.audio_data?.duration || 30}s)</p>
-                <audio 
-                  src={creative.audio_data.audio_url} 
-                  controls 
-                  className="w-full"
-                />
-                {creative.audio_data?.companion_banner_url && (
-                  <div className="mt-3">
-                    <p className="text-xs text-[#64748B] mb-2">Companion Banner:</p>
+            <div className="flex flex-col items-center gap-4 w-full max-w-md">
+              {/* Companion Banner First (On Top) */}
+              {companionUrl && (
+                <div className="w-full">
+                  <p className="text-xs text-[#64748B] mb-2 text-center">Companion Banner ({companionWidth}x{companionHeight})</p>
+                  <div 
+                    className="mx-auto rounded-lg border border-[#2D3B55] overflow-hidden bg-[#0F172A]"
+                    style={{ 
+                      width: Math.min(companionWidth, 400), 
+                      height: Math.min(companionHeight, 300)
+                    }}
+                  >
                     <img 
-                      src={creative.audio_data.companion_banner_url}
-                      alt="Companion"
-                      className="max-w-full rounded border border-[#2D3B55]"
-                      style={{ 
-                        maxWidth: creative.audio_data.companion_width || 300,
-                        maxHeight: creative.audio_data.companion_height || 250
-                      }}
+                      src={companionUrl}
+                      alt="Companion Banner"
+                      className="w-full h-full object-contain"
                     />
                   </div>
-                )}
+                </div>
+              )}
+              
+              {/* Audio Player Below Banner */}
+              <div className="p-4 surface-secondary rounded-lg w-full">
+                <p className="text-xs text-[#64748B] mb-3 text-center">Audio Preview ({creative.audio_data?.duration || 30}s)</p>
+                
+                {creative.audio_data?.audio_url ? (
+                  <audio 
+                    src={creative.audio_data.audio_url} 
+                    controls 
+                    className="w-full"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling && (e.target.nextSibling.style.display = 'block');
+                    }}
+                  />
+                ) : creative.audio_data?.vast_url ? (
+                  <div>
+                    <div className="p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                      <code className="text-xs text-[#EC4899] font-mono break-all">
+                        {creative.audio_data.vast_url}
+                      </code>
+                    </div>
+                    <div className="mt-3">
+                      <a 
+                        href={creative.audio_data.vast_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-[#EC4899] hover:underline"
+                      >
+                        Open VAST in new tab →
+                      </a>
+                    </div>
+                  </div>
+                ) : creative.audio_data?.vast_xml ? (
+                  <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[200px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                    {creative.audio_data.vast_xml}
+                  </pre>
+                ) : null}
+                
+                {/* Fallback message for invalid blob URLs */}
+                <div className="hidden text-center py-4 text-[#F59E0B]">
+                  <Music className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-xs">Audio file unavailable (session expired)</p>
+                  <p className="text-xs text-[#64748B] mt-1">Re-upload the audio file to preview</p>
+                </div>
               </div>
+              
               <Badge className="bg-[#EC4899]/20 text-[#EC4899]">Audio Ad</Badge>
-            </div>
-          );
-        } else if (creative.audio_data?.vast_url) {
-          return (
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 surface-secondary rounded-lg w-full">
-                <p className="text-xs text-[#64748B] mb-3">Audio VAST URL ({creative.audio_data?.duration || 30}s)</p>
-                <div className="p-3 bg-[#020408] rounded border border-[#2D3B55]">
-                  <code className="text-xs text-[#EC4899] font-mono break-all">
-                    {creative.audio_data.vast_url}
-                  </code>
-                </div>
-                <div className="mt-3">
-                  <a 
-                    href={creative.audio_data.vast_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-xs text-[#EC4899] hover:underline"
-                  >
-                    Open VAST in new tab →
-                  </a>
-                </div>
-              </div>
-              <Badge className="bg-[#EC4899]/20 text-[#EC4899]">Audio VAST</Badge>
-            </div>
-          );
-        } else if (creative.audio_data?.vast_xml) {
-          return (
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 surface-secondary rounded-lg w-full">
-                <p className="text-xs text-[#64748B] mb-3">Audio VAST XML ({creative.audio_data?.duration || 30}s)</p>
-                <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[200px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
-                  {creative.audio_data.vast_xml}
-                </pre>
-              </div>
-              <Badge className="bg-[#EC4899]/20 text-[#EC4899]">Audio VAST XML</Badge>
             </div>
           );
         }
