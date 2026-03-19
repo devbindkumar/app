@@ -467,6 +467,28 @@ Fraud | Audiences | Attribution | Migration
   - **Impersonation Feature**: Super Admin can "View As" any user without switching accounts
   - **Bulk Access Update**: Multi-select sidebar/permissions with Save Changes button
   - **Improved Admin Panel UI**: 3 tabs (Users, Hierarchy, Access Control), proper grid alignment
+- [x] **Security Features (March 2026)** - Comprehensive security enhancements:
+  - **Password Reset**: Token-based password reset flow (/api/auth/password-reset/request, /api/auth/password-reset/confirm)
+  - **Change Password**: Current password verification required (/api/auth/change-password)
+  - **Two-Factor Authentication (2FA)**: 
+    - TOTP-based using pyotp library
+    - Setup returns secret, QR code URL, 8 backup codes
+    - Enable/Disable with code verification
+    - Login flow: returns temp_token → verify-2fa → session token
+    - Backup codes can be used for login (single use)
+    - Admin and Super Admin roles can enable 2FA
+  - **Audit Logging**: All security events logged to audit_logs collection
+    - Login events (success and failed)
+    - Password reset requests and completions
+    - 2FA setup, enable, disable events
+    - GET /api/admin/audit-logs (Super Admin only)
+  - **Data Ownership Filtering**:
+    - Campaigns and Creatives filtered by owner_id
+    - Super Admin sees all data
+    - Admin sees own + children's data (hierarchical)
+    - Advertiser/User sees only own data
+  - **Frontend Security Tab**: 2FA enable/disable UI in Admin Panel
+  - **Frontend Audit Logs Tab**: View all audit events with filtering
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
