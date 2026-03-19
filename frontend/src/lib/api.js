@@ -10,9 +10,24 @@ const api = axios.create({
   },
 });
 
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Dashboard
 export const getDashboardStats = () => api.get('/dashboard/stats');
 export const getChartData = () => api.get('/dashboard/chart-data');
+export const getUserChartData = () => api.get('/dashboard/user-chart-data');
 
 // Campaigns
 export const getCampaigns = (status) => 

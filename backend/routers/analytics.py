@@ -52,7 +52,7 @@ async def get_dashboard_stats():
 
 @router.get("/dashboard/chart-data")
 async def get_chart_data():
-    """Get chart data for dashboard"""
+    """Get chart data for dashboard (global - for admins/super_admins)"""
     # Last 7 days of data
     end_dt = datetime.now(timezone.utc)
     start_dt = end_dt - timedelta(days=7)
@@ -66,6 +66,97 @@ async def get_chart_data():
                 }
             }
         },
+        {
+            "$group": {
+                "_id": {"$substr": ["$timestamp", 0, 10]},
+                "bids": {"$sum": {"$cond": ["$bid_made", 1, 0]}},
+                "wins": {"$sum": {"$cond": ["$win_notified", 1, 0]}},
+                "spend": {"$sum": {"$ifNull": ["$win_price", 0]}}
+            }
+        },
+        {"$sort": {"_id": 1}}
+    ]
+    
+    daily_data = await db.bid_logs.aggregate(pipeline).to_list(100)
+    
+    return {
+        "labels": [d["_id"] for d in daily_data],
+        "bids": [d["bids"] for d in daily_data],
+        "wins": [d["wins"] for d in daily_data],
+        "spend": [d["spend"] / 1000 for d in daily_data]
+    }
+
+
+@router.get("/dashboard/user-chart-data")
+async def get_user_chart_data(current_user: dict = Depends(get_current_user)):
+    """
+    Get chart data scoped to the current user.
+    - Advertiser: Only their own campaign data
+    - Admin: Their own + their advertisers' data
+    - Super Admin: All data (same as global)
+    """
+    end_dt = datetime.now(timezone.utc)
+    start_dt = end_dt - timedelta(days=7)
+    
+    user_role = current_user.get("role")
+    user_id = current_user.get("id")
+    
+    # Build the match query based on role
+    match_query = {
+        "timestamp": {
+            "$gte": start_dt.isoformat(),
+            "$lte": end_dt.isoformat()
+        }
+    }
+    
+    if user_role == UserRole.ADVERTISER.value:
+        # Advertiser: Get their campaign IDs and filter bid_logs
+        user_campaigns = await db.campaigns.find(
+            {"owner_id": user_id},
+            {"id": 1, "_id": 0}
+        ).to_list(1000)
+        campaign_ids = [c["id"] for c in user_campaigns]
+        
+        if not campaign_ids:
+            # No campaigns - return empty data
+            return {
+                "labels": [],
+                "bids": [],
+                "wins": [],
+                "spend": []
+            }
+        
+        match_query["campaign_id"] = {"$in": campaign_ids}
+        
+    elif user_role == UserRole.ADMIN.value:
+        # Admin: Get their own campaigns + their advertisers' campaigns
+        advertisers = await db.users.find(
+            {"parent_id": user_id, "role": UserRole.ADVERTISER.value},
+            {"id": 1, "_id": 0}
+        ).to_list(100)
+        advertiser_ids = [a["id"] for a in advertisers]
+        owner_ids = [user_id] + advertiser_ids
+        
+        user_campaigns = await db.campaigns.find(
+            {"owner_id": {"$in": owner_ids}},
+            {"id": 1, "_id": 0}
+        ).to_list(1000)
+        campaign_ids = [c["id"] for c in user_campaigns]
+        
+        if not campaign_ids:
+            return {
+                "labels": [],
+                "bids": [],
+                "wins": [],
+                "spend": []
+            }
+        
+        match_query["campaign_id"] = {"$in": campaign_ids}
+    
+    # Super Admin: No additional filtering, sees all data
+    
+    pipeline = [
+        {"$match": match_query},
         {
             "$group": {
                 "_id": {"$substr": ["$timestamp", 0, 10]},

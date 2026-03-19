@@ -26,7 +26,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Progress } from "../components/ui/progress";
 import { toast } from "sonner";
-import { getDashboardStats, getChartData, seedData } from "../lib/api";
+import { getDashboardStats, getChartData, getUserChartData, seedData } from "../lib/api";
 import {
   AreaChart,
   Area,
@@ -654,8 +654,8 @@ export default function Dashboard() {
         setRoleData(await roleRes.json());
       }
       
-      // Fetch chart data for advertiser dashboard
-      const chartRes = await getChartData();
+      // Fetch user-scoped chart data (respects role-based data isolation)
+      const chartRes = await getUserChartData();
       const rawChartData = chartRes.data;
       if (rawChartData && rawChartData.labels && Array.isArray(rawChartData.labels)) {
         const transformedData = rawChartData.labels.map((label, index) => ({
