@@ -514,6 +514,24 @@ Fraud | Audiences | Attribution | Migration
     - Export to CSV functionality
     - "Add Admin" button for Super Admin, "Add Advertiser" for Admin
   - **Login Page**: 3 demo account buttons (Advertiser, Admin, Super Admin)
+- [x] **Role-Based Dashboard Templates (March 2026)** - Tailored first-login experience:
+  - **Super Admin Dashboard**:
+    - Platform Health Banner (Logins 24h, Failed Logins 24h, Platform Online status)
+    - 6 Metric Cards (Total Admins, Advertisers, Campaigns, SSP Endpoints, Win Rate, Total Spend)
+    - Top Admins section with advertiser/campaign counts and spend
+    - Platform Campaigns pie chart showing status breakdown
+    - Platform Activity feed showing all user actions
+  - **Admin Dashboard**:
+    - Team Overview with 5 Metric Cards (Advertisers, Campaigns, Team Bids, Win Rate, Total Spend)
+    - Top Advertisers section with spend and campaign info
+    - Campaigns by Status pie chart
+    - Team Activity feed showing team actions
+  - **Advertiser Dashboard**:
+    - Campaign Performance focus with 5 Metric Cards (Active Campaigns, Total Bids, Win Rate, Total Spend, CTR)
+    - Bidding Activity area chart showing bids/wins over time
+    - Top Campaigns section ranked by wins
+    - Recent Creatives section
+  - **New Backend Endpoint**: GET /api/dashboard/role-data returns role-specific data
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
