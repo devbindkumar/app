@@ -459,6 +459,14 @@ Fraud | Audiences | Attribution | Migration
     - Advertiser: advertiser@demo.com / demo123
     - Admin: admin@demo.com / demo123
     - Super Admin: superadmin@demo.com / demo123
+- [x] **Hierarchical RBAC Enhancement (March 2026)** - Advanced multi-tenant hierarchy system:
+  - **Hierarchy Tracking**: Users have parent_id to track who created them
+  - **Role Creation Rules**: Super Admin → creates Admins → Admins create Advertisers/Users
+  - **Data Isolation**: Admin sees only their team, Super Admin sees all
+  - **User Hierarchy Tab**: Tree view of Admins and their team members
+  - **Impersonation Feature**: Super Admin can "View As" any user without switching accounts
+  - **Bulk Access Update**: Multi-select sidebar/permissions with Save Changes button
+  - **Improved Admin Panel UI**: 3 tabs (Users, Hierarchy, Access Control), proper grid alignment
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
