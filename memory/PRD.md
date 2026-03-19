@@ -532,6 +532,31 @@ Fraud | Audiences | Attribution | Migration
     - Top Campaigns section ranked by wins
     - Recent Creatives section
   - **New Backend Endpoint**: GET /api/dashboard/role-data returns role-specific data
+- [x] **Access Control Enhancements (March 2026)** - Improved UX and bulk management:
+  - **Access Not Allocated Page**:
+    - Clear "Access Not Allocated" message with red shield icon
+    - Shows current user role and required access
+    - "Go Back" and "Dashboard" navigation buttons
+    - ProtectedRoute wrapper for all routes with sidebar access checks
+  - **Bulk Delete Feature (Super Admin only)**:
+    - Checkboxes in user table for multi-select
+    - Select All checkbox in table header
+    - "Delete (N)" button appears when users selected
+    - Row highlighting for selected users
+    - Confirmation dialog showing users to be deleted
+    - POST /api/admin/users/bulk-delete endpoint
+    - Cannot delete self, returns deleted_count
+  - **Real-Time WebSocket Notifications**:
+    - WebSocket endpoint: /api/ws/notifications?token=<jwt>
+    - ConnectionManager for user-based and role-based broadcasting
+    - Notification types: campaign_update, user_activity, security_alert, new_advertiser, budget_alert, system_message
+    - NotificationContext for frontend state management
+    - NotificationBell component in sidebar with unread count badge
+    - Popover showing notifications with Live/Offline status
+    - Mark as read, mark all as read, clear notifications
+    - Auto-reconnect on connection loss
+    - GET /api/notifications/status (connected users count)
+    - POST /api/notifications/broadcast (Super Admin)
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
