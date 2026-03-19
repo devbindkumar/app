@@ -489,6 +489,31 @@ Fraud | Audiences | Attribution | Migration
     - Advertiser/User sees only own data
   - **Frontend Security Tab**: 2FA enable/disable UI in Admin Panel
   - **Frontend Audit Logs Tab**: View all audit events with filtering
+- [x] **3-Tier RBAC Hierarchy (March 2026)** - Refined access control system:
+  - **Hierarchy**: Super Admin → Admin → Advertiser (removed User role)
+  - **Creation Rules**:
+    - Super Admin can ONLY create Admins
+    - Admin can ONLY create Advertisers
+    - Advertisers cannot create accounts
+  - **View Access**:
+    - Super Admin: All Admins, all Advertisers under any Admin
+    - Admin: Only their created Advertisers
+    - Advertiser: Own campaigns and reports only
+  - **Seamless Navigation**: Breadcrumb navigation for viewing Admin/Advertiser dashboards
+  - **New Backend Endpoints**:
+    - GET /api/admin/stats: Quick stats (total admins, advertisers, campaigns, etc.)
+    - GET /api/admin/activity-timeline: Recent platform actions
+    - GET /api/admin/users/search: Search users with filters
+    - GET /api/admin/users/export: Export users to CSV
+    - GET /api/admin/advertiser/{id}/dashboard-data: Advertiser dashboard view
+    - GET /api/admin/admin/{id}/dashboard-data: Admin dashboard view (Super Admin only)
+  - **Enhanced Admin Panel UI**:
+    - Quick Stats cards (Admins, Advertisers, Campaigns, Active, Creatives)
+    - Activity Timeline sidebar showing recent actions
+    - Search input and Role filter dropdown
+    - Export to CSV functionality
+    - "Add Admin" button for Super Admin, "Add Advertiser" for Admin
+  - **Login Page**: 3 demo account buttons (Advertiser, Admin, Super Admin)
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
