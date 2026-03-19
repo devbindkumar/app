@@ -574,6 +574,35 @@ Fraud | Audiences | Attribution | Migration
     - budget_alert_email_template - Budget warning with progress bar
     - suspicious_login_email_template - Security alert with login details
   - **Note**: In Resend test mode, emails can only be sent to verified addresses. Production requires domain verification at resend.com/domains
+- [x] **Email Preferences System (March 2026)** - User-customizable notification settings:
+  - **Notification Toggles**:
+    - Security Alerts (suspicious login from new IP)
+    - Budget Alerts (campaign budget thresholds)
+    - New User Notifications (admin only - when user created under them)
+    - Password Reset confirmations
+    - System Announcements
+  - **Budget Alert Thresholds**:
+    - Warning Threshold (10-95%, default 75%)
+    - Critical Threshold (50-100%, default 90%)
+    - Critical must be greater than warning (validated)
+  - **Delivery Preferences**:
+    - Weekly Digest option (aggregate instead of individual emails)
+    - Digest Day selector (Monday-Sunday)
+    - Quiet Hours toggle (pause non-critical notifications)
+    - Quiet Hours Period (handles overnight, e.g., 22:00-08:00)
+  - **Backend Endpoints**:
+    - GET /api/auth/email-preferences - returns preferences with defaults
+    - PUT /api/auth/email-preferences - updates with validation
+    - POST /api/auth/email-preferences/reset - resets to defaults
+  - **Helper Functions**:
+    - should_send_notification(user_id, type) - checks preferences before sending
+    - get_budget_thresholds(user_id) - returns custom thresholds
+  - **Settings Page** (/settings):
+    - Modern UI with toggle switches
+    - Budget threshold sliders
+    - Conditional fields (digest day shows when digest enabled)
+    - Unsaved changes indicator
+    - Reset and Save buttons
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
