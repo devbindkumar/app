@@ -446,6 +446,19 @@ Fraud | Audiences | Attribution | Migration
   - Files stored persistently in /app/backend/uploads/ directory
   - Server URLs (e.g., https://.../api/uploads/audio_xxx.mp3) replace temporary blob URLs
   - Creatives now persist across page refreshes and sessions
+- [x] **Role-Based Access Control (RBAC) (March 2026)** - Complete authentication and authorization system:
+  - **4 Roles**: User, Advertiser, Admin, Super Admin
+  - **Backend Auth Endpoints**: /api/auth/login, /api/auth/register, /api/auth/logout, /api/auth/me
+  - **User Management**: Admin Panel for creating, updating, deactivating, and deleting users
+  - **Sidebar Access Control**: Super Admin can configure which menu items each role can see
+  - **Permissions System**: Super Admin can configure granular permissions per role
+  - **Frontend Auth Context**: AuthProvider with hasPermission(), hasSidebarAccess(), hasRole() helpers
+  - **Protected Routes**: Unauthenticated users redirected to /login
+  - **Demo Accounts Created**:
+    - User: user@demo.com / demo123
+    - Advertiser: advertiser@demo.com / demo123
+    - Admin: admin@demo.com / demo123
+    - Super Admin: superadmin@demo.com / demo123
 
 ### Refactoring (March 2026)
 - [x] **CampaignWizard.jsx Refactored** - Broke down 3,933 line monolithic file into 12 modular components:
