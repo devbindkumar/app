@@ -23,30 +23,64 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../components/ui/collapsible";
 import { toast } from "sonner";
 import { 
-  Users, Shield, Settings, Plus, Trash2, UserCog, 
-  Check, X, Eye, EyeOff, LayoutDashboard
+  Users, Shield, Plus, Trash2, Eye, EyeOff, 
+  LayoutDashboard, ChevronDown, ChevronRight, 
+  UserPlus, LogIn, Save, RefreshCw
 } from "lucide-react";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AdminPanel() {
-  const { user, token, hasRole, refreshUser } = useAuth();
+  const { user, token, hasRole, refreshUser, login } = useAuth();
   const [users, setUsers] = useState([]);
+  const [hierarchy, setHierarchy] = useState(null);
   const [roleConfigs, setRoleConfigs] = useState({});
   const [sidebarItems, setSidebarItems] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showCreateUser, setShowCreateUser] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "user" });
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "advertiser" });
   const [selectedRole, setSelectedRole] = useState("user");
+  const [expandedAdmins, setExpandedAdmins] = useState({});
+  
+  // Local state for editing (multi-select with save)
+  const [editedSidebarAccess, setEditedSidebarAccess] = useState([]);
+  const [editedPermissions, setEditedPermissions] = useState([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const isSuperAdmin = hasRole("super_admin");
+  const isAdmin = hasRole("admin");
+
+  // Determine allowed roles for user creation based on current user's role
+  const getAllowedRoles = () => {
+    if (isSuperAdmin) {
+      return ["admin", "advertiser", "user"];
+    } else if (isAdmin) {
+      return ["advertiser", "user"];
+    }
+    return [];
+  };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Update local state when role selection changes
+  useEffect(() => {
+    if (roleConfigs[selectedRole]) {
+      setEditedSidebarAccess(roleConfigs[selectedRole].sidebar_access || []);
+      setEditedPermissions(roleConfigs[selectedRole].permissions || []);
+      setHasUnsavedChanges(false);
+    }
+  }, [selectedRole, roleConfigs]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -57,8 +91,11 @@ export default function AdminPanel() {
       const usersRes = await fetch(`${API_URL}/api/admin/users`, { headers });
       if (usersRes.ok) setUsers(await usersRes.json());
       
-      // Fetch role configs (super admin only)
+      // Fetch hierarchy (super admin only)
       if (isSuperAdmin) {
+        const hierarchyRes = await fetch(`${API_URL}/api/admin/users/hierarchy`, { headers });
+        if (hierarchyRes.ok) setHierarchy(await hierarchyRes.json());
+        
         const configsRes = await fetch(`${API_URL}/api/admin/roles/config`, { headers });
         if (configsRes.ok) setRoleConfigs(await configsRes.json());
         
@@ -99,7 +136,7 @@ export default function AdminPanel() {
 
       toast.success("User created successfully");
       setShowCreateUser(false);
-      setNewUser({ name: "", email: "", password: "", role: "user" });
+      setNewUser({ name: "", email: "", password: "", role: "advertiser" });
       fetchData();
     } catch (error) {
       toast.error(error.message);
@@ -165,15 +202,11 @@ export default function AdminPanel() {
     }
   };
 
-  const updateRoleSidebar = async (role, items) => {
+  const impersonateUser = async (userId, userName) => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/roles/${role}/sidebar`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ role, allowed_items: items }),
+      const response = await fetch(`${API_URL}/api/admin/impersonate/${userId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -181,23 +214,54 @@ export default function AdminPanel() {
         throw new Error(err.detail);
       }
 
-      toast.success("Sidebar access updated");
-      fetchData();
-      refreshUser(); // Refresh current user if their role was updated
+      const data = await response.json();
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('impersonating', 'true');
+      localStorage.setItem('original_user', user?.name || 'Super Admin');
+      toast.success(`Now viewing as ${userName}`);
+      window.location.href = '/dashboard';
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const updateRolePermissions = async (role, perms) => {
+  // Toggle sidebar access item in local state
+  const toggleSidebarItem = (itemId) => {
+    setEditedSidebarAccess(prev => {
+      const newItems = prev.includes(itemId)
+        ? prev.filter(i => i !== itemId)
+        : [...prev, itemId];
+      setHasUnsavedChanges(true);
+      return newItems;
+    });
+  };
+
+  // Toggle permission in local state
+  const togglePermission = (permId) => {
+    setEditedPermissions(prev => {
+      const newPerms = prev.includes(permId)
+        ? prev.filter(p => p !== permId)
+        : [...prev, permId];
+      setHasUnsavedChanges(true);
+      return newPerms;
+    });
+  };
+
+  // Save all changes (bulk update)
+  const saveAccessChanges = async () => {
+    setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/api/admin/roles/${role}/permissions`, {
+      const response = await fetch(`${API_URL}/api/admin/roles/bulk-update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ role, permissions: perms }),
+        body: JSON.stringify({
+          role: selectedRole,
+          sidebar_access: editedSidebarAccess,
+          permissions: editedPermissions,
+        }),
       });
 
       if (!response.ok) {
@@ -205,11 +269,15 @@ export default function AdminPanel() {
         throw new Error(err.detail);
       }
 
-      toast.success("Permissions updated");
+      const data = await response.json();
+      toast.success(`Access updated for ${selectedRole} role (${data.users_updated} users updated)`);
+      setHasUnsavedChanges(false);
       fetchData();
       refreshUser();
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -222,6 +290,13 @@ export default function AdminPanel() {
     }
   };
 
+  const toggleAdminExpand = (adminId) => {
+    setExpandedAdmins(prev => ({
+      ...prev,
+      [adminId]: !prev[adminId]
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -231,12 +306,16 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#F8FAFC]">Admin Panel</h1>
-          <p className="text-[#64748B]">Manage users, roles, and permissions</p>
+          <p className="text-[#64748B]">
+            {isSuperAdmin 
+              ? "Manage users, roles, and permissions across the platform"
+              : "Manage your team members"}
+          </p>
         </div>
         <Badge className={getRoleBadgeColor(user?.role)}>
           {user?.role?.replace("_", " ").toUpperCase()}
@@ -244,17 +323,17 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="surface-secondary">
+        <TabsList className="surface-secondary border border-[#2D3B55]">
           <TabsTrigger value="users" className="data-[state=active]:bg-[#3B82F6]">
             <Users className="w-4 h-4 mr-2" /> Users
           </TabsTrigger>
           {isSuperAdmin && (
             <>
-              <TabsTrigger value="sidebar" className="data-[state=active]:bg-[#3B82F6]">
-                <LayoutDashboard className="w-4 h-4 mr-2" /> Sidebar Access
+              <TabsTrigger value="hierarchy" className="data-[state=active]:bg-[#3B82F6]">
+                <UserPlus className="w-4 h-4 mr-2" /> Hierarchy
               </TabsTrigger>
-              <TabsTrigger value="permissions" className="data-[state=active]:bg-[#3B82F6]">
-                <Shield className="w-4 h-4 mr-2" /> Permissions
+              <TabsTrigger value="access" className="data-[state=active]:bg-[#3B82F6]">
+                <LayoutDashboard className="w-4 h-4 mr-2" /> Access Control
               </TabsTrigger>
             </>
           )}
@@ -265,13 +344,15 @@ export default function AdminPanel() {
           <Card className="surface-primary border-panel">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-[#F8FAFC]">User Management</CardTitle>
+                <CardTitle className="text-[#F8FAFC]">
+                  {isSuperAdmin ? "All Users" : "My Team"}
+                </CardTitle>
                 <CardDescription className="text-[#64748B]">
                   {users.length} total users
                 </CardDescription>
               </div>
               <Button onClick={() => setShowCreateUser(true)} className="bg-[#3B82F6]">
-                <Plus className="w-4 h-4 mr-2" /> Add User
+                <Plus className="w-4 h-4 mr-2" /> Add {isSuperAdmin ? "User" : "Team Member"}
               </Button>
             </CardHeader>
             <CardContent>
@@ -280,6 +361,7 @@ export default function AdminPanel() {
                   <TableRow className="border-[#2D3B55]">
                     <TableHead className="text-[#94A3B8]">User</TableHead>
                     <TableHead className="text-[#94A3B8]">Role</TableHead>
+                    <TableHead className="text-[#94A3B8]">Created By</TableHead>
                     <TableHead className="text-[#94A3B8]">Status</TableHead>
                     <TableHead className="text-[#94A3B8]">Created</TableHead>
                     <TableHead className="text-[#94A3B8]">Actions</TableHead>
@@ -316,6 +398,11 @@ export default function AdminPanel() {
                           </Badge>
                         )}
                       </TableCell>
+                      <TableCell className="text-[#64748B] text-sm">
+                        {u.created_by ? (
+                          users.find(x => x.id === u.created_by)?.name || "System"
+                        ) : "System"}
+                      </TableCell>
                       <TableCell>
                         <Badge className={u.is_active ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}>
                           {u.is_active ? "Active" : "Inactive"}
@@ -326,12 +413,24 @@ export default function AdminPanel() {
                       </TableCell>
                       <TableCell>
                         {u.id !== user?.id && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-1">
+                            {isSuperAdmin && u.role !== "super_admin" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => impersonateUser(u.id, u.name)}
+                                className="text-[#3B82F6] hover:text-[#3B82F6] hover:bg-[#3B82F6]/10"
+                                title="View as this user"
+                              >
+                                <LogIn className="w-4 h-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleUserStatus(u.id, u.is_active)}
                               className="text-[#64748B] hover:text-[#F8FAFC]"
+                              title={u.is_active ? "Deactivate" : "Activate"}
                             >
                               {u.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </Button>
@@ -340,7 +439,8 @@ export default function AdminPanel() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => deleteUser(u.id)}
-                                className="text-[#EF4444] hover:text-[#EF4444]"
+                                className="text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10"
+                                title="Delete user"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -356,77 +456,114 @@ export default function AdminPanel() {
           </Card>
         </TabsContent>
 
-        {/* Sidebar Access Tab (Super Admin only) */}
+        {/* Hierarchy Tab (Super Admin only) */}
         {isSuperAdmin && (
-          <TabsContent value="sidebar">
+          <TabsContent value="hierarchy">
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-[#F8FAFC]">Sidebar Access Control</CardTitle>
+                <CardTitle className="text-[#F8FAFC]">User Hierarchy</CardTitle>
                 <CardDescription className="text-[#64748B]">
-                  Configure which menu items each role can access
+                  View admins and their team members. Click on an admin to expand/collapse.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <Label className="text-[#94A3B8]">Select Role</Label>
-                  <Select value={selectedRole} onValueChange={setSelectedRole}>
-                    <SelectTrigger className="w-48 mt-2 surface-secondary border-[#2D3B55]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55]">
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="advertiser">Advertiser</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="super_admin">Super Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
-                  {sidebarItems.map((item) => {
-                    const isChecked = roleConfigs[selectedRole]?.sidebar_access?.includes(item.id);
-                    return (
-                      <div
-                        key={item.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                          isChecked 
-                            ? "border-[#3B82F6] bg-[#3B82F6]/10" 
-                            : "border-[#2D3B55] hover:border-[#3B82F6]/50"
-                        }`}
-                        onClick={() => {
-                          const currentItems = roleConfigs[selectedRole]?.sidebar_access || [];
-                          const newItems = isChecked
-                            ? currentItems.filter((i) => i !== item.id)
-                            : [...currentItems, item.id];
-                          updateRoleSidebar(selectedRole, newItems);
-                        }}
-                      >
-                        <Checkbox checked={isChecked} className="pointer-events-none" />
-                        <span className="text-sm text-[#F8FAFC]">{item.label}</span>
+              <CardContent className="space-y-4">
+                {hierarchy?.admins?.map((admin) => (
+                  <Collapsible
+                    key={admin.id}
+                    open={expandedAdmins[admin.id]}
+                    onOpenChange={() => toggleAdminExpand(admin.id)}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center justify-between p-4 rounded-lg border border-[#2D3B55] hover:border-[#3B82F6]/50 cursor-pointer transition-colors">
+                        <div className="flex items-center gap-4">
+                          {expandedAdmins[admin.id] ? (
+                            <ChevronDown className="w-5 h-5 text-[#64748B]" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-[#64748B]" />
+                          )}
+                          <div className="w-10 h-10 rounded-full bg-[#10B981]/20 flex items-center justify-center">
+                            <span className="text-[#10B981] font-medium">{admin.name?.charAt(0)}</span>
+                          </div>
+                          <div>
+                            <p className="text-[#F8FAFC] font-medium">{admin.name}</p>
+                            <p className="text-[#64748B] text-sm">{admin.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge className="bg-[#10B981]/20 text-[#10B981]">Admin</Badge>
+                          <Badge variant="outline" className="border-[#2D3B55] text-[#94A3B8]">
+                            {admin.children_count} team members
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); impersonateUser(admin.id, admin.name); }}
+                            className="text-[#3B82F6]"
+                          >
+                            <LogIn className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="ml-14 mt-2 space-y-2">
+                      {admin.children?.map((child) => (
+                        <div 
+                          key={child.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#3B82F6]/20 flex items-center justify-center">
+                              <span className="text-[#3B82F6] text-sm">{child.name?.charAt(0)}</span>
+                            </div>
+                            <div>
+                              <p className="text-[#F8FAFC] text-sm">{child.name}</p>
+                              <p className="text-[#64748B] text-xs">{child.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={getRoleBadgeColor(child.role)} variant="outline">
+                              {child.role}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => impersonateUser(child.id, child.name)}
+                              className="text-[#3B82F6] h-7"
+                            >
+                              <LogIn className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      {admin.children?.length === 0 && (
+                        <p className="text-[#64748B] text-sm p-3">No team members yet</p>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+                
+                {hierarchy?.admins?.length === 0 && (
+                  <p className="text-[#64748B] text-center py-8">No admins created yet</p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
         )}
 
-        {/* Permissions Tab (Super Admin only) */}
+        {/* Access Control Tab (Super Admin only) */}
         {isSuperAdmin && (
-          <TabsContent value="permissions">
+          <TabsContent value="access">
             <Card className="surface-primary border-panel">
-              <CardHeader>
-                <CardTitle className="text-[#F8FAFC]">Role Permissions</CardTitle>
-                <CardDescription className="text-[#64748B]">
-                  Configure permissions for each role
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <Label className="text-[#94A3B8]">Select Role</Label>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-[#F8FAFC]">Access Control</CardTitle>
+                  <CardDescription className="text-[#64748B]">
+                    Configure sidebar access and permissions for each role
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-3">
                   <Select value={selectedRole} onValueChange={setSelectedRole}>
-                    <SelectTrigger className="w-48 mt-2 surface-secondary border-[#2D3B55]">
+                    <SelectTrigger className="w-40 surface-secondary border-[#2D3B55]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="surface-primary border-[#2D3B55]">
@@ -436,36 +573,90 @@ export default function AdminPanel() {
                       <SelectItem value="super_admin">Super Admin</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button
+                    onClick={saveAccessChanges}
+                    disabled={!hasUnsavedChanges || saving}
+                    className={hasUnsavedChanges ? "bg-[#10B981] hover:bg-[#10B981]/90" : "bg-[#3B82F6] opacity-50"}
+                  >
+                    {saving ? (
+                      <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                    ) : (
+                      <><Save className="w-4 h-4 mr-2" /> Save Changes</>
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Sidebar Access */}
+                <div>
+                  <h3 className="text-[#F8FAFC] font-medium mb-3 flex items-center gap-2">
+                    <LayoutDashboard className="w-4 h-4 text-[#3B82F6]" />
+                    Sidebar Menu Access
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    {sidebarItems.map((item) => {
+                      const isChecked = editedSidebarAccess.includes(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => toggleSidebarItem(item.id)}
+                          className={`flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-all ${
+                            isChecked 
+                              ? "border-[#3B82F6] bg-[#3B82F6]/10" 
+                              : "border-[#2D3B55] hover:border-[#3B82F6]/50 bg-[#0B1221]"
+                          }`}
+                        >
+                          <Checkbox 
+                            checked={isChecked} 
+                            className="pointer-events-none data-[state=checked]:bg-[#3B82F6]" 
+                          />
+                          <span className="text-sm text-[#F8FAFC] truncate">{item.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
-                  {permissions.map((perm) => {
-                    const isChecked = roleConfigs[selectedRole]?.permissions?.includes(perm.id);
-                    return (
-                      <div
-                        key={perm.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                          isChecked 
-                            ? "border-[#10B981] bg-[#10B981]/10" 
-                            : "border-[#2D3B55] hover:border-[#10B981]/50"
-                        }`}
-                        onClick={() => {
-                          const currentPerms = roleConfigs[selectedRole]?.permissions || [];
-                          const newPerms = isChecked
-                            ? currentPerms.filter((p) => p !== perm.id)
-                            : [...currentPerms, perm.id];
-                          updateRolePermissions(selectedRole, newPerms);
-                        }}
-                      >
-                        <Checkbox checked={isChecked} className="pointer-events-none" />
-                        <div>
-                          <span className="text-sm text-[#F8FAFC]">{perm.label}</span>
-                          <p className="text-xs text-[#64748B]">{perm.category}</p>
+                {/* Permissions */}
+                <div className="pt-4 border-t border-[#2D3B55]">
+                  <h3 className="text-[#F8FAFC] font-medium mb-3 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-[#10B981]" />
+                    Permissions
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    {permissions.map((perm) => {
+                      const isChecked = editedPermissions.includes(perm.id);
+                      return (
+                        <div
+                          key={perm.id}
+                          onClick={() => togglePermission(perm.id)}
+                          className={`flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-all ${
+                            isChecked 
+                              ? "border-[#10B981] bg-[#10B981]/10" 
+                              : "border-[#2D3B55] hover:border-[#10B981]/50 bg-[#0B1221]"
+                          }`}
+                        >
+                          <Checkbox 
+                            checked={isChecked} 
+                            className="pointer-events-none data-[state=checked]:bg-[#10B981]" 
+                          />
+                          <div className="min-w-0">
+                            <span className="text-sm text-[#F8FAFC] truncate block">{perm.label}</span>
+                            <span className="text-xs text-[#64748B]">{perm.category}</span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {hasUnsavedChanges && (
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/30">
+                    <p className="text-sm text-[#F59E0B]">
+                      You have unsaved changes. Click "Save Changes" to apply them to all users with this role.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -476,7 +667,9 @@ export default function AdminPanel() {
       <Dialog open={showCreateUser} onOpenChange={setShowCreateUser}>
         <DialogContent className="surface-primary border-panel">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Create New User</DialogTitle>
+            <DialogTitle className="text-[#F8FAFC]">
+              Create {isSuperAdmin ? "New User" : "New Team Member"}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -518,16 +711,18 @@ export default function AdminPanel() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="surface-primary border-[#2D3B55]">
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="advertiser">Advertiser</SelectItem>
-                  {isSuperAdmin && (
-                    <>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="super_admin">Super Admin</SelectItem>
-                    </>
-                  )}
+                  {getAllowedRoles().map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1).replace("_", " ")}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-[#64748B]">
+                {isSuperAdmin 
+                  ? "As Super Admin, you can create Admin, Advertiser, or User accounts"
+                  : "As Admin, you can create Advertiser or User accounts"}
+              </p>
             </div>
           </div>
           <DialogFooter>
@@ -535,7 +730,7 @@ export default function AdminPanel() {
               Cancel
             </Button>
             <Button onClick={createUser} className="bg-[#3B82F6]">
-              Create User
+              Create
             </Button>
           </DialogFooter>
         </DialogContent>
