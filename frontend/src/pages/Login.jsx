@@ -28,7 +28,6 @@ export default function Login() {
 
   const loginAsDemo = async (role) => {
     const credentials = {
-      user: { email: "user@demo.com", password: "demo123" },
       advertiser: { email: "advertiser@demo.com", password: "demo123" },
       admin: { email: "admin@demo.com", password: "demo123" },
       super_admin: { email: "superadmin@demo.com", password: "demo123" },
@@ -120,23 +119,13 @@ export default function Login() {
 
             <div className="mt-6 pt-6 border-t border-[#2D3B55]">
               <p className="text-sm text-[#64748B] text-center mb-4">Quick login with demo accounts</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => loginAsDemo("user")}
-                  disabled={loading}
-                  className="border-[#2D3B55] text-[#94A3B8] hover:bg-[#1E293B]"
-                  data-testid="demo-user"
-                >
-                  User
-                </Button>
+              <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => loginAsDemo("advertiser")}
                   disabled={loading}
-                  className="border-[#2D3B55] text-[#94A3B8] hover:bg-[#1E293B]"
+                  className="border-[#2D3B55] text-[#3B82F6] hover:bg-[#1E293B]"
                   data-testid="demo-advertiser"
                 >
                   Advertiser

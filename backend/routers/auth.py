@@ -1,6 +1,7 @@
 """
 Authentication and Role-Based Access Control (RBAC) endpoints
-Roles: User, Advertiser, Admin, Super Admin
+Roles: Advertiser, Admin, Super Admin (3-tier hierarchy)
+Hierarchy: Super Admin → Admin → Advertiser
 Features: Password Reset, 2FA (TOTP), Audit Logging, Data Ownership
 """
 from fastapi import APIRouter, HTTPException, Depends, Header, Request
@@ -23,7 +24,6 @@ router = APIRouter(tags=["Authentication"])
 
 # ============== ENUMS ==============
 class UserRole(str, Enum):
-    USER = "user"
     ADVERTISER = "advertiser"
     ADMIN = "admin"
     SUPER_ADMIN = "super_admin"
@@ -34,7 +34,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=6)
     name: str
-    role: UserRole = UserRole.USER
+    role: UserRole = UserRole.ADVERTISER
 
 
 class UserLogin(BaseModel):
@@ -112,10 +112,6 @@ class TwoFALoginVerify(BaseModel):
 
 # ============== DEFAULT PERMISSIONS ==============
 DEFAULT_PERMISSIONS = {
-    UserRole.USER: [
-        "view_dashboard",
-        "view_reports",
-    ],
     UserRole.ADVERTISER: [
         "view_dashboard",
         "view_reports",
@@ -158,10 +154,6 @@ DEFAULT_PERMISSIONS = {
 
 # ============== DEFAULT SIDEBAR ACCESS ==============
 DEFAULT_SIDEBAR_ACCESS = {
-    UserRole.USER: [
-        "dashboard",
-        "reports",
-    ],
     UserRole.ADVERTISER: [
         "dashboard",
         "campaigns",
@@ -191,6 +183,7 @@ DEFAULT_SIDEBAR_ACCESS = {
         "fraud",
         "audiences",
         "attribution",
+        "admin_panel",
     ],
     UserRole.SUPER_ADMIN: [
         "dashboard",
@@ -550,17 +543,15 @@ async def get_me(user: dict = Depends(get_current_user)):
 
 
 # ============== HIERARCHICAL USER MANAGEMENT ==============
-# Hierarchy: Super Admin -> Admin -> Advertiser -> User
+# Hierarchy: Super Admin -> Admin -> Advertiser (3-tier)
 
 def get_allowed_child_roles(parent_role: str) -> List[str]:
     """Get roles that a parent can create"""
     if parent_role == UserRole.SUPER_ADMIN.value:
-        return [UserRole.ADMIN.value, UserRole.ADVERTISER.value, UserRole.USER.value]
+        return [UserRole.ADMIN.value]  # Super Admin can ONLY create Admins
     elif parent_role == UserRole.ADMIN.value:
-        return [UserRole.ADVERTISER.value, UserRole.USER.value]
-    elif parent_role == UserRole.ADVERTISER.value:
-        return [UserRole.USER.value]
-    return []
+        return [UserRole.ADVERTISER.value]  # Admin can ONLY create Advertisers
+    return []  # Advertisers cannot create accounts
 
 
 @router.get("/admin/users")
@@ -629,10 +620,15 @@ async def create_user(
     allowed_roles = get_allowed_child_roles(current_role)
     
     if requested_role not in allowed_roles:
-        if current_role == UserRole.ADMIN.value:
+        if current_role == UserRole.SUPER_ADMIN.value:
             raise HTTPException(
                 status_code=403,
-                detail="Admin can only create Advertiser or User accounts"
+                detail="Super Admin can only create Admin accounts"
+            )
+        elif current_role == UserRole.ADMIN.value:
+            raise HTTPException(
+                status_code=403,
+                detail="Admin can only create Advertiser accounts"
             )
         raise HTTPException(
             status_code=403,
@@ -888,14 +884,8 @@ async def get_all_permissions(user: dict = Depends(require_role([UserRole.ADMIN,
 # ============== SEED DEMO ACCOUNTS ==============
 @router.post("/admin/seed-demo-accounts")
 async def seed_demo_accounts():
-    """Create demo accounts for testing (one-time setup)"""
+    """Create demo accounts for testing (one-time setup) - 3 tier hierarchy"""
     demo_accounts = [
-        {
-            "email": "user@demo.com",
-            "password": "demo123",
-            "name": "Demo User",
-            "role": UserRole.USER,
-        },
         {
             "email": "advertiser@demo.com",
             "password": "demo123",
@@ -917,10 +907,15 @@ async def seed_demo_accounts():
     ]
     
     created = []
+    admin_id = None
+    
+    # First pass - create accounts
     for account in demo_accounts:
         existing = await db.users.find_one({"email": account["email"]})
         if existing:
             created.append({"email": account["email"], "status": "already_exists"})
+            if account["role"] == UserRole.ADMIN:
+                admin_id = existing["id"]
             continue
         
         role = account["role"]
@@ -936,18 +931,27 @@ async def seed_demo_accounts():
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
+        
+        # Link advertiser to admin
+        if role == UserRole.ADVERTISER and admin_id:
+            user["parent_id"] = admin_id
+            user["created_by"] = admin_id
+        
         await db.users.insert_one(user)
         created.append({"email": account["email"], "status": "created", "role": role.value})
+        
+        if role == UserRole.ADMIN:
+            admin_id = user["id"]
     
     return {
         "status": "success",
         "accounts": created,
         "credentials": {
-            "user": {"email": "user@demo.com", "password": "demo123"},
             "advertiser": {"email": "advertiser@demo.com", "password": "demo123"},
             "admin": {"email": "admin@demo.com", "password": "demo123"},
             "super_admin": {"email": "superadmin@demo.com", "password": "demo123"},
-        }
+        },
+        "hierarchy_note": "Super Admin → Admin → Advertiser (3-tier system)"
     }
 
 
@@ -1386,3 +1390,281 @@ async def get_audit_logs_endpoint(
         user_id_filter=user_id
     )
 
+
+# ============== ADMIN DASHBOARD STATS ==============
+@router.get("/admin/stats")
+async def get_admin_stats(current_user: dict = Depends(require_role([UserRole.ADMIN, UserRole.SUPER_ADMIN]))):
+    """
+    Get quick stats for admin dashboard.
+    Super Admin: sees all stats
+    Admin: sees only their advertisers' stats
+    """
+    if current_user["role"] == UserRole.SUPER_ADMIN.value:
+        total_admins = await db.users.count_documents({"role": UserRole.ADMIN.value})
+        total_advertisers = await db.users.count_documents({"role": UserRole.ADVERTISER.value})
+        total_campaigns = await db.campaigns.count_documents({})
+        total_creatives = await db.creatives.count_documents({})
+        active_campaigns = await db.campaigns.count_documents({"status": "active"})
+    else:
+        # Admin sees only their data
+        total_admins = 0  # Admin doesn't see other admins
+        advertiser_ids = await db.users.find(
+            {"parent_id": current_user["id"], "role": UserRole.ADVERTISER.value},
+            {"id": 1, "_id": 0}
+        ).to_list(1000)
+        advertiser_id_list = [a["id"] for a in advertiser_ids]
+        total_advertisers = len(advertiser_id_list)
+        
+        # Count campaigns owned by admin or their advertisers
+        owner_ids = [current_user["id"]] + advertiser_id_list
+        total_campaigns = await db.campaigns.count_documents({"owner_id": {"$in": owner_ids}})
+        total_creatives = await db.creatives.count_documents({"owner_id": {"$in": owner_ids}})
+        active_campaigns = await db.campaigns.count_documents({"owner_id": {"$in": owner_ids}, "status": "active"})
+    
+    return {
+        "total_admins": total_admins,
+        "total_advertisers": total_advertisers,
+        "total_campaigns": total_campaigns,
+        "total_creatives": total_creatives,
+        "active_campaigns": active_campaigns
+    }
+
+
+@router.get("/admin/activity-timeline")
+async def get_activity_timeline(
+    limit: int = 20,
+    current_user: dict = Depends(require_role([UserRole.ADMIN, UserRole.SUPER_ADMIN]))
+):
+    """
+    Get recent activity timeline across admins/advertisers.
+    Shows user creation, campaign creation, login events etc.
+    """
+    if current_user["role"] == UserRole.SUPER_ADMIN.value:
+        # Super Admin sees all activity
+        query = {}
+    else:
+        # Admin sees only activity from themselves and their advertisers
+        advertiser_ids = await db.users.find(
+            {"parent_id": current_user["id"]},
+            {"id": 1, "_id": 0}
+        ).to_list(1000)
+        user_ids = [current_user["id"]] + [a["id"] for a in advertiser_ids]
+        query = {"actor.user_id": {"$in": user_ids}}
+    
+    # Get recent audit logs as activity
+    activities = await db.audit_logs.find(
+        query,
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    # Format activities for display
+    formatted = []
+    for act in activities:
+        formatted.append({
+            "timestamp": act.get("timestamp"),
+            "action": act.get("action"),
+            "actor_name": act.get("actor", {}).get("email", "Unknown"),
+            "actor_role": act.get("actor", {}).get("role", "unknown"),
+            "target_type": act.get("target", {}).get("type") if act.get("target") else None,
+            "target_name": act.get("target", {}).get("name") if act.get("target") else None,
+            "success": act.get("success", True),
+            "details": act.get("details")
+        })
+    
+    return {"activities": formatted, "total": len(formatted)}
+
+
+@router.get("/admin/users/export")
+async def export_users_csv(current_user: dict = Depends(require_role([UserRole.ADMIN, UserRole.SUPER_ADMIN]))):
+    """
+    Export users list to CSV format.
+    Super Admin: all users
+    Admin: only their advertisers
+    """
+    from fastapi.responses import StreamingResponse
+    import csv
+    from io import StringIO
+    
+    if current_user["role"] == UserRole.SUPER_ADMIN.value:
+        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    else:
+        users = await db.users.find(
+            {"parent_id": current_user["id"]},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(1000)
+    
+    # Create CSV
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(["Name", "Email", "Role", "Status", "Created At", "Created By"])
+    
+    # Get all users for lookup
+    all_users = await db.users.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(1000)
+    user_name_map = {u["id"]: u["name"] for u in all_users}
+    
+    for user in users:
+        created_by_name = user_name_map.get(user.get("created_by"), "System")
+        writer.writerow([
+            user.get("name", ""),
+            user.get("email", ""),
+            user.get("role", ""),
+            "Active" if user.get("is_active", True) else "Inactive",
+            user.get("created_at", "")[:10] if user.get("created_at") else "",
+            created_by_name
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=users_export.csv"}
+    )
+
+
+@router.get("/admin/users/search")
+async def search_users(
+    q: str = "",
+    role: Optional[str] = None,
+    current_user: dict = Depends(require_role([UserRole.ADMIN, UserRole.SUPER_ADMIN]))
+):
+    """
+    Search users by name or email with optional role filter.
+    """
+    query = {}
+    
+    # Apply search query
+    if q:
+        query["$or"] = [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"email": {"$regex": q, "$options": "i"}}
+        ]
+    
+    # Apply role filter
+    if role:
+        query["role"] = role
+    
+    # Apply hierarchy restrictions for Admin
+    if current_user["role"] != UserRole.SUPER_ADMIN.value:
+        query["parent_id"] = current_user["id"]
+    
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).to_list(100)
+    return users
+
+
+@router.get("/admin/advertiser/{advertiser_id}/dashboard-data")
+async def get_advertiser_dashboard_data(
+    advertiser_id: str,
+    current_user: dict = Depends(require_role([UserRole.ADMIN, UserRole.SUPER_ADMIN]))
+):
+    """
+    Get dashboard data for a specific advertiser (for view-as feature).
+    Returns the same data the advertiser would see.
+    """
+    # Verify access
+    advertiser = await db.users.find_one({"id": advertiser_id}, {"_id": 0, "password_hash": 0})
+    if not advertiser:
+        raise HTTPException(status_code=404, detail="Advertiser not found")
+    
+    if advertiser["role"] != UserRole.ADVERTISER.value:
+        raise HTTPException(status_code=400, detail="Target user is not an advertiser")
+    
+    # Admin can only view their own advertisers
+    if current_user["role"] == UserRole.ADMIN.value:
+        if advertiser.get("parent_id") != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Cannot view this advertiser's data")
+    
+    # Get advertiser's campaigns
+    campaigns = await db.campaigns.find(
+        {"owner_id": advertiser_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get advertiser's creatives
+    creatives = await db.creatives.find(
+        {"owner_id": advertiser_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Calculate stats
+    total_campaigns = len(campaigns)
+    active_campaigns = len([c for c in campaigns if c.get("status") == "active"])
+    total_spend = sum(c.get("budget", {}).get("total_spent", 0) for c in campaigns)
+    total_impressions = sum(c.get("wins", 0) for c in campaigns)
+    
+    return {
+        "advertiser": {
+            "id": advertiser["id"],
+            "name": advertiser["name"],
+            "email": advertiser["email"],
+            "created_at": advertiser.get("created_at"),
+            "is_active": advertiser.get("is_active", True)
+        },
+        "stats": {
+            "total_campaigns": total_campaigns,
+            "active_campaigns": active_campaigns,
+            "total_creatives": len(creatives),
+            "total_spend": total_spend,
+            "total_impressions": total_impressions
+        },
+        "campaigns": campaigns[:10],  # Return last 10 campaigns
+        "creatives": creatives[:10]   # Return last 10 creatives
+    }
+
+
+@router.get("/admin/admin/{admin_id}/dashboard-data")
+async def get_admin_dashboard_data(
+    admin_id: str,
+    current_user: dict = Depends(require_role([UserRole.SUPER_ADMIN]))
+):
+    """
+    Get dashboard data for a specific admin (Super Admin only).
+    Returns the admin's advertisers and aggregate stats.
+    """
+    admin = await db.users.find_one({"id": admin_id}, {"_id": 0, "password_hash": 0})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    if admin["role"] != UserRole.ADMIN.value:
+        raise HTTPException(status_code=400, detail="Target user is not an admin")
+    
+    # Get admin's advertisers
+    advertisers = await db.users.find(
+        {"parent_id": admin_id, "role": UserRole.ADVERTISER.value},
+        {"_id": 0, "password_hash": 0}
+    ).to_list(100)
+    
+    # Get aggregate stats across all advertisers
+    advertiser_ids = [a["id"] for a in advertisers]
+    owner_ids = [admin_id] + advertiser_ids
+    
+    campaigns = await db.campaigns.find(
+        {"owner_id": {"$in": owner_ids}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    creatives_count = await db.creatives.count_documents({"owner_id": {"$in": owner_ids}})
+    
+    total_spend = sum(c.get("budget", {}).get("total_spent", 0) for c in campaigns)
+    total_impressions = sum(c.get("wins", 0) for c in campaigns)
+    
+    return {
+        "admin": {
+            "id": admin["id"],
+            "name": admin["name"],
+            "email": admin["email"],
+            "created_at": admin.get("created_at"),
+            "is_active": admin.get("is_active", True)
+        },
+        "stats": {
+            "total_advertisers": len(advertisers),
+            "total_campaigns": len(campaigns),
+            "active_campaigns": len([c for c in campaigns if c.get("status") == "active"]),
+            "total_creatives": creatives_count,
+            "total_spend": total_spend,
+            "total_impressions": total_impressions
+        },
+        "advertisers": advertisers
+    }
