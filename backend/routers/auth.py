@@ -16,7 +16,7 @@ import pyotp
 import base64
 import io
 
-from routers.shared import db
+from routers.shared import db, logger
 from routers.audit import log_audit, AuditAction, get_audit_logs
 
 router = APIRouter(tags=["Authentication"])
@@ -442,6 +442,32 @@ async def login(credentials: UserLogin, request: Request):
         success=True
     )
     
+    # Check for suspicious login (new IP address)
+    ip_address = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")
+    
+    # Get user's recent login IPs
+    recent_logins = await db.audit_logs.find({
+        "actor.user_id": user["id"],
+        "action": AuditAction.AUTH_LOGIN,
+        "success": True
+    }).sort("timestamp", -1).limit(10).to_list(10)
+    
+    known_ips = set(log.get("ip_address") for log in recent_logins if log.get("ip_address"))
+    
+    # If this is a new IP and user has logged in before, send alert
+    if len(recent_logins) > 1 and ip_address not in known_ips:
+        try:
+            from routers.email_service import send_suspicious_login_alert
+            await send_suspicious_login_alert(
+                user_email=user["email"],
+                user_name=user.get("name", "User"),
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send suspicious login alert: {e}")
+    
     # Return response
     user_response = UserResponse(
         id=user["id"],
@@ -688,6 +714,19 @@ async def create_user(
     }
     
     await db.users.insert_one(user)
+    
+    # Send email notification to the admin who created the user
+    try:
+        from routers.email_service import send_new_user_notification
+        await send_new_user_notification(
+            admin_email=current_user["email"],
+            admin_name=current_user["name"],
+            new_user_name=user_data.name,
+            new_user_email=user_data.email,
+            new_user_role=user_data.role.value
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send new user email notification: {e}")
     
     return UserResponse(
         id=user["id"],
@@ -1184,7 +1223,7 @@ async def get_my_data_scope(current_user: dict = Depends(get_current_user)):
 async def request_password_reset(data: PasswordResetRequest, request: Request):
     """
     Request a password reset. 
-    In production, this would send an email. For demo, we return the token directly.
+    Sends an email with the reset link.
     """
     user = await db.users.find_one({"email": data.email.lower()}, {"_id": 0})
     
@@ -1215,12 +1254,22 @@ async def request_password_reset(data: PasswordResetRequest, request: Request):
         success=True
     )
     
-    # In production, send email here. For demo, return token directly.
+    # Send password reset email
+    try:
+        from routers.email_service import send_password_reset_email
+        await send_password_reset_email(
+            user_email=user["email"],
+            user_name=user.get("name", "User"),
+            reset_token=reset_token
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send password reset email: {e}")
+    
     return {
         "status": "success",
-        "message": "Password reset link generated",
-        "reset_token": reset_token,  # Remove this in production!
-        "reset_url": f"/reset-password?token={reset_token}"  # For demo
+        "message": "Password reset link sent to your email",
+        "reset_token": reset_token,  # Keep for demo purposes
+        "reset_url": f"/reset-password?token={reset_token}"
     }
 
 

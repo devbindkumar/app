@@ -295,3 +295,68 @@ async def bulk_delete_campaigns(campaign_ids: List[str]):
     result = await db.campaigns.delete_many({"id": {"$in": campaign_ids}})
     return {"deleted": result.deleted_count}
 
+
+@router.post("/campaigns/{campaign_id}/check-budget")
+async def check_campaign_budget(
+    campaign_id: str,
+    authorization: Optional[str] = Header(None)
+):
+    """
+    Check campaign budget and send alert if below threshold.
+    Thresholds: 90% (critical), 75% (warning)
+    """
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    budget = campaign.get("budget", {})
+    # Support both "total" and "total_budget" field names
+    total_budget = budget.get("total", 0) or budget.get("total_budget", 0)
+    # Support both "total_spent" and "total_spend" field names
+    spent = budget.get("total_spent", 0) or budget.get("total_spend", 0)
+    
+    if total_budget <= 0:
+        return {"status": "no_budget", "message": "No budget configured"}
+    
+    percentage_used = (spent / total_budget) * 100
+    remaining = total_budget - spent
+    
+    # Get campaign owner for email
+    owner_id = campaign.get("owner_id")
+    owner = await db.users.find_one({"id": owner_id}, {"_id": 0, "password_hash": 0}) if owner_id else None
+    
+    alert_sent = False
+    alert_type = None
+    
+    if percentage_used >= 90:
+        alert_type = "critical"
+    elif percentage_used >= 75:
+        alert_type = "warning"
+    
+    if alert_type and owner:
+        try:
+            from routers.email_service import send_budget_alert
+            await send_budget_alert(
+                user_email=owner["email"],
+                user_name=owner.get("name", "User"),
+                campaign_name=campaign.get("name", "Unknown Campaign"),
+                campaign_id=campaign_id,
+                percentage_used=percentage_used,
+                remaining_budget=remaining
+            )
+            alert_sent = True
+        except Exception as e:
+            import logging
+            logging.warning(f"Failed to send budget alert: {e}")
+    
+    return {
+        "campaign_id": campaign_id,
+        "campaign_name": campaign.get("name"),
+        "total_budget": total_budget,
+        "spent": spent,
+        "remaining": remaining,
+        "percentage_used": round(percentage_used, 2),
+        "alert_type": alert_type,
+        "alert_sent": alert_sent
+    }
+
