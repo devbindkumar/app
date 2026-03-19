@@ -190,6 +190,14 @@ export default function Layout() {
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#2D3B55]" />
               <DropdownMenuItem 
+                onClick={() => window.location.href = '/settings'}
+                className="text-[#F8FAFC] focus:text-[#F8FAFC] cursor-pointer"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Email Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#2D3B55]" />
+              <DropdownMenuItem 
                 onClick={logout}
                 className="text-[#EF4444] focus:text-[#EF4444] cursor-pointer"
               >

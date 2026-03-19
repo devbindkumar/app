@@ -30,6 +30,7 @@ import Audiences from "./pages/Audiences";
 import Attribution from "./pages/Attribution";
 import BidStream from "./pages/BidStream";
 import MediaPlanner from "./pages/MediaPlanner";
+import Settings from "./pages/Settings";
 import "./App.css";
 
 function App() {
@@ -80,6 +81,7 @@ function App() {
               <Route path="media-planner" element={<ProtectedRoute requiredSidebarAccess="media_planner"><MediaPlanner /></ProtectedRoute>} />
               <Route path="migration-matrix" element={<ProtectedRoute requiredSidebarAccess="migration"><MigrationMatrix /></ProtectedRoute>} />
               <Route path="admin" element={<ProtectedRoute requiredSidebarAccess="admin_panel"><AdminPanel /></ProtectedRoute>} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
         </NotificationProvider>

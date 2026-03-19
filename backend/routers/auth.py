@@ -110,6 +110,45 @@ class TwoFALoginVerify(BaseModel):
     code: str
 
 
+# ============== EMAIL PREFERENCES ==============
+class EmailPreferences(BaseModel):
+    # Notification toggles
+    new_user_notifications: bool = True  # Admin: when new user created under them
+    security_alerts: bool = True  # Suspicious login alerts
+    budget_alerts: bool = True  # Campaign budget warnings
+    password_reset_notifications: bool = True  # Password reset confirmations
+    system_announcements: bool = True  # Platform announcements
+    weekly_digest: bool = False  # Weekly summary instead of individual emails
+    
+    # Budget alert settings
+    budget_warning_threshold: int = 75  # Percentage at which to send warning
+    budget_critical_threshold: int = 90  # Percentage at which to send critical alert
+    
+    # Delivery preferences
+    digest_day: str = "monday"  # Day to send weekly digest
+    quiet_hours_enabled: bool = False  # Pause non-critical notifications during quiet hours
+    quiet_hours_start: int = 22  # 10 PM
+    quiet_hours_end: int = 8  # 8 AM
+
+
+class EmailPreferencesUpdate(BaseModel):
+    new_user_notifications: Optional[bool] = None
+    security_alerts: Optional[bool] = None
+    budget_alerts: Optional[bool] = None
+    password_reset_notifications: Optional[bool] = None
+    system_announcements: Optional[bool] = None
+    weekly_digest: Optional[bool] = None
+    budget_warning_threshold: Optional[int] = None
+    budget_critical_threshold: Optional[int] = None
+    digest_day: Optional[str] = None
+    quiet_hours_enabled: Optional[bool] = None
+    quiet_hours_start: Optional[int] = None
+    quiet_hours_end: Optional[int] = None
+
+
+DEFAULT_EMAIL_PREFERENCES = EmailPreferences().model_dump()
+
+
 # ============== DEFAULT PERMISSIONS ==============
 DEFAULT_PERMISSIONS = {
     UserRole.ADVERTISER: [
@@ -463,7 +502,8 @@ async def login(credentials: UserLogin, request: Request):
                 user_email=user["email"],
                 user_name=user.get("name", "User"),
                 ip_address=ip_address,
-                user_agent=user_agent
+                user_agent=user_agent,
+                user_id=user["id"]  # Pass user_id for preference check
             )
         except Exception as e:
             logger.warning(f"Failed to send suspicious login alert: {e}")
@@ -723,7 +763,8 @@ async def create_user(
             admin_name=current_user["name"],
             new_user_name=user_data.name,
             new_user_email=user_data.email,
-            new_user_role=user_data.role.value
+            new_user_role=user_data.role.value,
+            admin_id=current_user["id"]  # Pass admin_id for preference check
         )
     except Exception as e:
         logger.warning(f"Failed to send new user email notification: {e}")
@@ -1260,7 +1301,8 @@ async def request_password_reset(data: PasswordResetRequest, request: Request):
         await send_password_reset_email(
             user_email=user["email"],
             user_name=user.get("name", "User"),
-            reset_token=reset_token
+            reset_token=reset_token,
+            user_id=user["id"]  # Pass user_id for preference check
         )
     except Exception as e:
         logger.warning(f"Failed to send password reset email: {e}")
@@ -1799,3 +1841,150 @@ async def get_admin_dashboard_data(
         },
         "advertisers": advertisers
     }
+
+
+# ============== EMAIL PREFERENCES ==============
+
+@router.get("/auth/email-preferences")
+async def get_email_preferences(current_user: dict = Depends(get_current_user)):
+    """Get current user's email notification preferences"""
+    user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0, "email_preferences": 1})
+    
+    # Return existing preferences or defaults
+    preferences = user.get("email_preferences") if user else None
+    if not preferences:
+        preferences = DEFAULT_EMAIL_PREFERENCES
+    
+    return {
+        "preferences": preferences,
+        "defaults": DEFAULT_EMAIL_PREFERENCES
+    }
+
+
+@router.put("/auth/email-preferences")
+async def update_email_preferences(
+    updates: EmailPreferencesUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user's email notification preferences"""
+    # Get current preferences
+    user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0, "email_preferences": 1})
+    current_prefs = user.get("email_preferences", DEFAULT_EMAIL_PREFERENCES) if user else DEFAULT_EMAIL_PREFERENCES
+    
+    # Apply updates
+    update_data = updates.model_dump(exclude_none=True)
+    
+    # Validate threshold values
+    if "budget_warning_threshold" in update_data:
+        if not 10 <= update_data["budget_warning_threshold"] <= 95:
+            raise HTTPException(status_code=400, detail="Budget warning threshold must be between 10 and 95")
+    
+    if "budget_critical_threshold" in update_data:
+        if not 50 <= update_data["budget_critical_threshold"] <= 100:
+            raise HTTPException(status_code=400, detail="Budget critical threshold must be between 50 and 100")
+    
+    # Ensure critical > warning
+    warning = update_data.get("budget_warning_threshold", current_prefs.get("budget_warning_threshold", 75))
+    critical = update_data.get("budget_critical_threshold", current_prefs.get("budget_critical_threshold", 90))
+    if critical <= warning:
+        raise HTTPException(status_code=400, detail="Critical threshold must be greater than warning threshold")
+    
+    # Validate digest_day
+    if "digest_day" in update_data:
+        valid_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        if update_data["digest_day"].lower() not in valid_days:
+            raise HTTPException(status_code=400, detail=f"Invalid digest day. Must be one of: {valid_days}")
+        update_data["digest_day"] = update_data["digest_day"].lower()
+    
+    # Validate quiet hours
+    if "quiet_hours_start" in update_data:
+        if not 0 <= update_data["quiet_hours_start"] <= 23:
+            raise HTTPException(status_code=400, detail="Quiet hours start must be between 0 and 23")
+    
+    if "quiet_hours_end" in update_data:
+        if not 0 <= update_data["quiet_hours_end"] <= 23:
+            raise HTTPException(status_code=400, detail="Quiet hours end must be between 0 and 23")
+    
+    # Merge with current preferences
+    new_prefs = {**current_prefs, **update_data}
+    
+    # Update in database
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"email_preferences": new_prefs, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "status": "updated",
+        "preferences": new_prefs
+    }
+
+
+@router.post("/auth/email-preferences/reset")
+async def reset_email_preferences(current_user: dict = Depends(get_current_user)):
+    """Reset email preferences to defaults"""
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"email_preferences": DEFAULT_EMAIL_PREFERENCES, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "status": "reset",
+        "preferences": DEFAULT_EMAIL_PREFERENCES
+    }
+
+
+async def get_user_email_preferences(user_id: str) -> dict:
+    """Helper function to get user's email preferences"""
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "email_preferences": 1})
+    return user.get("email_preferences", DEFAULT_EMAIL_PREFERENCES) if user else DEFAULT_EMAIL_PREFERENCES
+
+
+async def should_send_notification(user_id: str, notification_type: str) -> bool:
+    """
+    Check if a notification should be sent based on user preferences.
+    notification_type: 'new_user', 'security', 'budget', 'password_reset', 'system'
+    """
+    prefs = await get_user_email_preferences(user_id)
+    
+    type_mapping = {
+        "new_user": "new_user_notifications",
+        "security": "security_alerts",
+        "budget": "budget_alerts",
+        "password_reset": "password_reset_notifications",
+        "system": "system_announcements"
+    }
+    
+    pref_key = type_mapping.get(notification_type)
+    if not pref_key:
+        return True  # Unknown types default to sending
+    
+    # Check if notification is enabled
+    if not prefs.get(pref_key, True):
+        return False
+    
+    # Check quiet hours for non-critical notifications
+    if notification_type not in ["security", "password_reset"] and prefs.get("quiet_hours_enabled", False):
+        from datetime import datetime
+        current_hour = datetime.now().hour
+        start = prefs.get("quiet_hours_start", 22)
+        end = prefs.get("quiet_hours_end", 8)
+        
+        # Handle overnight quiet hours (e.g., 22:00 to 08:00)
+        if start > end:
+            if current_hour >= start or current_hour < end:
+                return False
+        else:
+            if start <= current_hour < end:
+                return False
+    
+    return True
+
+
+async def get_budget_thresholds(user_id: str) -> tuple:
+    """Get user's budget alert thresholds (warning, critical)"""
+    prefs = await get_user_email_preferences(user_id)
+    return (
+        prefs.get("budget_warning_threshold", 75),
+        prefs.get("budget_critical_threshold", 90)
+    )

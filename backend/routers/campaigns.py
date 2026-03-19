@@ -327,24 +327,36 @@ async def check_campaign_budget(
     
     alert_sent = False
     alert_type = None
+    alert_result = None
     
-    if percentage_used >= 90:
+    # Get user's custom thresholds if available
+    if owner:
+        try:
+            from routers.auth import get_budget_thresholds
+            warning_threshold, critical_threshold = await get_budget_thresholds(owner_id)
+        except Exception:
+            warning_threshold, critical_threshold = 75, 90
+    else:
+        warning_threshold, critical_threshold = 75, 90
+    
+    if percentage_used >= critical_threshold:
         alert_type = "critical"
-    elif percentage_used >= 75:
+    elif percentage_used >= warning_threshold:
         alert_type = "warning"
     
     if alert_type and owner:
         try:
             from routers.email_service import send_budget_alert
-            await send_budget_alert(
+            alert_result = await send_budget_alert(
                 user_email=owner["email"],
                 user_name=owner.get("name", "User"),
                 campaign_name=campaign.get("name", "Unknown Campaign"),
                 campaign_id=campaign_id,
                 percentage_used=percentage_used,
-                remaining_budget=remaining
+                remaining_budget=remaining,
+                user_id=owner_id  # Pass user_id for preference check
             )
-            alert_sent = True
+            alert_sent = alert_result.get("status") == "success"
         except Exception as e:
             import logging
             logging.warning(f"Failed to send budget alert: {e}")
@@ -357,6 +369,9 @@ async def check_campaign_budget(
         "remaining": remaining,
         "percentage_used": round(percentage_used, 2),
         "alert_type": alert_type,
-        "alert_sent": alert_sent
+        "alert_sent": alert_sent,
+        "warning_threshold": warning_threshold,
+        "critical_threshold": critical_threshold,
+        "alert_result": alert_result
     }
 

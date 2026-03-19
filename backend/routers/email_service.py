@@ -283,31 +283,70 @@ async def send_email(to_email: str, subject: str, html_content: str) -> Dict[str
         }
 
 
-async def send_new_user_notification(admin_email: str, admin_name: str, new_user_name: str, new_user_email: str, new_user_role: str):
+async def send_new_user_notification(admin_email: str, admin_name: str, new_user_name: str, new_user_email: str, new_user_role: str, admin_id: str = None):
     """Send notification to admin when a new user is created under them"""
+    # Check preferences if admin_id provided
+    if admin_id:
+        from routers.auth import should_send_notification
+        if not await should_send_notification(admin_id, "new_user"):
+            logger.info(f"New user notification skipped for {admin_email} (disabled in preferences)")
+            return {"status": "skipped", "message": "Notification disabled in user preferences"}
+    
     subject = f"New {new_user_role.replace('_', ' ').title()} Created: {new_user_name}"
     html_content = new_user_email_template(admin_name, new_user_name, new_user_email, new_user_role)
     return await send_email(admin_email, subject, html_content)
 
 
-async def send_password_reset_email(user_email: str, user_name: str, reset_token: str):
+async def send_password_reset_email(user_email: str, user_name: str, reset_token: str, user_id: str = None):
     """Send password reset email with token"""
+    # Password reset emails are always sent (security critical)
+    # But we still log the preference check
+    if user_id:
+        from routers.auth import should_send_notification
+        should_send = await should_send_notification(user_id, "password_reset")
+        if not should_send:
+            logger.info(f"Password reset notification for {user_email} - preferences disabled but sending anyway (security)")
+    
     subject = f"Reset Your {APP_NAME} Password"
     html_content = password_reset_email_template(user_name, reset_token)
     return await send_email(user_email, subject, html_content)
 
 
-async def send_budget_alert(user_email: str, user_name: str, campaign_name: str, campaign_id: str, percentage_used: float, remaining_budget: float):
+async def send_budget_alert(user_email: str, user_name: str, campaign_name: str, campaign_id: str, percentage_used: float, remaining_budget: float, user_id: str = None):
     """Send budget alert notification"""
-    alert_type = "Critical" if percentage_used >= 90 else "Warning"
+    # Check preferences if user_id provided
+    if user_id:
+        from routers.auth import should_send_notification, get_budget_thresholds
+        if not await should_send_notification(user_id, "budget"):
+            logger.info(f"Budget alert skipped for {user_email} (disabled in preferences)")
+            return {"status": "skipped", "message": "Budget alerts disabled in user preferences"}
+        
+        # Get custom thresholds
+        warning_threshold, critical_threshold = await get_budget_thresholds(user_id)
+        
+        # Check if this alert should be sent based on thresholds
+        if percentage_used < warning_threshold:
+            return {"status": "skipped", "message": f"Budget ({percentage_used}%) below warning threshold ({warning_threshold}%)"}
+    else:
+        warning_threshold, critical_threshold = 75, 90
+    
+    alert_type = "Critical" if percentage_used >= critical_threshold else "Warning"
     subject = f"[{alert_type}] Campaign Budget Alert: {campaign_name}"
     html_content = budget_alert_email_template(user_name, campaign_name, campaign_id, percentage_used, remaining_budget)
     return await send_email(user_email, subject, html_content)
 
 
-async def send_suspicious_login_alert(user_email: str, user_name: str, ip_address: str, user_agent: str, location: Optional[str] = None):
+async def send_suspicious_login_alert(user_email: str, user_name: str, ip_address: str, user_agent: str, location: Optional[str] = None, user_id: str = None):
     """Send suspicious login alert"""
+    # Security alerts are critical but can still be checked
+    if user_id:
+        from routers.auth import should_send_notification
+        if not await should_send_notification(user_id, "security"):
+            logger.info(f"Security alert skipped for {user_email} (disabled in preferences)")
+            return {"status": "skipped", "message": "Security alerts disabled in user preferences"}
+    
     login_time = datetime.now(timezone.utc).strftime("%B %d, %Y at %I:%M %p UTC")
     subject = f"New Sign-in to Your {APP_NAME} Account"
     html_content = suspicious_login_email_template(user_name, login_time, ip_address, user_agent, location)
     return await send_email(user_email, subject, html_content)
+
