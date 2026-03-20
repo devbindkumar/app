@@ -30,23 +30,29 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 
 ### Creative Tracking & Verification (March 2026)
 
-**Third Party Tags:**
-- Support for verification vendors (IAS, MOAT, DoubleVerify, etc.)
-- Tag types: Script Tag, iFrame, Image Pixel
-- Fire events: Impression, Viewable, Click, Complete
-- Enable/disable toggle per tag
-- Full CRUD support (add, edit, remove)
+**Third Party JS Tag Creative Type (NEW):**
+- New creative type: "Third Party JS Tag" (`js_tag`)
+- Full settings UI with:
+  - Vendor Name (e.g., Google, Criteo, TTD)
+  - Tag Type selection: Script Tag, iFrame, Document.write
+  - Tag URL (optional external URL)
+  - Tag Content/Code textarea for pasting complete tag
+  - Container Width/Height for ad dimensions
+  - HTTPS Secure checkbox
+- Live preview panel showing tag configuration
+- Full CRUD support (create, read, update, delete)
+
+**Backend Models Added:**
+- `JSTagCreative` model with: tag_content, tag_url, width, height, is_secure, vendor, tag_type
+- `ImpressionPixel` model with: id, name, url, event, enabled
+- Added `js_tag_data` field to Creative and CreativeCreate models
 
 **Impression Pixels:**
+- Standalone section (removed from Third Party Tags tab)
 - 1x1 tracking pixels for impression counting
 - Fire events: Impression, Viewable, Click, Complete, First Quartile, Midpoint, Third Quartile
 - Enable/disable toggle per pixel
 - Full CRUD support (add, edit, remove)
-
-**Backend Models Added:**
-- `ThirdPartyTag` model with: id, name, vendor, tag_type, tag_content, event, enabled
-- `ImpressionPixel` model with: id, name, url, event, enabled
-- Both added to Creative and CreativeCreate models
 
 ### Campaign Wizard Enhancements (December 2025)
 

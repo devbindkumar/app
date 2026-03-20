@@ -23,6 +23,7 @@ class CreativeType(str, Enum):
     VIDEO = "video"
     NATIVE = "native"
     AUDIO = "audio"
+    JS_TAG = "js_tag"
 
 
 class CreativeFormat(str, Enum):
@@ -431,6 +432,17 @@ class AudioCreative(BaseModel):
     companion_height: Optional[int] = Field(default=None, description="Companion banner height")
 
 
+class JSTagCreative(BaseModel):
+    """Third-party JavaScript tag creative"""
+    tag_content: str = Field(default="", description="Full JS tag code (script tag or inline JS)")
+    tag_url: Optional[str] = Field(default=None, description="URL to external JS file")
+    width: Optional[int] = Field(default=None, description="Ad container width")
+    height: Optional[int] = Field(default=None, description="Ad container height")
+    is_secure: bool = Field(default=True, description="Whether tag is HTTPS compatible")
+    vendor: Optional[str] = Field(default=None, description="Tag vendor name (e.g., Google, Criteo)")
+    tag_type: str = Field(default="script", description="Tag type: script, iframe, or document.write")
+
+
 class NativeCreative(BaseModel):
     title: str = Field(default="")
     description: str = Field(default="")
@@ -491,8 +503,9 @@ class Creative(BaseModel):
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None
     audio_data: Optional[AudioCreative] = None
+    js_tag_data: Optional[JSTagCreative] = None
     
-    # JS Tag specific
+    # JS Tag specific (legacy field - use js_tag_data instead)
     js_tag: Optional[str] = Field(default=None, description="JavaScript tag for ad serving")
     
     # Preview URL (auto-generated for VAST, computed for others)
@@ -1183,6 +1196,7 @@ class CreativeCreate(BaseModel):
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None
     audio_data: Optional[AudioCreative] = None
+    js_tag_data: Optional[JSTagCreative] = None
     js_tag: Optional[str] = None
 
 

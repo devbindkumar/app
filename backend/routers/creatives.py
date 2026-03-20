@@ -90,6 +90,7 @@ async def create_creative(
         video_data=input.video_data,
         native_data=input.native_data,
         audio_data=input.audio_data,
+        js_tag_data=input.js_tag_data,
         js_tag=input.js_tag
     )
     
@@ -105,6 +106,9 @@ async def create_creative(
                 creative.preview_url = creative.video_data.vast_url
             elif creative.video_data.video_url:
                 creative.preview_url = creative.video_data.video_url
+    elif creative.type == CreativeType.JS_TAG:
+        if creative.js_tag_data and creative.js_tag_data.tag_url:
+            creative.preview_url = creative.js_tag_data.tag_url
     
     doc = creative.model_dump()
     # Add ownership
@@ -171,6 +175,8 @@ async def update_creative(
         update_data["native_data"] = input.native_data.model_dump() if hasattr(input.native_data, 'model_dump') else input.native_data
     if input.audio_data:
         update_data["audio_data"] = input.audio_data.model_dump() if hasattr(input.audio_data, 'model_dump') else input.audio_data
+    if input.js_tag_data:
+        update_data["js_tag_data"] = input.js_tag_data.model_dump() if hasattr(input.js_tag_data, 'model_dump') else input.js_tag_data
     
     # Update preview URL based on creative type
     if update_data.get("type") == "banner":
@@ -185,6 +191,10 @@ async def update_creative(
             update_data["preview_url"] = video_data["vast_url"]
         elif video_data.get("video_url"):
             update_data["preview_url"] = video_data["video_url"]
+    elif update_data.get("type") == "js_tag":
+        js_tag_data = update_data.get("js_tag_data", {})
+        if js_tag_data.get("tag_url"):
+            update_data["preview_url"] = js_tag_data["tag_url"]
     
     await db.creatives.update_one(
         {"id": creative_id},
