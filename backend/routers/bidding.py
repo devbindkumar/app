@@ -741,3 +741,221 @@ async def debug_nurl_test(request: Request):
     }
 
 
+@router.post("/debug/test-full-flow")
+async def test_full_flow(request: Request):
+    """
+    Test the complete bid -> win -> impression flow.
+    Creates a test bid log and simulates win notification.
+    """
+    import uuid
+    
+    # Get an active campaign
+    campaign = await db.campaigns.find_one({"status": "active"}, {"_id": 0})
+    if not campaign:
+        return {"error": "No active campaign found. Create and activate a campaign first."}
+    
+    # Get a creative
+    creative = await db.creatives.find_one({}, {"_id": 0})
+    if not creative:
+        return {"error": "No creative found. Create a creative first."}
+    
+    # Get an SSP endpoint
+    ssp = await db.ssp_endpoints.find_one({"status": "active"}, {"_id": 0})
+    
+    # Create test bid log
+    test_bid_id = f"test-{uuid.uuid4()}"
+    test_log_id = str(uuid.uuid4())
+    
+    nurl_base = os.environ.get('NURL_BASE_URL') or os.environ.get('REACT_APP_BACKEND_URL', '')
+    
+    bid_log = {
+        "id": test_log_id,
+        "request_id": f"test-request-{uuid.uuid4()}",
+        "bid_id": test_bid_id,
+        "ssp_id": ssp["id"] if ssp else None,
+        "openrtb_version": "2.5",
+        "bid_made": True,
+        "bid_price": 2.5,
+        "shaded_price": 2.3,
+        "campaign_id": campaign["id"],
+        "creative_id": creative["id"],
+        "nurl": f"{nurl_base}/api/notify/win/{test_bid_id}?price=${{AUCTION_PRICE}}",
+        "burl": f"{nurl_base}/api/notify/billing/{test_bid_id}?price=${{AUCTION_PRICE}}",
+        "win_notified": False,
+        "billing_notified": False,
+        "matched_campaigns": [campaign["id"]],
+        "rejection_reasons": [],
+        "processing_time_ms": 5.2,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "request_summary": {"test": True}
+    }
+    
+    # Insert bid log
+    await db.bid_logs.insert_one(bid_log)
+    
+    # Update campaign bids counter
+    await db.campaigns.update_one(
+        {"id": campaign["id"]},
+        {"$inc": {"bids": 1}}
+    )
+    
+    # Update SSP stats
+    if ssp:
+        await db.ssp_endpoints.update_one(
+            {"id": ssp["id"]},
+            {"$inc": {"total_requests": 1, "total_bids": 1}}
+        )
+    
+    # Get campaign stats before win
+    campaign_before = await db.campaigns.find_one({"id": campaign["id"]}, {"_id": 0, "name": 1, "bids": 1, "wins": 1, "impressions": 1})
+    
+    return {
+        "status": "success",
+        "message": "Test bid log created. Now call the win notification endpoint to complete the flow.",
+        "test_bid_id": test_bid_id,
+        "campaign_id": campaign["id"],
+        "campaign_name": campaign["name"],
+        "campaign_stats_before": campaign_before,
+        "nurl_to_call": f"{nurl_base}/api/notify/win/{test_bid_id}?price=2.0",
+        "burl_to_call": f"{nurl_base}/api/notify/billing/{test_bid_id}?price=2.0",
+        "instructions": [
+            f"1. Call the nurl: curl '{nurl_base}/api/notify/win/{test_bid_id}?price=2.0'",
+            f"2. Verify campaign wins increased",
+            f"3. Call the burl: curl '{nurl_base}/api/notify/billing/{test_bid_id}?price=2.0'"
+        ]
+    }
+
+
+@router.get("/debug/campaign-stats/{campaign_id}")
+async def debug_campaign_stats(campaign_id: str):
+    """Get detailed stats for a campaign including bid log counts"""
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Count from bid_logs
+    bid_log_stats = {
+        "total_bid_logs": await db.bid_logs.count_documents({"campaign_id": campaign_id}),
+        "bids_made": await db.bid_logs.count_documents({"campaign_id": campaign_id, "bid_made": True}),
+        "wins_notified": await db.bid_logs.count_documents({"campaign_id": campaign_id, "win_notified": True}),
+        "billing_notified": await db.bid_logs.count_documents({"campaign_id": campaign_id, "billing_notified": True}),
+    }
+    
+    # Get recent bid logs for this campaign
+    recent_logs = await db.bid_logs.find(
+        {"campaign_id": campaign_id},
+        {"_id": 0, "id": 1, "bid_id": 1, "bid_made": 1, "win_notified": 1, "timestamp": 1}
+    ).sort("timestamp", -1).limit(5).to_list(5)
+    
+    return {
+        "campaign": {
+            "id": campaign["id"],
+            "name": campaign["name"],
+            "status": campaign.get("status"),
+            "stored_bids": campaign.get("bids", 0),
+            "stored_wins": campaign.get("wins", 0),
+            "stored_impressions": campaign.get("impressions", 0),
+        },
+        "bid_log_stats": bid_log_stats,
+        "recent_logs": recent_logs,
+        "discrepancy": {
+            "bids_diff": campaign.get("bids", 0) - bid_log_stats["bids_made"],
+            "wins_diff": campaign.get("wins", 0) - bid_log_stats["wins_notified"],
+        }
+    }
+
+
+@router.post("/debug/sync-campaign-stats/{campaign_id}")
+async def sync_campaign_stats(campaign_id: str):
+    """
+    Recalculate and sync campaign stats from bid_logs.
+    Useful if there's a discrepancy between stored stats and actual logs.
+    """
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Count from bid_logs
+    bids_count = await db.bid_logs.count_documents({"campaign_id": campaign_id, "bid_made": True})
+    wins_count = await db.bid_logs.count_documents({"campaign_id": campaign_id, "win_notified": True})
+    
+    # Calculate total spend from win prices
+    pipeline = [
+        {"$match": {"campaign_id": campaign_id, "win_notified": True}},
+        {"$group": {"_id": None, "total_spend": {"$sum": {"$divide": [{"$ifNull": ["$win_price", 0]}, 1000]}}}}
+    ]
+    spend_result = await db.bid_logs.aggregate(pipeline).to_list(1)
+    total_spend = spend_result[0]["total_spend"] if spend_result else 0
+    
+    old_stats = {
+        "bids": campaign.get("bids", 0),
+        "wins": campaign.get("wins", 0),
+        "impressions": campaign.get("impressions", 0),
+    }
+    
+    # Update campaign with accurate stats
+    await db.campaigns.update_one(
+        {"id": campaign_id},
+        {"$set": {
+            "bids": bids_count,
+            "wins": wins_count,
+            "impressions": wins_count,  # impressions = wins for OpenRTB
+            "budget.total_spend": total_spend
+        }}
+    )
+    
+    return {
+        "status": "success",
+        "campaign_id": campaign_id,
+        "old_stats": old_stats,
+        "new_stats": {
+            "bids": bids_count,
+            "wins": wins_count,
+            "impressions": wins_count,
+            "total_spend": total_spend
+        },
+        "message": "Campaign stats synced from bid_logs"
+    }
+
+
+@router.post("/debug/sync-all-campaign-stats")
+async def sync_all_campaign_stats():
+    """Sync stats for all campaigns from bid_logs"""
+    campaigns = await db.campaigns.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(100)
+    
+    results = []
+    for campaign in campaigns:
+        campaign_id = campaign["id"]
+        
+        bids_count = await db.bid_logs.count_documents({"campaign_id": campaign_id, "bid_made": True})
+        wins_count = await db.bid_logs.count_documents({"campaign_id": campaign_id, "win_notified": True})
+        
+        pipeline = [
+            {"$match": {"campaign_id": campaign_id, "win_notified": True}},
+            {"$group": {"_id": None, "total_spend": {"$sum": {"$divide": [{"$ifNull": ["$win_price", 0]}, 1000]}}}}
+        ]
+        spend_result = await db.bid_logs.aggregate(pipeline).to_list(1)
+        total_spend = spend_result[0]["total_spend"] if spend_result else 0
+        
+        await db.campaigns.update_one(
+            {"id": campaign_id},
+            {"$set": {
+                "bids": bids_count,
+                "wins": wins_count,
+                "impressions": wins_count,
+                "budget.total_spend": total_spend
+            }}
+        )
+        
+        results.append({
+            "campaign_id": campaign_id,
+            "name": campaign["name"],
+            "synced_bids": bids_count,
+            "synced_wins": wins_count
+        })
+    
+    return {
+        "status": "success",
+        "campaigns_synced": len(results),
+        "results": results
+    }
