@@ -401,6 +401,7 @@ class Creative(BaseModel):
     crid: Optional[str] = Field(default=None, description="Creative ID for buyers")
     cat: List[str] = Field(default_factory=list, description="IAB content categories")
     attr: List[int] = Field(default_factory=list, description="Creative attributes")
+    click_url: Optional[str] = Field(default=None, description="Click-through URL")
     
     # Type-specific data
     banner_data: Optional[BannerCreative] = None
@@ -1074,6 +1075,7 @@ class CreativeCreate(BaseModel):
     adomain: List[str] = Field(default_factory=list)
     iurl: Optional[str] = None
     cat: List[str] = Field(default_factory=list)
+    click_url: Optional[str] = None
     banner_data: Optional[BannerCreative] = None
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None

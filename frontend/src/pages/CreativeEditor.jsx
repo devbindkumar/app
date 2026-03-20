@@ -136,11 +136,21 @@ export default function CreativeEditor() {
       
       if (creative) {
         setCreativeType(creative.type || "banner");
+        
+        // Extract click URL from ad_markup if present (for banner)
+        let extractedClickUrl = "";
+        if (creative.banner_data?.ad_markup) {
+          const hrefMatch = creative.banner_data.ad_markup.match(/href="([^"]+)"/);
+          if (hrefMatch) extractedClickUrl = hrefMatch[1];
+        }
+        
         setForm(prev => ({
           ...prev,
           name: creative.name || "",
+          clickUrl: creative.click_url || extractedClickUrl || "",
           cat: (creative.cat || []).join(", "),
           adomain: (creative.adomain || []).join(", "),
+          // Banner
           imageUrl: creative.banner_data?.image_url || creative.iurl || "",
           backgroundColor: "#FFFFFF",
           // Native
@@ -152,6 +162,7 @@ export default function CreativeEditor() {
           nativeClickUrl: creative.native_data?.click_url || "",
           // Video
           vastUrl: creative.video_data?.vast_url || "",
+          vastVersion: creative.video_data?.vast_version || "4.2",
           videoDuration: creative.video_data?.duration || 15,
           videoUrl: creative.video_data?.video_url || "",
           videoWidth: creative.video_data?.width || 1920,
@@ -161,6 +172,7 @@ export default function CreativeEditor() {
           audioVastXml: creative.audio_data?.vast_xml || "",
           audioUrl: creative.audio_data?.audio_url || "",
           audioDuration: creative.audio_data?.duration || 30,
+          audioMimes: creative.audio_data?.mimes?.join(", ") || "audio/mpeg, audio/mp3, audio/ogg",
           companionBannerUrl: creative.audio_data?.companion_banner_url || "",
           companionWidth: creative.audio_data?.companion_width || 300,
           companionHeight: creative.audio_data?.companion_height || 250,
@@ -410,7 +422,8 @@ export default function CreativeEditor() {
         type: creativeType,
         iurl: form.imageUrl || form.nativeImageUrl || null,
         cat: form.cat.split(',').map(s => s.trim()).filter(Boolean),
-        adomain: form.adomain.split(',').map(s => s.trim()).filter(Boolean)
+        adomain: form.adomain.split(',').map(s => s.trim()).filter(Boolean),
+        click_url: form.clickUrl || null
       };
       
       if (creativeType === "banner") {
@@ -418,22 +431,25 @@ export default function CreativeEditor() {
           width: useCustomSize ? customWidth : selectedSize.w,
           height: useCustomSize ? customHeight : selectedSize.h,
           mimes: ["image/jpeg", "image/png", "image/gif"],
-          ad_markup: generateBannerMarkup()
+          ad_markup: generateBannerMarkup(),
+          image_url: form.imageUrl || null
         };
       } else if (creativeType === "native") {
         payload.native_data = {
           title: form.nativeTitle,
+          description: form.nativeDescription,
           desc: form.nativeDescription,
           icon_url: form.nativeIconUrl,
           main_image_url: form.nativeImageUrl,
+          image_url: form.nativeImageUrl,
           cta_text: form.nativeCtaText || "Learn More",
           click_url: form.nativeClickUrl || form.clickUrl
         };
       } else if (creativeType === "video") {
         payload.video_data = {
-          duration: form.videoDuration,
-          width: form.videoWidth,
-          height: form.videoHeight,
+          duration: parseInt(form.videoDuration) || 15,
+          width: parseInt(form.videoWidth) || 1920,
+          height: parseInt(form.videoHeight) || 1080,
           mimes: ["video/mp4", "video/webm"],
           protocols: [2, 3, 5, 6],
           vast_url: videoSourceType === "vast" ? form.vastUrl : null,
@@ -443,7 +459,7 @@ export default function CreativeEditor() {
         };
       } else if (creativeType === "audio") {
         payload.audio_data = {
-          duration: parseInt(form.audioDuration),
+          duration: parseInt(form.audioDuration) || 30,
           mimes: form.audioMimes.split(',').map(s => s.trim()).filter(Boolean),
           vast_url: audioSourceType === "vast" ? form.audioVastUrl : null,
           vast_xml: audioSourceType === "vast" && form.audioVastXml ? form.audioVastXml : null,

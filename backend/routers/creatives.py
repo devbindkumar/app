@@ -83,6 +83,7 @@ async def create_creative(
         adomain=input.adomain,
         iurl=input.iurl,
         cat=input.cat,
+        click_url=input.click_url,
         banner_data=input.banner_data,
         video_data=input.video_data,
         native_data=input.native_data,
@@ -152,6 +153,7 @@ async def update_creative(
         "adomain": input.adomain,
         "iurl": input.iurl,
         "cat": input.cat,
+        "click_url": input.click_url,
         "js_tag": input.js_tag,
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
