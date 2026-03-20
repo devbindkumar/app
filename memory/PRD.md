@@ -28,6 +28,26 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
 - WebSocket Real-time Bid Stream
 - Campaign Creation Wizard (8-step) - IO step removed
 
+### Creative Tracking & Verification (March 2026)
+
+**Third Party Tags:**
+- Support for verification vendors (IAS, MOAT, DoubleVerify, etc.)
+- Tag types: Script Tag, iFrame, Image Pixel
+- Fire events: Impression, Viewable, Click, Complete
+- Enable/disable toggle per tag
+- Full CRUD support (add, edit, remove)
+
+**Impression Pixels:**
+- 1x1 tracking pixels for impression counting
+- Fire events: Impression, Viewable, Click, Complete, First Quartile, Midpoint, Third Quartile
+- Enable/disable toggle per pixel
+- Full CRUD support (add, edit, remove)
+
+**Backend Models Added:**
+- `ThirdPartyTag` model with: id, name, vendor, tag_type, tag_content, event, enabled
+- `ImpressionPixel` model with: id, name, url, event, enabled
+- Both added to Creative and CreativeCreate models
+
 ### Campaign Wizard Enhancements (December 2025)
 
 **Optimization & Pricing:**

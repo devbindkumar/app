@@ -443,6 +443,30 @@ class NativeCreative(BaseModel):
     price: Optional[str] = Field(default=None, description="Price string e.g. '$9.99'")
 
 
+class ThirdPartyTag(BaseModel):
+    """Third-party verification/tracking tag"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str = Field(description="Tag name/label (e.g., 'IAS Viewability', 'MOAT')")
+    vendor: Optional[str] = Field(default=None, description="Vendor name")
+    tag_type: str = Field(default="script", description="Tag type: script, iframe, img")
+    tag_content: str = Field(description="The actual tag content (URL or script)")
+    event: str = Field(default="impression", description="When to fire: impression, viewable, click, complete")
+    enabled: bool = Field(default=True)
+
+
+class ImpressionPixel(BaseModel):
+    """Impression tracking pixel"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str = Field(description="Pixel name/label")
+    url: str = Field(description="Pixel URL (1x1 tracking pixel)")
+    event: str = Field(default="impression", description="When to fire: impression, viewable, click, complete, firstQuartile, midpoint, thirdQuartile")
+    enabled: bool = Field(default=True)
+
+
 class Creative(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
@@ -457,6 +481,10 @@ class Creative(BaseModel):
     cat: List[str] = Field(default_factory=list, description="IAB content categories")
     attr: List[int] = Field(default_factory=list, description="Creative attributes")
     click_url: Optional[str] = Field(default=None, description="Click-through URL")
+    
+    # Third-party tags and tracking pixels
+    third_party_tags: List[ThirdPartyTag] = Field(default_factory=list, description="Third-party verification tags")
+    impression_pixels: List[ImpressionPixel] = Field(default_factory=list, description="Impression tracking pixels")
     
     # Type-specific data
     banner_data: Optional[BannerCreative] = None
@@ -1149,6 +1177,8 @@ class CreativeCreate(BaseModel):
     iurl: Optional[str] = None
     cat: List[str] = Field(default_factory=list)
     click_url: Optional[str] = None
+    third_party_tags: List[ThirdPartyTag] = Field(default_factory=list, description="Third-party verification tags")
+    impression_pixels: List[ImpressionPixel] = Field(default_factory=list, description="Impression tracking pixels")
     banner_data: Optional[BannerCreative] = None
     video_data: Optional[VideoCreative] = None
     native_data: Optional[NativeCreative] = None

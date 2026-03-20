@@ -84,6 +84,8 @@ async def create_creative(
         iurl=input.iurl,
         cat=input.cat,
         click_url=input.click_url,
+        third_party_tags=input.third_party_tags,
+        impression_pixels=input.impression_pixels,
         banner_data=input.banner_data,
         video_data=input.video_data,
         native_data=input.native_data,
@@ -154,6 +156,8 @@ async def update_creative(
         "iurl": input.iurl,
         "cat": input.cat,
         "click_url": input.click_url,
+        "third_party_tags": [tag.model_dump() if hasattr(tag, 'model_dump') else tag for tag in input.third_party_tags] if input.third_party_tags else [],
+        "impression_pixels": [pixel.model_dump() if hasattr(pixel, 'model_dump') else pixel for pixel in input.impression_pixels] if input.impression_pixels else [],
         "js_tag": input.js_tag,
         "updated_at": datetime.now(timezone.utc).isoformat()
     }

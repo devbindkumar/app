@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { 
   ArrowLeft, Save, Upload, Image, Video, 
-  Eye, Palette, Maximize2, Check, RefreshCw, Play, Film, Music
+  Eye, Palette, Maximize2, Check, RefreshCw, Play, Film, Music,
+  Code, MonitorPlay, Plus, Trash2, ToggleLeft, ToggleRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -24,6 +25,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { toast } from "sonner";
 import { createCreative, updateCreative, getCreatives, uploadImage, uploadVideo, uploadAudio } from "../lib/api";
 
@@ -86,6 +93,11 @@ export default function CreativeEditor() {
   const [videoSourceType, setVideoSourceType] = useState("vast");
   // Audio source type: 'vast' or 'upload'
   const [audioSourceType, setAudioSourceType] = useState("vast");
+  
+  // Third Party Tags
+  const [thirdPartyTags, setThirdPartyTags] = useState([]);
+  // Impression Pixels
+  const [impressionPixels, setImpressionPixels] = useState([]);
   
   const [form, setForm] = useState({
     name: "",
@@ -195,6 +207,10 @@ export default function CreativeEditor() {
         // Set video/audio source type
         if (creative.video_data?.video_url) setVideoSourceType("upload");
         if (creative.audio_data?.audio_url) setAudioSourceType("upload");
+        
+        // Load third party tags and impression pixels
+        if (creative.third_party_tags) setThirdPartyTags(creative.third_party_tags);
+        if (creative.impression_pixels) setImpressionPixels(creative.impression_pixels);
       }
     } catch (error) {
       toast.error("Failed to load creative");
@@ -407,6 +423,52 @@ export default function CreativeEditor() {
 </a>`;
   };
 
+  // Third Party Tag Management
+  const addThirdPartyTag = () => {
+    const newTag = {
+      id: crypto.randomUUID(),
+      name: "",
+      vendor: "",
+      tag_type: "script",
+      tag_content: "",
+      event: "impression",
+      enabled: true
+    };
+    setThirdPartyTags(prev => [...prev, newTag]);
+  };
+
+  const updateThirdPartyTag = (id, field, value) => {
+    setThirdPartyTags(prev => prev.map(tag => 
+      tag.id === id ? { ...tag, [field]: value } : tag
+    ));
+  };
+
+  const removeThirdPartyTag = (id) => {
+    setThirdPartyTags(prev => prev.filter(tag => tag.id !== id));
+  };
+
+  // Impression Pixel Management
+  const addImpressionPixel = () => {
+    const newPixel = {
+      id: crypto.randomUUID(),
+      name: "",
+      url: "",
+      event: "impression",
+      enabled: true
+    };
+    setImpressionPixels(prev => [...prev, newPixel]);
+  };
+
+  const updateImpressionPixel = (id, field, value) => {
+    setImpressionPixels(prev => prev.map(pixel => 
+      pixel.id === id ? { ...pixel, [field]: value } : pixel
+    ));
+  };
+
+  const removeImpressionPixel = (id) => {
+    setImpressionPixels(prev => prev.filter(pixel => pixel.id !== id));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -423,7 +485,9 @@ export default function CreativeEditor() {
         iurl: form.imageUrl || form.nativeImageUrl || null,
         cat: form.cat.split(',').map(s => s.trim()).filter(Boolean),
         adomain: form.adomain.split(',').map(s => s.trim()).filter(Boolean),
-        click_url: form.clickUrl || null
+        click_url: form.clickUrl || null,
+        third_party_tags: thirdPartyTags.filter(tag => tag.name && tag.tag_content),
+        impression_pixels: impressionPixels.filter(pixel => pixel.name && pixel.url)
       };
       
       if (creativeType === "banner") {
@@ -1316,6 +1380,247 @@ export default function CreativeEditor() {
               </CardContent>
             </Card>
           )}
+
+          {/* Third Party Tags & Impression Pixels */}
+          <Card className="surface-primary border-panel">
+            <CardHeader>
+              <CardTitle className="text-lg text-[#F8FAFC]">Tracking & Verification</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="third-party" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-[#0F172A] border border-[#2D3B55]">
+                  <TabsTrigger 
+                    value="third-party" 
+                    className="data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white text-[#94A3B8]"
+                  >
+                    <Code className="w-4 h-4 mr-2" />
+                    Third Party Tags
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="pixels" 
+                    className="data-[state=active]:bg-[#10B981] data-[state=active]:text-white text-[#94A3B8]"
+                  >
+                    <MonitorPlay className="w-4 h-4 mr-2" />
+                    Impression Pixels
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Third Party Tags Tab */}
+                <TabsContent value="third-party" className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-[#94A3B8]">Add verification tags (IAS, MOAT, DoubleVerify, etc.)</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={addThirdPartyTag}
+                      className="border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6]/10"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Tag
+                    </Button>
+                  </div>
+
+                  {thirdPartyTags.length === 0 ? (
+                    <div className="p-6 surface-secondary rounded-lg border border-dashed border-[#2D3B55] text-center">
+                      <Code className="w-8 h-8 mx-auto text-[#64748B] mb-2" />
+                      <p className="text-sm text-[#64748B]">No third-party tags added</p>
+                      <p className="text-xs text-[#475569] mt-1">Click "Add Tag" to add verification or tracking tags</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {thirdPartyTags.map((tag, index) => (
+                        <div key={tag.id} className="p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs text-[#64748B]">Tag #{index + 1}</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateThirdPartyTag(tag.id, 'enabled', !tag.enabled)}
+                                className="text-[#94A3B8] hover:text-[#F8FAFC]"
+                              >
+                                {tag.enabled ? (
+                                  <ToggleRight className="w-5 h-5 text-[#10B981]" />
+                                ) : (
+                                  <ToggleLeft className="w-5 h-5 text-[#64748B]" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => removeThirdPartyTag(tag.id)}
+                                className="text-[#EF4444] hover:text-[#EF4444]/80"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Tag Name *</Label>
+                              <Input
+                                value={tag.name}
+                                onChange={(e) => updateThirdPartyTag(tag.id, 'name', e.target.value)}
+                                placeholder="e.g., IAS Viewability"
+                                className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Vendor</Label>
+                              <Input
+                                value={tag.vendor}
+                                onChange={(e) => updateThirdPartyTag(tag.id, 'vendor', e.target.value)}
+                                placeholder="e.g., IAS, MOAT"
+                                className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Tag Type</Label>
+                              <Select 
+                                value={tag.tag_type} 
+                                onValueChange={(v) => updateThirdPartyTag(tag.id, 'tag_type', v)}
+                              >
+                                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="surface-primary border-[#2D3B55]">
+                                  <SelectItem value="script" className="text-[#F8FAFC]">Script Tag</SelectItem>
+                                  <SelectItem value="iframe" className="text-[#F8FAFC]">iFrame</SelectItem>
+                                  <SelectItem value="img" className="text-[#F8FAFC]">Image Pixel</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Fire On Event</Label>
+                              <Select 
+                                value={tag.event} 
+                                onValueChange={(v) => updateThirdPartyTag(tag.id, 'event', v)}
+                              >
+                                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="surface-primary border-[#2D3B55]">
+                                  <SelectItem value="impression" className="text-[#F8FAFC]">Impression</SelectItem>
+                                  <SelectItem value="viewable" className="text-[#F8FAFC]">Viewable</SelectItem>
+                                  <SelectItem value="click" className="text-[#F8FAFC]">Click</SelectItem>
+                                  <SelectItem value="complete" className="text-[#F8FAFC]">Complete (Video/Audio)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Tag Content (URL or Script) *</Label>
+                            <Textarea
+                              value={tag.tag_content}
+                              onChange={(e) => updateThirdPartyTag(tag.id, 'tag_content', e.target.value)}
+                              placeholder="https://pixel.example.com/track?id=xxx or <script>...</script>"
+                              className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono text-xs h-20"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                {/* Impression Pixels Tab */}
+                <TabsContent value="pixels" className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-[#94A3B8]">Add 1x1 tracking pixels for impression counting</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={addImpressionPixel}
+                      className="border-[#10B981] text-[#10B981] hover:bg-[#10B981]/10"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Pixel
+                    </Button>
+                  </div>
+
+                  {impressionPixels.length === 0 ? (
+                    <div className="p-6 surface-secondary rounded-lg border border-dashed border-[#2D3B55] text-center">
+                      <MonitorPlay className="w-8 h-8 mx-auto text-[#64748B] mb-2" />
+                      <p className="text-sm text-[#64748B]">No impression pixels added</p>
+                      <p className="text-xs text-[#475569] mt-1">Click "Add Pixel" to add tracking pixels</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {impressionPixels.map((pixel, index) => (
+                        <div key={pixel.id} className="p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs text-[#64748B]">Pixel #{index + 1}</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateImpressionPixel(pixel.id, 'enabled', !pixel.enabled)}
+                                className="text-[#94A3B8] hover:text-[#F8FAFC]"
+                              >
+                                {pixel.enabled ? (
+                                  <ToggleRight className="w-5 h-5 text-[#10B981]" />
+                                ) : (
+                                  <ToggleLeft className="w-5 h-5 text-[#64748B]" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => removeImpressionPixel(pixel.id)}
+                                className="text-[#EF4444] hover:text-[#EF4444]/80"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Pixel Name *</Label>
+                              <Input
+                                value={pixel.name}
+                                onChange={(e) => updateImpressionPixel(pixel.id, 'name', e.target.value)}
+                                placeholder="e.g., DCM Impression"
+                                className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-[#64748B]">Fire On Event</Label>
+                              <Select 
+                                value={pixel.event} 
+                                onValueChange={(v) => updateImpressionPixel(pixel.id, 'event', v)}
+                              >
+                                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="surface-primary border-[#2D3B55]">
+                                  <SelectItem value="impression" className="text-[#F8FAFC]">Impression</SelectItem>
+                                  <SelectItem value="viewable" className="text-[#F8FAFC]">Viewable</SelectItem>
+                                  <SelectItem value="click" className="text-[#F8FAFC]">Click</SelectItem>
+                                  <SelectItem value="complete" className="text-[#F8FAFC]">Complete</SelectItem>
+                                  <SelectItem value="firstQuartile" className="text-[#F8FAFC]">First Quartile (25%)</SelectItem>
+                                  <SelectItem value="midpoint" className="text-[#F8FAFC]">Midpoint (50%)</SelectItem>
+                                  <SelectItem value="thirdQuartile" className="text-[#F8FAFC]">Third Quartile (75%)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-xs text-[#64748B]">Pixel URL *</Label>
+                            <Input
+                              value={pixel.url}
+                              onChange={(e) => updateImpressionPixel(pixel.id, 'url', e.target.value)}
+                              placeholder="https://tracking.example.com/pixel?id=xxx"
+                              className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono text-xs"
+                            />
+                            <p className="text-xs text-[#475569]">1x1 pixel URL that fires on the selected event</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Sidebar */}
