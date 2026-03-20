@@ -263,10 +263,25 @@ async def _process_bid_request_internal(
         headers["x-openrtb-version"] = x_openrtb_version
     
     # Get base URL for nurl/burl callbacks
-    # Check for X-Forwarded-Proto header (set by reverse proxy) or fallback to request scheme
-    scheme = request.headers.get('x-forwarded-proto', request.base_url.scheme)
-    host = request.headers.get('host', '')
-    nurl_base = os.environ.get('NURL_BASE_URL', f"{scheme}://{host}")
+    # Priority: 1. NURL_BASE_URL env var, 2. REACT_APP_BACKEND_URL, 3. x-forwarded-host, 4. Construct from request
+    nurl_base = os.environ.get('NURL_BASE_URL')
+    if not nurl_base:
+        nurl_base = os.environ.get('REACT_APP_BACKEND_URL')
+    if not nurl_base:
+        # Try to get from forwarded headers (for reverse proxy/load balancer)
+        forwarded_host = request.headers.get('x-forwarded-host')
+        forwarded_proto = request.headers.get('x-forwarded-proto', 'https')
+        if forwarded_host:
+            nurl_base = f"{forwarded_proto}://{forwarded_host}"
+        else:
+            scheme = request.base_url.scheme
+            host = request.headers.get('host', str(request.base_url.netloc))
+            nurl_base = f"{scheme}://{host}"
+    
+    # Remove trailing slash
+    nurl_base = nurl_base.rstrip('/')
+    
+    logger.info(f"Bid request from SSP {ssp_id}, using nurl_base: {nurl_base}")
     
     # Process bid request
     try:
@@ -422,6 +437,8 @@ async def adjust_bid_shading(campaign_id: str, current_win_rate: float, shading_
 @router.api_route("/notify/win/{bid_id}", methods=["GET", "POST"])
 async def win_notification(bid_id: str, price: float = 0.0):
     """Handle win notification (nurl callback) - Supports both GET and POST"""
+    logger.info(f"Win notification received: bid_id={bid_id}, price={price}")
+    
     # First try to find by bid_id field
     bid_log = await db.bid_logs.find_one({"bid_id": bid_id}, {"_id": 0})
     if not bid_log:
@@ -435,9 +452,11 @@ async def win_notification(bid_id: str, price: float = 0.0):
         )
     
     if not bid_log:
+        logger.warning(f"Win notification failed - bid not found: {bid_id}")
         raise HTTPException(status_code=404, detail="Bid not found")
     
     if bid_log.get("win_notified"):
+        logger.info(f"Win notification already processed: {bid_id}")
         return {"status": "already_notified", "bid_id": bid_id}
     
     campaign_id = bid_log.get("campaign_id")
@@ -446,9 +465,16 @@ async def win_notification(bid_id: str, price: float = 0.0):
     
     win_price = price if price > 0 else bid_price
     
+    # Update bid log - use the same id we found
     await db.bid_logs.update_one(
         {"id": bid_log["id"]},
-        {"$set": {"win_notified": True, "win_price": win_price}}
+        {
+            "$set": {
+                "win_notified": True, 
+                "win_price": win_price,
+                "win_timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        }
     )
     
     if campaign_id:
@@ -672,3 +698,46 @@ async def track_bulk_impressions(impressions: List[dict]):
 async def get_migration_matrix():
     """Get OpenRTB 2.5 to 2.6 field migration matrix"""
     return OPENRTB_MIGRATION_MATRIX
+
+
+@router.get("/debug/nurl-test")
+async def debug_nurl_test(request: Request):
+    """Debug endpoint to test nurl/burl URL generation"""
+    nurl_base = os.environ.get('NURL_BASE_URL')
+    react_backend_url = os.environ.get('REACT_APP_BACKEND_URL')
+    
+    scheme = request.headers.get('x-forwarded-proto', request.base_url.scheme)
+    host = request.headers.get('host', str(request.base_url.netloc))
+    constructed_url = f"{scheme}://{host}"
+    
+    # Get sample bid_id from recent logs
+    recent_bid = await db.bid_logs.find_one(
+        {"bid_made": True},
+        {"_id": 0, "bid_id": 1, "id": 1, "nurl": 1},
+        sort=[("timestamp", -1)]
+    )
+    
+    sample_nurl = None
+    if nurl_base or react_backend_url:
+        base = nurl_base or react_backend_url
+        sample_nurl = f"{base}/api/notify/win/SAMPLE_BID_ID?price=${{AUCTION_PRICE}}"
+    
+    return {
+        "env_vars": {
+            "NURL_BASE_URL": nurl_base,
+            "REACT_APP_BACKEND_URL": react_backend_url
+        },
+        "request_info": {
+            "scheme": scheme,
+            "host": host,
+            "constructed_url": constructed_url,
+            "x-forwarded-proto": request.headers.get('x-forwarded-proto'),
+            "x-forwarded-host": request.headers.get('x-forwarded-host')
+        },
+        "sample_nurl": sample_nurl,
+        "recent_bid_log": recent_bid,
+        "nurl_endpoint": "/api/notify/win/{bid_id}?price={AUCTION_PRICE}",
+        "burl_endpoint": "/api/notify/billing/{bid_id}?price={AUCTION_PRICE}"
+    }
+
+
