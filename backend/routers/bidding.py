@@ -263,25 +263,29 @@ async def _process_bid_request_internal(
         headers["x-openrtb-version"] = x_openrtb_version
     
     # Get base URL for nurl/burl callbacks
-    # Priority: 1. NURL_BASE_URL env var, 2. REACT_APP_BACKEND_URL, 3. x-forwarded-host, 4. Construct from request
-    nurl_base = os.environ.get('NURL_BASE_URL')
-    if not nurl_base:
-        nurl_base = os.environ.get('REACT_APP_BACKEND_URL')
-    if not nurl_base:
-        # Try to get from forwarded headers (for reverse proxy/load balancer)
-        forwarded_host = request.headers.get('x-forwarded-host')
-        forwarded_proto = request.headers.get('x-forwarded-proto', 'https')
-        if forwarded_host:
-            nurl_base = f"{forwarded_proto}://{forwarded_host}"
-        else:
-            scheme = request.base_url.scheme
-            host = request.headers.get('host', str(request.base_url.netloc))
-            nurl_base = f"{scheme}://{host}"
+    # ALWAYS use the request's host to ensure callbacks work on any domain (preview, deployed, custom domain)
+    # Priority: x-forwarded-host (reverse proxy) → Host header → fallback to env var
+    forwarded_host = request.headers.get('x-forwarded-host')
+    host_header = request.headers.get('host')
+    forwarded_proto = request.headers.get('x-forwarded-proto', 'https')
     
-    # Remove trailing slash
+    if forwarded_host:
+        # Behind reverse proxy (like in production)
+        nurl_base = f"{forwarded_proto}://{forwarded_host}"
+    elif host_header:
+        # Direct request with Host header
+        scheme = forwarded_proto if forwarded_proto else ('https' if '443' in host_header else 'http')
+        nurl_base = f"{scheme}://{host_header}"
+    else:
+        # Fallback to environment variable
+        nurl_base = os.environ.get('NURL_BASE_URL') or os.environ.get('REACT_APP_BACKEND_URL', '')
+    
+    # Remove trailing slash and ensure https for production
     nurl_base = nurl_base.rstrip('/')
+    if nurl_base and not nurl_base.startswith('http://localhost'):
+        nurl_base = nurl_base.replace('http://', 'https://')
     
-    logger.info(f"Bid request from SSP {ssp_id}, using nurl_base: {nurl_base}")
+    logger.info(f"Bid request from SSP {ssp_id}, host={host_header}, forwarded_host={forwarded_host}, nurl_base={nurl_base}")
     
     # Process bid request
     try:
@@ -702,42 +706,53 @@ async def get_migration_matrix():
 
 @router.get("/debug/nurl-test")
 async def debug_nurl_test(request: Request):
-    """Debug endpoint to test nurl/burl URL generation"""
-    nurl_base = os.environ.get('NURL_BASE_URL')
-    react_backend_url = os.environ.get('REACT_APP_BACKEND_URL')
+    """Debug endpoint to test nurl/burl URL generation - shows what domain will be used"""
     
-    scheme = request.headers.get('x-forwarded-proto', request.base_url.scheme)
-    host = request.headers.get('host', str(request.base_url.netloc))
-    constructed_url = f"{scheme}://{host}"
+    # Get all relevant headers
+    forwarded_host = request.headers.get('x-forwarded-host')
+    host_header = request.headers.get('host')
+    forwarded_proto = request.headers.get('x-forwarded-proto', 'https')
     
-    # Get sample bid_id from recent logs
+    # Calculate what nurl_base would be used
+    if forwarded_host:
+        calculated_nurl_base = f"{forwarded_proto}://{forwarded_host}"
+    elif host_header:
+        scheme = forwarded_proto if forwarded_proto else ('https' if '443' in host_header else 'http')
+        calculated_nurl_base = f"{scheme}://{host_header}"
+    else:
+        calculated_nurl_base = os.environ.get('NURL_BASE_URL') or os.environ.get('REACT_APP_BACKEND_URL', 'NOT_SET')
+    
+    # Ensure https
+    if calculated_nurl_base and not calculated_nurl_base.startswith('http://localhost'):
+        calculated_nurl_base = calculated_nurl_base.replace('http://', 'https://')
+    
+    # Get sample from recent logs
     recent_bid = await db.bid_logs.find_one(
-        {"bid_made": True},
-        {"_id": 0, "bid_id": 1, "id": 1, "nurl": 1},
+        {"bid_made": True, "nurl": {"$exists": True}},
+        {"_id": 0, "bid_id": 1, "nurl": 1, "timestamp": 1},
         sort=[("timestamp", -1)]
     )
     
-    sample_nurl = None
-    if nurl_base or react_backend_url:
-        base = nurl_base or react_backend_url
-        sample_nurl = f"{base}/api/notify/win/SAMPLE_BID_ID?price=${{AUCTION_PRICE}}"
-    
     return {
-        "env_vars": {
-            "NURL_BASE_URL": nurl_base,
-            "REACT_APP_BACKEND_URL": react_backend_url
+        "your_domain": calculated_nurl_base,
+        "request_headers": {
+            "host": host_header,
+            "x-forwarded-host": forwarded_host,
+            "x-forwarded-proto": forwarded_proto,
         },
-        "request_info": {
-            "scheme": scheme,
-            "host": host,
-            "constructed_url": constructed_url,
-            "x-forwarded-proto": request.headers.get('x-forwarded-proto'),
-            "x-forwarded-host": request.headers.get('x-forwarded-host')
+        "env_vars_fallback": {
+            "NURL_BASE_URL": os.environ.get('NURL_BASE_URL'),
+            "REACT_APP_BACKEND_URL": os.environ.get('REACT_APP_BACKEND_URL')
         },
-        "sample_nurl": sample_nurl,
-        "recent_bid_log": recent_bid,
-        "nurl_endpoint": "/api/notify/win/{bid_id}?price={AUCTION_PRICE}",
-        "burl_endpoint": "/api/notify/billing/{bid_id}?price={AUCTION_PRICE}"
+        "sample_nurl_that_would_be_generated": f"{calculated_nurl_base}/api/notify/win/{{BID_ID}}?price={{AUCTION_PRICE}}",
+        "recent_bid_nurl": recent_bid.get("nurl") if recent_bid else None,
+        "tracking_endpoints": {
+            "win_notification": f"{calculated_nurl_base}/api/notify/win/{{bid_id}}?price={{price}}",
+            "billing_notification": f"{calculated_nurl_base}/api/notify/billing/{{bid_id}}?price={{price}}",
+            "impression_tracking": f"{calculated_nurl_base}/api/track/impression?bid_id={{bid_id}}",
+            "pixel_tracking": f"{calculated_nurl_base}/api/pixel/{{bid_id}}?price={{price}}"
+        },
+        "status": "OK - Domain detection working"
     }
 
 
@@ -762,11 +777,26 @@ async def test_full_flow(request: Request):
     # Get an SSP endpoint
     ssp = await db.ssp_endpoints.find_one({"status": "active"}, {"_id": 0})
     
+    # Calculate nurl_base from request (same logic as bid endpoint)
+    forwarded_host = request.headers.get('x-forwarded-host')
+    host_header = request.headers.get('host')
+    forwarded_proto = request.headers.get('x-forwarded-proto', 'https')
+    
+    if forwarded_host:
+        nurl_base = f"{forwarded_proto}://{forwarded_host}"
+    elif host_header:
+        scheme = forwarded_proto if forwarded_proto else ('https' if '443' in host_header else 'http')
+        nurl_base = f"{scheme}://{host_header}"
+    else:
+        nurl_base = os.environ.get('NURL_BASE_URL') or os.environ.get('REACT_APP_BACKEND_URL', '')
+    
+    nurl_base = nurl_base.rstrip('/')
+    if nurl_base and not nurl_base.startswith('http://localhost'):
+        nurl_base = nurl_base.replace('http://', 'https://')
+    
     # Create test bid log
     test_bid_id = f"test-{uuid.uuid4()}"
     test_log_id = str(uuid.uuid4())
-    
-    nurl_base = os.environ.get('NURL_BASE_URL') or os.environ.get('REACT_APP_BACKEND_URL', '')
     
     bid_log = {
         "id": test_log_id,
