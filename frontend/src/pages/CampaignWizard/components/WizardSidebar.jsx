@@ -13,18 +13,18 @@ export function WizardSidebar({
   onBack
 }) {
   return (
-    <div className="w-72 surface-primary border-r border-[#2D3B55] flex flex-col">
+    <div className="w-72 surface-primary border-r border-slate-200 flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-[#2D3B55]">
+      <div className="p-4 border-b border-slate-200">
         <Button
           variant="ghost"
           onClick={onBack}
-          className="text-[#94A3B8] hover:text-[#F8FAFC] mb-2 -ml-2"
+          className="text-slate-600 hover:text-slate-900 mb-2 -ml-2"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to campaigns
         </Button>
-        <h1 className="text-lg font-semibold text-[#F8FAFC]">
+        <h1 className="text-lg font-semibold text-slate-900">
           {isEdit ? "Edit campaign" : "New campaign"}
         </h1>
       </div>
@@ -48,7 +48,7 @@ export function WizardSidebar({
                     : isCompleted
                     ? "bg-[#10B981]/10 cursor-pointer hover:bg-[#10B981]/20"
                     : isAccessible
-                    ? "cursor-pointer hover:bg-[#1E293B]"
+                    ? "cursor-pointer hover:bg-slate-100"
                     : "opacity-50 cursor-not-allowed"
                 }`}
                 data-testid={`wizard-step-${step.id}`}
@@ -58,12 +58,12 @@ export function WizardSidebar({
                     ? "bg-[#3B82F6] text-white"
                     : isCompleted
                     ? "bg-[#10B981] text-white"
-                    : "bg-[#2D3B55] text-[#64748B]"
+                    : "bg-slate-200 text-slate-500"
                 }`}>
                   {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                 </div>
                 <span className={`text-sm ${
-                  isActive ? "text-[#F8FAFC] font-medium" : "text-[#94A3B8]"
+                  isActive ? "text-slate-900 font-medium" : "text-slate-600"
                 }`}>
                   {step.title}
                 </span>
@@ -75,10 +75,10 @@ export function WizardSidebar({
       </div>
 
       {/* Actions */}
-      <div className="p-4 border-t border-[#2D3B55] space-y-2">
+      <div className="p-4 border-t border-slate-200 space-y-2">
         <Button
           variant="outline"
-          className="w-full border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+          className="w-full border-slate-200 text-slate-600 hover:text-slate-900"
           onClick={onSaveDraft}
           disabled={saving}
         >

@@ -16,15 +16,15 @@ export function AudienceStep({ form, updateField }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Audience</h2>
-        <p className="text-sm text-[#64748B]">Define demographic, interest, and audience targeting</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Audience</h2>
+        <p className="text-sm text-slate-500">Define demographic, interest, and audience targeting</p>
       </div>
 
       {/* Affinity Segments */}
       <Card className="surface-secondary border-[#F59E0B]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#F59E0B]">Affinity Segments</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Target users based on long-term interests and lifestyles
           </CardDescription>
         </CardHeader>
@@ -36,12 +36,12 @@ export function AudienceStep({ form, updateField }) {
               }
             }}
           >
-            <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+            <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
               <SelectValue placeholder="Select affinity segment" />
             </SelectTrigger>
-            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+            <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
               {AFFINITY_SEGMENTS.map((seg) => (
-                <SelectItem key={seg} value={seg} className="text-[#F8FAFC]">{seg}</SelectItem>
+                <SelectItem key={seg} value={seg} className="text-slate-900">{seg}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -62,7 +62,7 @@ export function AudienceStep({ form, updateField }) {
       <Card className="surface-secondary border-[#10B981]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#10B981]">In-Market Segments</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Target users actively researching or comparing products/services
           </CardDescription>
         </CardHeader>
@@ -74,12 +74,12 @@ export function AudienceStep({ form, updateField }) {
               }
             }}
           >
-            <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+            <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
               <SelectValue placeholder="Select in-market segment" />
             </SelectTrigger>
-            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+            <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
               {IN_MARKET_SEGMENTS.map((seg) => (
-                <SelectItem key={seg} value={seg} className="text-[#F8FAFC]">{seg}</SelectItem>
+                <SelectItem key={seg} value={seg} className="text-slate-900">{seg}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -100,7 +100,7 @@ export function AudienceStep({ form, updateField }) {
       <Card className="surface-secondary border-[#3B82F6]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#3B82F6]">First Party Audiences</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Your owned customer data (customer lists, site visitors)
           </CardDescription>
         </CardHeader>
@@ -110,7 +110,7 @@ export function AudienceStep({ form, updateField }) {
               value={form.first_party_audience_input}
               onChange={(e) => updateField("first_party_audience_input", e.target.value)}
               placeholder="Audience name"
-              className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+              className="surface-primary border-slate-200 text-slate-900"
             />
             <button 
               onClick={() => {
@@ -141,7 +141,7 @@ export function AudienceStep({ form, updateField }) {
       <Card className="surface-secondary border-[#8B5CF6]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#8B5CF6]">Third Party Audiences</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Data from external providers
           </CardDescription>
         </CardHeader>
@@ -151,7 +151,7 @@ export function AudienceStep({ form, updateField }) {
               value={form.third_party_audience_input}
               onChange={(e) => updateField("third_party_audience_input", e.target.value)}
               placeholder="Audience name or segment ID"
-              className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+              className="surface-primary border-slate-200 text-slate-900"
             />
             <button 
               onClick={() => {
@@ -186,7 +186,7 @@ export function AudienceStep({ form, updateField }) {
         <CardContent className="space-y-4">
           {/* Age Ranges */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Age Ranges</Label>
+            <Label className="text-slate-600">Age Ranges</Label>
             <Select 
               onValueChange={(v) => {
                 if (v && !form.age_ranges.includes(v)) {
@@ -194,12 +194,12 @@ export function AudienceStep({ form, updateField }) {
                 }
               }}
             >
-              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                 <SelectValue placeholder="Select age range" />
               </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55]">
+              <SelectContent className="surface-primary border-slate-200">
                 {AGE_RANGES.map((age) => (
-                  <SelectItem key={age} value={age} className="text-[#F8FAFC]">{age}</SelectItem>
+                  <SelectItem key={age} value={age} className="text-slate-900">{age}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -217,7 +217,7 @@ export function AudienceStep({ form, updateField }) {
 
           {/* Genders */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Genders</Label>
+            <Label className="text-slate-600">Genders</Label>
             <Select 
               onValueChange={(v) => {
                 if (v && !form.genders.includes(v)) {
@@ -225,12 +225,12 @@ export function AudienceStep({ form, updateField }) {
                 }
               }}
             >
-              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55]">
+              <SelectContent className="surface-primary border-slate-200">
                 {GENDERS.map((g) => (
-                  <SelectItem key={g} value={g} className="text-[#F8FAFC] capitalize">{g}</SelectItem>
+                  <SelectItem key={g} value={g} className="text-slate-900 capitalize">{g}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -248,7 +248,7 @@ export function AudienceStep({ form, updateField }) {
 
           {/* Income Segments */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Income Segments</Label>
+            <Label className="text-slate-600">Income Segments</Label>
             <Select 
               onValueChange={(v) => {
                 if (v && !form.income_segments.includes(v)) {
@@ -256,12 +256,12 @@ export function AudienceStep({ form, updateField }) {
                 }
               }}
             >
-              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                 <SelectValue placeholder="Select income segment" />
               </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55]">
+              <SelectContent className="surface-primary border-slate-200">
                 {INCOME_SEGMENTS.map((inc) => (
-                  <SelectItem key={inc} value={inc} className="text-[#F8FAFC] capitalize">{inc}</SelectItem>
+                  <SelectItem key={inc} value={inc} className="text-slate-900 capitalize">{inc}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -279,7 +279,7 @@ export function AudienceStep({ form, updateField }) {
 
           {/* Parental Status */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Parental Status</Label>
+            <Label className="text-slate-600">Parental Status</Label>
             <div className="flex gap-4">
               {PARENTAL_STATUSES.map((status) => (
                 <label key={status} className="flex items-center gap-2 cursor-pointer">
@@ -292,9 +292,9 @@ export function AudienceStep({ form, updateField }) {
                         : [...form.parental_status, status];
                       updateField("parental_status", list);
                     }}
-                    className="rounded border-[#2D3B55]"
+                    className="rounded border-slate-200"
                   />
-                  <span className="text-sm text-[#F8FAFC] capitalize">{status.replace('_', ' ')}</span>
+                  <span className="text-sm text-slate-900 capitalize">{status.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -302,7 +302,7 @@ export function AudienceStep({ form, updateField }) {
 
           {/* Languages */}
           <div className="space-y-2">
-            <Label className="text-[#94A3B8]">Languages</Label>
+            <Label className="text-slate-600">Languages</Label>
             <Select 
               onValueChange={(v) => {
                 if (v && !form.languages.includes(v)) {
@@ -310,12 +310,12 @@ export function AudienceStep({ form, updateField }) {
                 }
               }}
             >
-              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+              <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
                 {LANGUAGES.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code} className="text-[#F8FAFC]">{lang.name}</SelectItem>
+                  <SelectItem key={lang.code} value={lang.code} className="text-slate-900">{lang.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -343,13 +343,13 @@ export function AudienceStep({ form, updateField }) {
               onCheckedChange={(v) => updateField("lookalike_enabled", v)}
             />
           </div>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Expand reach to similar users
           </CardDescription>
         </CardHeader>
         {form.lookalike_enabled && (
           <CardContent>
-            <Label className="text-[#94A3B8]">Expansion Level: {form.lookalike_expansion}</Label>
+            <Label className="text-slate-600">Expansion Level: {form.lookalike_expansion}</Label>
             <Slider
               value={[form.lookalike_expansion]}
               onValueChange={([v]) => updateField("lookalike_expansion", v)}
@@ -358,7 +358,7 @@ export function AudienceStep({ form, updateField }) {
               step={1}
               className="mt-2"
             />
-            <div className="flex justify-between text-xs text-[#64748B] mt-1">
+            <div className="flex justify-between text-xs text-slate-500 mt-1">
               <span>More Similar</span>
               <span>Broader Reach</span>
             </div>

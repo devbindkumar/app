@@ -46,16 +46,16 @@ export function CreativesStep({ form, updateField, creatives }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Creatives</h2>
-        <p className="text-sm text-[#64748B]">Select creatives for your campaign</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Creatives</h2>
+        <p className="text-sm text-slate-500">Select creatives for your campaign</p>
       </div>
 
       {creatives.length === 0 ? (
-        <Card className="surface-secondary border-[#2D3B55]">
+        <Card className="surface-secondary border-slate-200">
           <CardContent className="py-12 text-center">
-            <ImageIcon className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
-            <p className="text-[#94A3B8] mb-2">No creatives available</p>
-            <p className="text-sm text-[#64748B]">
+            <ImageIcon className="w-12 h-12 mx-auto text-slate-500 mb-4" />
+            <p className="text-slate-600 mb-2">No creatives available</p>
+            <p className="text-sm text-slate-500">
               Create creatives in the Creatives section first
             </p>
           </CardContent>
@@ -73,7 +73,7 @@ export function CreativesStep({ form, updateField, creatives }) {
                 className={`cursor-pointer transition-all ${
                   isSelected
                     ? "border-[#10B981] bg-[#10B981]/10"
-                    : "surface-secondary border-[#2D3B55] hover:border-[#10B981]/50"
+                    : "surface-secondary border-slate-200 hover:border-[#10B981]/50"
                 }`}
                 data-testid="creative-card"
               >
@@ -87,7 +87,7 @@ export function CreativesStep({ form, updateField, creatives }) {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Icon className="w-8 h-8 text-[#64748B]" />
+                      <Icon className="w-8 h-8 text-slate-500" />
                     )}
                     
                     {/* Selection indicator */}
@@ -106,19 +106,19 @@ export function CreativesStep({ form, updateField, creatives }) {
                   </div>
                   
                   {/* Info */}
-                  <h3 className="text-sm font-medium text-[#F8FAFC] truncate">{creative.name}</h3>
+                  <h3 className="text-sm font-medium text-slate-900 truncate">{creative.name}</h3>
                   
                   <div className="flex items-center gap-2 mt-2">
                     <Badge className={getFormatBadgeColor(creative.type)}>
                       {creative.type}
                     </Badge>
                     {creative.format && (
-                      <Badge className="bg-[#64748B]/20 text-[#64748B] text-xs">
+                      <Badge className="bg-[#64748B]/20 text-slate-500 text-xs">
                         {creative.format.replace(/_/g, ' ')}
                       </Badge>
                     )}
                     {creative.banner_data?.width && creative.banner_data?.height && (
-                      <Badge className="bg-[#64748B]/20 text-[#64748B] text-xs">
+                      <Badge className="bg-[#64748B]/20 text-slate-500 text-xs">
                         {creative.banner_data.width}x{creative.banner_data.height}
                       </Badge>
                     )}
@@ -136,7 +136,7 @@ export function CreativesStep({ form, updateField, creatives }) {
           <CardTitle className="text-sm text-[#F59E0B]">Creative Best Practices</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2 text-sm text-[#94A3B8]">
+          <ul className="space-y-2 text-sm text-slate-600">
             <li className="flex items-start gap-2">
               <span className="text-[#F59E0B]">•</span>
               Use multiple ad sizes (300x250, 728x90, 320x50) for maximum reach

@@ -92,7 +92,7 @@ export default function Audiences() {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Loading audiences...</div>
+        <div className="text-slate-500">Loading audiences...</div>
       </div>
     );
   }
@@ -102,8 +102,8 @@ export default function Audiences() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Audience Segments</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Audience Segments</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Create and manage custom audience segments for targeting
           </p>
         </div>
@@ -125,8 +125,8 @@ export default function Audiences() {
               <Users className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Audiences</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{audiences.length}</p>
+              <p className="text-xs text-slate-500">Total Audiences</p>
+              <p className="text-xl font-bold text-slate-900">{audiences.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -136,7 +136,7 @@ export default function Audiences() {
               <Target className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Active Segments</p>
+              <p className="text-xs text-slate-500">Active Segments</p>
               <p className="text-xl font-bold text-[#3B82F6]">
                 {audiences.filter(a => a.status === "active").length}
               </p>
@@ -149,8 +149,8 @@ export default function Audiences() {
               <Settings className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Reach</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">
+              <p className="text-xs text-slate-500">Total Reach</p>
+              <p className="text-xl font-bold text-slate-900">
                 {audiences.reduce((sum, a) => sum + (a.size || 0), 0).toLocaleString()}
               </p>
             </div>
@@ -163,9 +163,9 @@ export default function Audiences() {
         {audiences.length === 0 ? (
           <Card className="surface-primary border-panel col-span-3">
             <CardContent className="p-8 text-center">
-              <Users className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
-              <p className="text-[#F8FAFC] font-medium">No audience segments yet</p>
-              <p className="text-sm text-[#64748B]">Create your first audience to start targeting</p>
+              <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+              <p className="text-slate-900 font-medium">No audience segments yet</p>
+              <p className="text-sm text-slate-500">Create your first audience to start targeting</p>
             </CardContent>
           </Card>
         ) : (
@@ -175,7 +175,7 @@ export default function Audiences() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#10B981]" />
-                    <h3 className="font-medium text-[#F8FAFC]">{audience.name}</h3>
+                    <h3 className="font-medium text-slate-900">{audience.name}</h3>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -188,29 +188,29 @@ export default function Audiences() {
                 </div>
                 
                 {audience.description && (
-                  <p className="text-xs text-[#94A3B8] mb-3">{audience.description}</p>
+                  <p className="text-xs text-slate-600 mb-3">{audience.description}</p>
                 )}
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#64748B]">Status</span>
+                    <span className="text-slate-500">Status</span>
                     <Badge variant="outline" className={
                       audience.status === "active" 
                         ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30"
-                        : "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30"
+                        : "bg-[#64748B]/20 text-slate-500 border-[#64748B]/30"
                     }>
                       {audience.status}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#64748B]">Estimated Size</span>
-                    <span className="text-[#F8FAFC] font-mono">{(audience.size || 0).toLocaleString()}</span>
+                    <span className="text-slate-500">Estimated Size</span>
+                    <span className="text-slate-900 font-mono">{(audience.size || 0).toLocaleString()}</span>
                   </div>
                 </div>
                 
                 {audience.rules && Object.keys(audience.rules).length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-[#2D3B55]">
-                    <p className="text-xs text-[#64748B] mb-2">Rules</p>
+                  <div className="mt-3 pt-3 border-t border-slate-200">
+                    <p className="text-xs text-slate-500 mb-2">Rules</p>
                     <div className="flex flex-wrap gap-1">
                       {audience.rules.geo_countries?.length > 0 && (
                         <Badge variant="outline" className="text-[9px] text-[#3B82F6] border-[#3B82F6]/30">
@@ -240,29 +240,29 @@ export default function Audiences() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="surface-primary border-panel max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Create Audience Segment</DialogTitle>
+            <DialogTitle className="text-slate-900">Create Audience Segment</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Name *</Label>
+              <Label className="text-slate-600">Name *</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., High-Value Mobile Users"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Description</Label>
+              <Label className="text-slate-600">Description</Label>
               <Input
                 value={form.description}
                 onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Describe this audience segment"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Target Countries (comma-separated)</Label>
+              <Label className="text-slate-600">Target Countries (comma-separated)</Label>
               <Input
                 value={form.rules.geo_countries.join(", ")}
                 onChange={(e) => setForm(prev => ({ 
@@ -273,11 +273,11 @@ export default function Audiences() {
                   }
                 }))}
                 placeholder="USA, GBR, CAN"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                className="surface-secondary border-slate-200 text-slate-900 font-mono"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">IAB Categories (comma-separated)</Label>
+              <Label className="text-slate-600">IAB Categories (comma-separated)</Label>
               <Input
                 value={form.rules.categories.join(", ")}
                 onChange={(e) => setForm(prev => ({ 
@@ -288,12 +288,12 @@ export default function Audiences() {
                   }
                 }))}
                 placeholder="IAB1, IAB9, IAB17"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC] font-mono"
+                className="surface-secondary border-slate-200 text-slate-900 font-mono"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreate(false)} className="border-[#2D3B55]">
+            <Button variant="outline" onClick={() => setShowCreate(false)} className="border-slate-200">
               Cancel
             </Button>
             <Button onClick={handleCreate} className="bg-[#10B981] hover:bg-[#34D399]">
@@ -307,13 +307,13 @@ export default function Audiences() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Delete Audience</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Delete Audience</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               Are you sure you want to delete this audience segment? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8]">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-slate-200 text-slate-600">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-[#EF4444] hover:bg-[#F87171]">
               Delete
             </AlertDialogAction>

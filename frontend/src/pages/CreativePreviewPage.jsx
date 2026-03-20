@@ -68,10 +68,10 @@ export default function CreativePreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#020408] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[#94A3B8]">Loading creative preview...</p>
+          <p className="text-slate-600">Loading creative preview...</p>
         </div>
       </div>
     );
@@ -79,12 +79,12 @@ export default function CreativePreviewPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#020408] flex items-center justify-center p-6">
-        <Card className="max-w-md w-full surface-primary border-[#2D3B55]">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full surface-primary border-slate-200">
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-16 h-16 text-[#EF4444] mx-auto mb-4" />
-            <h1 className="text-xl font-bold text-[#F8FAFC] mb-2">Preview Not Available</h1>
-            <p className="text-[#94A3B8]">{error}</p>
+            <h1 className="text-xl font-bold text-slate-900 mb-2">Preview Not Available</h1>
+            <p className="text-slate-600">{error}</p>
           </CardContent>
         </Card>
       </div>
@@ -135,17 +135,17 @@ export default function CreativePreviewPage() {
   `;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020408] via-[#0A0F1C] to-[#0F172A]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="border-b border-[#2D3B55] bg-[#0A0F1C]/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-slate-200 bg-slate-50/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
               <Code className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-[#F8FAFC]">Innoviedge</h1>
-              <p className="text-xs text-[#64748B]">Creative Preview</p>
+              <h1 className="text-lg font-bold text-slate-900">Innoviedge</h1>
+              <p className="text-xs text-slate-500">Creative Preview</p>
             </div>
           </div>
           {approvalStatus && (
@@ -168,12 +168,12 @@ export default function CreativePreviewPage() {
           {/* Main Preview Area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Creative Info */}
-            <Card className="surface-primary border-[#2D3B55]">
+            <Card className="surface-primary border-slate-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-xl font-bold text-[#F8FAFC]">{creative.name}</h2>
-                    <p className="text-sm text-[#64748B] mt-1">Third Party JS Tag Creative</p>
+                    <h2 className="text-xl font-bold text-slate-900">{creative.name}</h2>
+                    <p className="text-sm text-slate-500 mt-1">Third Party JS Tag Creative</p>
                   </div>
                   <div className="flex gap-2">
                     {vendor && <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">{vendor}</Badge>}
@@ -184,11 +184,11 @@ export default function CreativePreviewPage() {
                 {/* Live Preview */}
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-medium text-[#F8FAFC]">Live Ad Preview</p>
+                    <p className="text-sm font-medium text-slate-900">Live Ad Preview</p>
                     <Badge className="bg-[#10B981]/20 text-[#10B981] text-xs animate-pulse">LIVE</Badge>
                   </div>
                   <div 
-                    className="rounded-xl border-2 border-dashed border-[#3B82F6]/30 bg-[#0A0F1C] p-6 flex items-center justify-center"
+                    className="rounded-xl border-2 border-dashed border-[#3B82F6]/30 bg-slate-50 p-6 flex items-center justify-center"
                     style={{ minHeight: Math.min(jsHeight + 60, 450) }}
                   >
                     {tagContent ? (
@@ -207,12 +207,12 @@ export default function CreativePreviewPage() {
                       </div>
                     ) : (
                       <div className="text-center py-12">
-                        <Code className="w-16 h-16 text-[#64748B] mx-auto mb-4 opacity-50" />
-                        <p className="text-[#94A3B8]">No preview available</p>
+                        <Code className="w-16 h-16 text-slate-500 mx-auto mb-4 opacity-50" />
+                        <p className="text-slate-600">No preview available</p>
                       </div>
                     )}
                   </div>
-                  <p className="text-[10px] text-[#475569] text-center mt-3">
+                  <p className="text-[10px] text-slate-400 text-center mt-3">
                     This is a simulated preview. Actual rendering may vary based on the target environment.
                   </p>
                 </div>
@@ -220,25 +220,25 @@ export default function CreativePreviewPage() {
             </Card>
 
             {/* Tag Details */}
-            <Card className="surface-primary border-[#2D3B55]">
+            <Card className="surface-primary border-slate-200">
               <CardContent className="p-6">
-                <h3 className="text-sm font-medium text-[#F8FAFC] mb-3">Tag Details</h3>
+                <h3 className="text-sm font-medium text-slate-900 mb-3">Tag Details</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-[#64748B]">Type</p>
-                    <p className="text-[#F8FAFC] capitalize">{jsTagData.tag_type || 'script'}</p>
+                    <p className="text-slate-500">Type</p>
+                    <p className="text-slate-900 capitalize">{jsTagData.tag_type || 'script'}</p>
                   </div>
                   <div>
-                    <p className="text-[#64748B]">Dimensions</p>
-                    <p className="text-[#F8FAFC]">{jsWidth} x {jsHeight} pixels</p>
+                    <p className="text-slate-500">Dimensions</p>
+                    <p className="text-slate-900">{jsWidth} x {jsHeight} pixels</p>
                   </div>
                   <div>
-                    <p className="text-[#64748B]">HTTPS Compatible</p>
-                    <p className="text-[#F8FAFC]">{jsTagData.is_secure !== false ? 'Yes' : 'No'}</p>
+                    <p className="text-slate-500">HTTPS Compatible</p>
+                    <p className="text-slate-900">{jsTagData.is_secure !== false ? 'Yes' : 'No'}</p>
                   </div>
                   <div>
-                    <p className="text-[#64748B]">Vendor</p>
-                    <p className="text-[#F8FAFC]">{vendor}</p>
+                    <p className="text-slate-500">Vendor</p>
+                    <p className="text-slate-900">{vendor}</p>
                   </div>
                 </div>
               </CardContent>
@@ -247,9 +247,9 @@ export default function CreativePreviewPage() {
 
           {/* Approval Panel */}
           <div className="space-y-6">
-            <Card className="surface-primary border-[#2D3B55] sticky top-24">
+            <Card className="surface-primary border-slate-200 sticky top-24">
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold text-[#F8FAFC] mb-4">Approval</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Approval</h3>
                 
                 {approvalStatus ? (
                   <div className="text-center py-6">
@@ -258,33 +258,33 @@ export default function CreativePreviewPage() {
                         <div className="w-16 h-16 rounded-full bg-[#10B981]/20 flex items-center justify-center mx-auto mb-4">
                           <Check className="w-8 h-8 text-[#10B981]" />
                         </div>
-                        <p className="text-[#F8FAFC] font-medium">Creative Approved</p>
-                        <p className="text-sm text-[#64748B] mt-1">Thank you for your feedback!</p>
+                        <p className="text-slate-900 font-medium">Creative Approved</p>
+                        <p className="text-sm text-slate-500 mt-1">Thank you for your feedback!</p>
                       </>
                     ) : (
                       <>
                         <div className="w-16 h-16 rounded-full bg-[#F59E0B]/20 flex items-center justify-center mx-auto mb-4">
                           <Clock className="w-8 h-8 text-[#F59E0B]" />
                         </div>
-                        <p className="text-[#F8FAFC] font-medium">Changes Requested</p>
-                        <p className="text-sm text-[#64748B] mt-1">Your feedback has been submitted</p>
+                        <p className="text-slate-900 font-medium">Changes Requested</p>
+                        <p className="text-sm text-slate-500 mt-1">Your feedback has been submitted</p>
                       </>
                     )}
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm text-[#94A3B8] mb-4">
+                    <p className="text-sm text-slate-600 mb-4">
                       Please review the creative above and provide your approval or feedback.
                     </p>
                     
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm text-[#64748B] mb-2 block">Feedback (optional)</label>
+                        <label className="text-sm text-slate-500 mb-2 block">Feedback (optional)</label>
                         <Textarea
                           value={feedback}
                           onChange={(e) => setFeedback(e.target.value)}
                           placeholder="Add any comments or change requests..."
-                          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] min-h-[100px]"
+                          className="surface-secondary border-slate-200 text-slate-900 min-h-[100px]"
                         />
                       </div>
                       
@@ -314,9 +314,9 @@ export default function CreativePreviewPage() {
             </Card>
 
             {/* Help */}
-            <Card className="surface-primary border-[#2D3B55]">
+            <Card className="surface-primary border-slate-200">
               <CardContent className="p-4">
-                <p className="text-xs text-[#64748B]">
+                <p className="text-xs text-slate-500">
                   Need help? Contact your account manager or reply to the email that shared this preview.
                 </p>
               </CardContent>

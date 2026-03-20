@@ -25,7 +25,7 @@ import {
 } from "../lib/api";
 
 const STATUS_COLORS = {
-  draft: { bg: "bg-[#64748B]/20", text: "text-[#94A3B8]" },
+  draft: { bg: "bg-[#64748B]/20", text: "text-slate-600" },
   active: { bg: "bg-[#10B981]/20", text: "text-[#10B981]" },
   paused: { bg: "bg-[#F59E0B]/20", text: "text-[#F59E0B]" },
   completed: { bg: "bg-[#3B82F6]/20", text: "text-[#3B82F6]" },
@@ -325,8 +325,8 @@ export default function InsertionOrders() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Insertion Orders</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Insertion Orders</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Manage insertion orders and line items for structured campaign delivery
           </p>
         </div>
@@ -346,18 +346,18 @@ export default function InsertionOrders() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <FileText className="w-4 h-4 text-[#3B82F6]" />
-              <span className="text-xs text-[#64748B]">Total IOs</span>
+              <span className="text-xs text-slate-500">Total IOs</span>
             </div>
-            <p className="text-2xl font-bold text-[#F8FAFC]">{insertionOrders.length}</p>
+            <p className="text-2xl font-bold text-slate-900">{insertionOrders.length}</p>
           </CardContent>
         </Card>
         <Card className="surface-primary border-panel">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Layers className="w-4 h-4 text-[#10B981]" />
-              <span className="text-xs text-[#64748B]">Total Line Items</span>
+              <span className="text-xs text-slate-500">Total Line Items</span>
             </div>
-            <p className="text-2xl font-bold text-[#F8FAFC]">
+            <p className="text-2xl font-bold text-slate-900">
               {Object.values(lineItems).flat().length}
             </p>
           </CardContent>
@@ -366,9 +366,9 @@ export default function InsertionOrders() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <DollarSign className="w-4 h-4 text-[#F59E0B]" />
-              <span className="text-xs text-[#64748B]">Total Budget</span>
+              <span className="text-xs text-slate-500">Total Budget</span>
             </div>
-            <p className="text-2xl font-bold text-[#F8FAFC]">
+            <p className="text-2xl font-bold text-slate-900">
               {formatCurrency(insertionOrders.reduce((sum, io) => sum + io.total_budget, 0))}
             </p>
           </CardContent>
@@ -377,9 +377,9 @@ export default function InsertionOrders() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Play className="w-4 h-4 text-[#8B5CF6]" />
-              <span className="text-xs text-[#64748B]">Active IOs</span>
+              <span className="text-xs text-slate-500">Active IOs</span>
             </div>
-            <p className="text-2xl font-bold text-[#F8FAFC]">
+            <p className="text-2xl font-bold text-slate-900">
               {insertionOrders.filter(io => io.status === 'active').length}
             </p>
           </CardContent>
@@ -390,9 +390,9 @@ export default function InsertionOrders() {
       {insertionOrders.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="py-12 text-center">
-            <FileText className="w-16 h-16 mx-auto text-[#64748B] mb-4" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No Insertion Orders</h3>
-            <p className="text-sm text-[#94A3B8] mb-4">
+            <FileText className="w-16 h-16 mx-auto text-slate-500 mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No Insertion Orders</h3>
+            <p className="text-sm text-slate-600 mb-4">
               Create your first insertion order to start structuring campaigns
             </p>
             <Button 
@@ -416,7 +416,7 @@ export default function InsertionOrders() {
               <Card key={io.id} className="surface-primary border-panel">
                 {/* IO Header */}
                 <div 
-                  className="p-4 cursor-pointer hover:bg-[#1E293B]/30 transition-colors"
+                  className="p-4 cursor-pointer hover:bg-slate-100/30 transition-colors"
                   onClick={() => setExpandedIO(isExpanded ? null : io.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -430,12 +430,12 @@ export default function InsertionOrders() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-[#F8FAFC]">{io.name}</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{io.name}</h3>
                           <Badge className={`${STATUS_COLORS[io.status]?.bg} ${STATUS_COLORS[io.status]?.text}`}>
                             {io.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-[#64748B] mt-1">
+                        <p className="text-sm text-slate-500 mt-1">
                           {ioLineItems.length} line items • {io.structure_type} structure
                         </p>
                       </div>
@@ -445,8 +445,8 @@ export default function InsertionOrders() {
                       {/* Budget Progress */}
                       <div className="w-48">
                         <div className="flex justify-between text-xs mb-1">
-                          <span className="text-[#64748B]">Budget</span>
-                          <span className="text-[#F8FAFC]">
+                          <span className="text-slate-500">Budget</span>
+                          <span className="text-slate-900">
                             {formatCurrency(spent)} / {formatCurrency(io.total_budget)}
                           </span>
                         </div>
@@ -455,10 +455,10 @@ export default function InsertionOrders() {
                       
                       {/* Performance */}
                       <div className="text-right">
-                        <p className="text-lg font-semibold text-[#F8FAFC]">
+                        <p className="text-lg font-semibold text-slate-900">
                           {calcIOImpressions(io.id).toLocaleString()}
                         </p>
-                        <p className="text-xs text-[#64748B]">Impressions</p>
+                        <p className="text-xs text-slate-500">Impressions</p>
                       </div>
                       
                       {/* Actions */}
@@ -488,7 +488,7 @@ export default function InsertionOrders() {
                           size="icon"
                           variant="ghost"
                           onClick={() => openEditIO(io)}
-                          className="text-[#94A3B8] hover:text-[#F8FAFC]"
+                          className="text-slate-600 hover:text-slate-900"
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
@@ -507,9 +507,9 @@ export default function InsertionOrders() {
                 
                 {/* Expanded Line Items */}
                 {isExpanded && (
-                  <div className="border-t border-[#2D3B55] p-4 bg-[#0A0F1C]/50">
+                  <div className="border-t border-slate-200 p-4 bg-slate-50/50">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm font-medium text-[#94A3B8]">Line Items</h4>
+                      <h4 className="text-sm font-medium text-slate-600">Line Items</h4>
                       <Button
                         size="sm"
                         onClick={() => openAddLineItem(io.id, io)}
@@ -522,8 +522,8 @@ export default function InsertionOrders() {
                     
                     {ioLineItems.length === 0 ? (
                       <div className="text-center py-8">
-                        <Layers className="w-10 h-10 mx-auto text-[#64748B] mb-2" />
-                        <p className="text-sm text-[#64748B]">No line items yet</p>
+                        <Layers className="w-10 h-10 mx-auto text-slate-500 mb-2" />
+                        <p className="text-sm text-slate-500">No line items yet</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -539,7 +539,7 @@ export default function InsertionOrders() {
                                 <div className="flex items-center gap-3">
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-sm font-medium text-[#F8FAFC]">{item.name}</span>
+                                      <span className="text-sm font-medium text-slate-900">{item.name}</span>
                                       <Badge 
                                         className="text-xs capitalize"
                                         style={{ 
@@ -549,11 +549,11 @@ export default function InsertionOrders() {
                                       >
                                         {item.line_item_type}
                                       </Badge>
-                                      <Badge className="bg-[#2D3B55] text-[#94A3B8] text-xs">
+                                      <Badge className="bg-slate-200 text-slate-600 text-xs">
                                         {item.inventory_source}
                                       </Badge>
                                     </div>
-                                    <div className="flex items-center gap-4 mt-1 text-xs text-[#64748B]">
+                                    <div className="flex items-center gap-4 mt-1 text-xs text-slate-500">
                                       <span>Strategy: {item.bid_strategy?.replace(/_/g, ' ')}</span>
                                       <span>Bid: ${item.bid_price?.toFixed(2)}</span>
                                     </div>
@@ -564,8 +564,8 @@ export default function InsertionOrders() {
                                   {/* Line Item Budget */}
                                   <div className="w-32">
                                     <div className="flex justify-between text-xs mb-1">
-                                      <span className="text-[#64748B]">Budget</span>
-                                      <span className="text-[#F8FAFC]">{formatCurrency(item.budget)}</span>
+                                      <span className="text-slate-500">Budget</span>
+                                      <span className="text-slate-900">{formatCurrency(item.budget)}</span>
                                     </div>
                                     <Progress value={itemBudgetPercent} className="h-1.5" />
                                   </div>
@@ -573,12 +573,12 @@ export default function InsertionOrders() {
                                   {/* Stats */}
                                   <div className="flex gap-4 text-xs">
                                     <div className="text-right">
-                                      <p className="text-[#F8FAFC] font-medium">{item.impressions?.toLocaleString() || 0}</p>
-                                      <p className="text-[#64748B]">Impr.</p>
+                                      <p className="text-slate-900 font-medium">{item.impressions?.toLocaleString() || 0}</p>
+                                      <p className="text-slate-500">Impr.</p>
                                     </div>
                                     <div className="text-right">
-                                      <p className="text-[#F8FAFC] font-medium">{item.clicks?.toLocaleString() || 0}</p>
-                                      <p className="text-[#64748B]">Clicks</p>
+                                      <p className="text-slate-900 font-medium">{item.clicks?.toLocaleString() || 0}</p>
+                                      <p className="text-slate-500">Clicks</p>
                                     </div>
                                   </div>
                                   
@@ -588,7 +588,7 @@ export default function InsertionOrders() {
                                       size="icon"
                                       variant="ghost"
                                       onClick={() => openEditLineItem(item, io.id)}
-                                      className="h-8 w-8 text-[#94A3B8] hover:text-[#F8FAFC]"
+                                      className="h-8 w-8 text-slate-600 hover:text-slate-900"
                                     >
                                       <Edit2 className="w-3 h-3" />
                                     </Button>
@@ -620,48 +620,48 @@ export default function InsertionOrders() {
       <Dialog open={showIODialog} onOpenChange={setShowIODialog}>
         <DialogContent className="surface-primary border-panel max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">
+            <DialogTitle className="text-slate-900">
               {editingIO ? "Edit Insertion Order" : "Create Insertion Order"}
             </DialogTitle>
-            <DialogDescription className="text-[#64748B]">
+            <DialogDescription className="text-slate-500">
               Configure your insertion order settings
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Name *</Label>
+              <Label className="text-slate-600">Name *</Label>
               <Input
                 value={ioForm.name}
                 onChange={(e) => setIOForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Q1 Brand Campaign"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
                 data-testid="io-name-input"
               />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Total Budget</Label>
+                <Label className="text-slate-600">Total Budget</Label>
                 <Input
                   type="number"
                   value={ioForm.total_budget}
                   onChange={(e) => setIOForm(prev => ({ ...prev, total_budget: parseFloat(e.target.value) || 0 }))}
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Currency</Label>
+                <Label className="text-slate-600">Currency</Label>
                 <Select 
                   value={ioForm.currency} 
                   onValueChange={(v) => setIOForm(prev => ({ ...prev, currency: v }))}
                 >
-                  <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     {["USD", "EUR", "GBP", "CAD", "AUD"].map(c => (
-                      <SelectItem key={c} value={c} className="text-[#F8FAFC]">{c}</SelectItem>
+                      <SelectItem key={c} value={c} className="text-slate-900">{c}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -669,56 +669,56 @@ export default function InsertionOrders() {
             </div>
             
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Structure Type</Label>
+              <Label className="text-slate-600">Structure Type</Label>
               <Select 
                 value={ioForm.structure_type} 
                 onValueChange={(v) => setIOForm(prev => ({ ...prev, structure_type: v }))}
               >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
-                  <SelectItem value="audience" className="text-[#F8FAFC]">By Audience</SelectItem>
-                  <SelectItem value="tactic" className="text-[#F8FAFC]">By Tactic</SelectItem>
-                  <SelectItem value="goal" className="text-[#F8FAFC]">By Goal</SelectItem>
+                <SelectContent className="surface-primary border-slate-200">
+                  <SelectItem value="audience" className="text-slate-900">By Audience</SelectItem>
+                  <SelectItem value="tactic" className="text-slate-900">By Tactic</SelectItem>
+                  <SelectItem value="goal" className="text-slate-900">By Goal</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Start Date</Label>
+                <Label className="text-slate-600">Start Date</Label>
                 <Input
                   type="date"
                   value={ioForm.start_date}
                   onChange={(e) => setIOForm(prev => ({ ...prev, start_date: e.target.value }))}
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">End Date</Label>
+                <Label className="text-slate-600">End Date</Label>
                 <Input
                   type="date"
                   value={ioForm.end_date}
                   onChange={(e) => setIOForm(prev => ({ ...prev, end_date: e.target.value }))}
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Link to Campaign (optional)</Label>
+              <Label className="text-slate-600">Link to Campaign (optional)</Label>
               <Select 
                 value={ioForm.campaign_id} 
                 onValueChange={(v) => setIOForm(prev => ({ ...prev, campaign_id: v }))}
               >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                   <SelectValue placeholder="Select campaign" />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
-                  <SelectItem value="none" className="text-[#F8FAFC]">None</SelectItem>
+                <SelectContent className="surface-primary border-slate-200">
+                  <SelectItem value="none" className="text-slate-900">None</SelectItem>
                   {campaigns.map(c => (
-                    <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -726,7 +726,7 @@ export default function InsertionOrders() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowIODialog(false)} className="border-[#2D3B55] text-[#94A3B8]">
+            <Button variant="outline" onClick={() => setShowIODialog(false)} className="border-slate-200 text-slate-600">
               Cancel
             </Button>
             <Button 
@@ -745,10 +745,10 @@ export default function InsertionOrders() {
       <Dialog open={showLineItemDialog} onOpenChange={setShowLineItemDialog}>
         <DialogContent className="surface-primary border-panel max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">
+            <DialogTitle className="text-slate-900">
               {editingLineItem ? "Edit Line Item" : "Create Line Item"}
             </DialogTitle>
-            <DialogDescription className="text-[#64748B]">
+            <DialogDescription className="text-slate-500">
               Configure line item targeting and bidding
             </DialogDescription>
           </DialogHeader>
@@ -756,28 +756,28 @@ export default function InsertionOrders() {
           <div className="grid grid-cols-2 gap-6 py-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Name *</Label>
+                <Label className="text-slate-600">Name *</Label>
                 <Input
                   value={lineItemForm.name}
                   onChange={(e) => setLineItemForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Retargeting - High Intent"
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                   data-testid="line-item-name-input"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Line Item Type</Label>
+                <Label className="text-slate-600">Line Item Type</Label>
                 <Select 
                   value={lineItemForm.line_item_type} 
                   onValueChange={(v) => setLineItemForm(prev => ({ ...prev, line_item_type: v }))}
                 >
-                  <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     {LINE_ITEM_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value} className="text-[#F8FAFC]">
+                      <SelectItem key={type.value} value={type.value} className="text-slate-900">
                         {type.label}
                       </SelectItem>
                     ))}
@@ -786,27 +786,27 @@ export default function InsertionOrders() {
               </div>
               
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Budget</Label>
+                <Label className="text-slate-600">Budget</Label>
                 <Input
                   type="number"
                   value={lineItemForm.budget}
                   onChange={(e) => setLineItemForm(prev => ({ ...prev, budget: parseFloat(e.target.value) || 0 }))}
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Bid Strategy</Label>
+                <Label className="text-slate-600">Bid Strategy</Label>
                 <Select 
                   value={lineItemForm.bid_strategy} 
                   onValueChange={(v) => setLineItemForm(prev => ({ ...prev, bid_strategy: v }))}
                 >
-                  <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     {BID_STRATEGIES.map(s => (
-                      <SelectItem key={s.value} value={s.value} className="text-[#F8FAFC]">
+                      <SelectItem key={s.value} value={s.value} className="text-slate-900">
                         {s.label}
                       </SelectItem>
                     ))}
@@ -816,27 +816,27 @@ export default function InsertionOrders() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Bid Price</Label>
+                  <Label className="text-slate-600">Bid Price</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={lineItemForm.bid_price}
                     onChange={(e) => setLineItemForm(prev => ({ ...prev, bid_price: parseFloat(e.target.value) || 0 }))}
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                    className="surface-secondary border-slate-200 text-slate-900"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Inventory Source</Label>
+                  <Label className="text-slate-600">Inventory Source</Label>
                   <Select 
                     value={lineItemForm.inventory_source} 
                     onValueChange={(v) => setLineItemForm(prev => ({ ...prev, inventory_source: v }))}
                   >
-                    <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                    <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55]">
+                    <SelectContent className="surface-primary border-slate-200">
                       {INVENTORY_SOURCES.map(s => (
-                        <SelectItem key={s.value} value={s.value} className="text-[#F8FAFC]">
+                        <SelectItem key={s.value} value={s.value} className="text-slate-900">
                           {s.label}
                         </SelectItem>
                       ))}
@@ -857,11 +857,11 @@ export default function InsertionOrders() {
                   <div 
                     key={idx} 
                     onClick={() => applyRecommendation(rec)}
-                    className="p-3 surface-secondary rounded-lg cursor-pointer hover:bg-[#2D3B55] transition-colors border-l-2"
+                    className="p-3 surface-secondary rounded-lg cursor-pointer hover:bg-slate-200 transition-colors border-l-2"
                     style={{ borderLeftColor: getLineItemTypeColor(rec.type) }}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-[#F8FAFC]">{rec.name}</span>
+                      <span className="text-sm font-medium text-slate-900">{rec.name}</span>
                       <Badge 
                         className="text-xs"
                         style={{ 
@@ -872,8 +872,8 @@ export default function InsertionOrders() {
                         {rec.type}
                       </Badge>
                     </div>
-                    <p className="text-xs text-[#64748B]">{rec.description}</p>
-                    <div className="flex gap-3 mt-2 text-xs text-[#94A3B8]">
+                    <p className="text-xs text-slate-500">{rec.description}</p>
+                    <div className="flex gap-3 mt-2 text-xs text-slate-600">
                       <span>Budget: ${rec.budget}</span>
                       <span>{rec.inventory_source}</span>
                     </div>
@@ -884,7 +884,7 @@ export default function InsertionOrders() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowLineItemDialog(false)} className="border-[#2D3B55] text-[#94A3B8]">
+            <Button variant="outline" onClick={() => setShowLineItemDialog(false)} className="border-slate-200 text-slate-600">
               Cancel
             </Button>
             <Button 

@@ -128,8 +128,8 @@ export default function Attribution() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Cross-Campaign Attribution</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Cross-Campaign Attribution</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Analyze user journeys and attribute conversions across campaigns
           </p>
         </div>
@@ -146,8 +146,8 @@ export default function Attribution() {
       {/* Attribution Model Selector */}
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-[#F8FAFC]">Attribution Model</CardTitle>
-          <CardDescription className="text-[#64748B]">
+          <CardTitle className="text-lg text-slate-900">Attribution Model</CardTitle>
+          <CardDescription className="text-slate-500">
             Select how conversion credit is distributed across touchpoints
           </CardDescription>
         </CardHeader>
@@ -160,11 +160,11 @@ export default function Attribution() {
                 className={`p-4 rounded-lg cursor-pointer border transition-all ${
                   selectedModel === model.value
                     ? "bg-[#3B82F6]/20 border-[#3B82F6]"
-                    : "surface-secondary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                    : "surface-secondary border-slate-200 hover:border-[#3B82F6]/50"
                 }`}
               >
-                <p className="text-sm font-medium text-[#F8FAFC]">{model.label}</p>
-                <p className="text-xs text-[#64748B] mt-1">{model.desc}</p>
+                <p className="text-sm font-medium text-slate-900">{model.label}</p>
+                <p className="text-xs text-slate-500 mt-1">{model.desc}</p>
               </div>
             ))}
           </div>
@@ -178,9 +178,9 @@ export default function Attribution() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Target className="w-4 h-4 text-[#3B82F6]" />
-                <span className="text-xs text-[#64748B]">Total Conversions</span>
+                <span className="text-xs text-slate-500">Total Conversions</span>
               </div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">
+              <p className="text-2xl font-bold text-slate-900">
                 {formatNumber(attributionData.total_conversions)}
               </p>
             </CardContent>
@@ -189,9 +189,9 @@ export default function Attribution() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-[#10B981]" />
-                <span className="text-xs text-[#64748B]">Total Value</span>
+                <span className="text-xs text-slate-500">Total Value</span>
               </div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">
+              <p className="text-2xl font-bold text-slate-900">
                 ${formatNumber(attributionData.total_value)}
               </p>
             </CardContent>
@@ -200,9 +200,9 @@ export default function Attribution() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <BarChart3 className="w-4 h-4 text-[#F59E0B]" />
-                <span className="text-xs text-[#64748B]">Campaigns</span>
+                <span className="text-xs text-slate-500">Campaigns</span>
               </div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">
+              <p className="text-2xl font-bold text-slate-900">
                 {attributionData.attribution?.length || 0}
               </p>
             </CardContent>
@@ -211,9 +211,9 @@ export default function Attribution() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <GitBranch className="w-4 h-4 text-[#8B5CF6]" />
-                <span className="text-xs text-[#64748B]">Model</span>
+                <span className="text-xs text-slate-500">Model</span>
               </div>
-              <p className="text-2xl font-bold text-[#F8FAFC] capitalize">
+              <p className="text-2xl font-bold text-slate-900 capitalize">
                 {selectedModel.replace(/_/g, ' ')}
               </p>
             </CardContent>
@@ -225,7 +225,7 @@ export default function Attribution() {
         {/* Attribution Bar Chart */}
         <Card className="col-span-2 surface-primary border-panel">
           <CardHeader className="pb-0">
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-[#3B82F6]" />
               Attributed Conversions by Campaign
             </CardTitle>
@@ -235,20 +235,20 @@ export default function Attribution() {
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={attributionChartData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                     <XAxis 
                       dataKey="name" 
                       tick={{ fill: '#94A3B8', fontSize: 11 }} 
-                      axisLine={{ stroke: '#1E293B' }}
+                      axisLine={{ stroke: '#E2E8F0' }}
                       angle={-45}
                       textAnchor="end"
                       height={80}
                     />
-                    <YAxis tick={{ fill: '#94A3B8', fontSize: 11 }} axisLine={{ stroke: '#1E293B' }} />
+                    <YAxis tick={{ fill: '#94A3B8', fontSize: 11 }} axisLine={{ stroke: '#E2E8F0' }} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#0A0F1C', 
-                        border: '1px solid #2D3B55',
+                        backgroundColor: '#F8FAFC', 
+                        border: '1px solid #E2E8F0',
                         borderRadius: '8px',
                         color: '#F8FAFC'
                       }}
@@ -269,9 +269,9 @@ export default function Attribution() {
             ) : (
               <div className="h-[300px] flex items-center justify-center">
                 <div className="text-center">
-                  <Target className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
-                  <p className="text-[#94A3B8]">No attribution data available</p>
-                  <p className="text-sm text-[#64748B] mt-1">Track conversions to see attribution analysis</p>
+                  <Target className="w-12 h-12 mx-auto text-slate-500 mb-4" />
+                  <p className="text-slate-600">No attribution data available</p>
+                  <p className="text-sm text-slate-500 mt-1">Track conversions to see attribution analysis</p>
                 </div>
               </div>
             )}
@@ -281,7 +281,7 @@ export default function Attribution() {
         {/* Attribution Share Pie */}
         <Card className="surface-primary border-panel">
           <CardHeader className="pb-0">
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <PieChart className="w-5 h-5 text-[#10B981]" />
               Attribution Share
             </CardTitle>
@@ -306,22 +306,22 @@ export default function Attribution() {
                     </Pie>
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#0A0F1C', 
-                        border: '1px solid #2D3B55',
+                        backgroundColor: '#F8FAFC', 
+                        border: '1px solid #E2E8F0',
                         borderRadius: '8px',
                         color: '#F8FAFC'
                       }}
                     />
                     <Legend 
                       wrapperStyle={{ fontSize: '11px' }}
-                      formatter={(value) => <span className="text-[#94A3B8]">{value}</span>}
+                      formatter={(value) => <span className="text-slate-600">{value}</span>}
                     />
                   </RechartsPie>
                 </ResponsiveContainer>
               </div>
             ) : (
               <div className="h-[300px] flex items-center justify-center">
-                <p className="text-[#64748B]">No data</p>
+                <p className="text-slate-500">No data</p>
               </div>
             )}
           </CardContent>
@@ -332,34 +332,34 @@ export default function Attribution() {
       {attributionData?.attribution?.length > 0 && (
         <Card className="surface-primary border-panel">
           <CardHeader>
-            <CardTitle className="text-lg text-[#F8FAFC]">Campaign Attribution Details</CardTitle>
+            <CardTitle className="text-lg text-slate-900">Campaign Attribution Details</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#2D3B55]">
-                    <th className="text-left py-3 px-3 text-xs text-[#64748B] font-medium">Campaign</th>
-                    <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Attributed Conversions</th>
-                    <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Attributed Value</th>
-                    <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Share</th>
-                    <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Visual</th>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-left py-3 px-3 text-xs text-slate-500 font-medium">Campaign</th>
+                    <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Attributed Conversions</th>
+                    <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Attributed Value</th>
+                    <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Share</th>
+                    <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Visual</th>
                   </tr>
                 </thead>
                 <tbody>
                   {attributionData.attribution.map((item, idx) => (
-                    <tr key={item.campaign_id} className="border-b border-[#2D3B55]/30">
+                    <tr key={item.campaign_id} className="border-b border-slate-200/30">
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-2">
                           <div 
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: COLORS[idx % COLORS.length] }}
                           />
-                          <span className="text-sm text-[#F8FAFC]">{item.campaign_name}</span>
+                          <span className="text-sm text-slate-900">{item.campaign_name}</span>
                         </div>
                       </td>
                       <td className="py-3 px-3 text-right">
-                        <span className="text-sm font-mono text-[#F8FAFC]">
+                        <span className="text-sm font-mono text-slate-900">
                           {item.attributed_conversions?.toFixed(2)}
                         </span>
                       </td>
@@ -391,11 +391,11 @@ export default function Attribution() {
       {/* User Journey Explorer */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
             <GitBranch className="w-5 h-5 text-[#8B5CF6]" />
             User Journey Explorer
           </CardTitle>
-          <CardDescription className="text-[#64748B]">
+          <CardDescription className="text-slate-500">
             Visualize individual user touchpoints across campaigns
           </CardDescription>
         </CardHeader>
@@ -405,7 +405,7 @@ export default function Attribution() {
               value={searchUserId}
               onChange={(e) => setSearchUserId(e.target.value)}
               placeholder="Enter user ID to explore journey"
-              className="max-w-md surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+              className="max-w-md surface-secondary border-slate-200 text-slate-900"
             />
             <Button onClick={searchUserJourney} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
               <Users className="w-4 h-4 mr-2" />
@@ -418,27 +418,27 @@ export default function Attribution() {
               {/* Journey Stats */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="p-3 surface-secondary rounded-lg">
-                  <p className="text-xs text-[#64748B]">Campaigns Touched</p>
-                  <p className="text-xl font-bold text-[#F8FAFC]">{userJourney.campaigns_touched}</p>
+                  <p className="text-xs text-slate-500">Campaigns Touched</p>
+                  <p className="text-xl font-bold text-slate-900">{userJourney.campaigns_touched}</p>
                 </div>
                 <div className="p-3 surface-secondary rounded-lg">
-                  <p className="text-xs text-[#64748B]">Total Events</p>
-                  <p className="text-xl font-bold text-[#F8FAFC]">{userJourney.total_events}</p>
+                  <p className="text-xs text-slate-500">Total Events</p>
+                  <p className="text-xl font-bold text-slate-900">{userJourney.total_events}</p>
                 </div>
                 <div className="p-3 surface-secondary rounded-lg">
-                  <p className="text-xs text-[#64748B]">First Touch</p>
-                  <p className="text-sm text-[#F8FAFC] truncate">{userJourney.first_touch?.campaign_name || '-'}</p>
+                  <p className="text-xs text-slate-500">First Touch</p>
+                  <p className="text-sm text-slate-900 truncate">{userJourney.first_touch?.campaign_name || '-'}</p>
                 </div>
                 <div className="p-3 surface-secondary rounded-lg">
-                  <p className="text-xs text-[#64748B]">Last Touch</p>
-                  <p className="text-sm text-[#F8FAFC] truncate">{userJourney.last_touch?.campaign_name || '-'}</p>
+                  <p className="text-xs text-slate-500">Last Touch</p>
+                  <p className="text-sm text-slate-900 truncate">{userJourney.last_touch?.campaign_name || '-'}</p>
                 </div>
               </div>
 
               {/* Journey Timeline */}
               {userJourney.journey?.length > 0 ? (
                 <div className="relative">
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[#2D3B55]" />
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200" />
                   <div className="space-y-4">
                     {userJourney.journey.map((event, idx) => (
                       <div key={idx} className="flex items-start gap-4 relative">
@@ -462,9 +462,9 @@ export default function Attribution() {
                               >
                                 {event.event_type}
                               </Badge>
-                              <span className="text-sm text-[#F8FAFC]">{event.campaign_name}</span>
+                              <span className="text-sm text-slate-900">{event.campaign_name}</span>
                             </div>
-                            <span className="text-xs text-[#64748B]">
+                            <span className="text-xs text-slate-500">
                               {new Date(event.timestamp).toLocaleString()}
                             </span>
                           </div>
@@ -473,7 +473,7 @@ export default function Attribution() {
                           )}
                         </div>
                         {idx < userJourney.journey.length - 1 && (
-                          <ArrowRight className="absolute left-[52px] bottom-[-16px] w-4 h-4 text-[#64748B]" />
+                          <ArrowRight className="absolute left-[52px] bottom-[-16px] w-4 h-4 text-slate-500" />
                         )}
                       </div>
                     ))}
@@ -481,8 +481,8 @@ export default function Attribution() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <GitBranch className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
-                  <p className="text-[#94A3B8]">No journey data for this user</p>
+                  <GitBranch className="w-12 h-12 mx-auto text-slate-500 mb-4" />
+                  <p className="text-slate-600">No journey data for this user</p>
                 </div>
               )}
             </div>
@@ -490,9 +490,9 @@ export default function Attribution() {
 
           {!userJourney && (
             <div className="text-center py-8">
-              <Users className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
-              <p className="text-[#94A3B8]">Enter a user ID to explore their conversion journey</p>
-              <p className="text-sm text-[#64748B] mt-1">
+              <Users className="w-12 h-12 mx-auto text-slate-500 mb-4" />
+              <p className="text-slate-600">Enter a user ID to explore their conversion journey</p>
+              <p className="text-sm text-slate-500 mt-1">
                 Track attribution events to build user journeys
               </p>
             </div>

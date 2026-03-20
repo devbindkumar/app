@@ -77,13 +77,13 @@ export default function SSPAnalytics() {
 
   const getStatusIcon = (status) => {
     if (status === "active") return <CheckCircle2 className="w-4 h-4 text-[#10B981]" />;
-    return <AlertCircle className="w-4 h-4 text-[#64748B]" />;
+    return <AlertCircle className="w-4 h-4 text-slate-500" />;
   };
 
   const getTrendIcon = (value, threshold = 0) => {
     if (value > threshold) return <ArrowUpRight className="w-4 h-4 text-[#10B981]" />;
     if (value < threshold) return <ArrowDownRight className="w-4 h-4 text-[#EF4444]" />;
-    return <Minus className="w-4 h-4 text-[#64748B]" />;
+    return <Minus className="w-4 h-4 text-slate-500" />;
   };
 
   // Prepare chart data
@@ -104,7 +104,7 @@ export default function SSPAnalytics() {
       <div className="p-6 flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3B82F6] mx-auto mb-4"></div>
-          <div className="text-[#64748B]">Loading SSP analytics...</div>
+          <div className="text-slate-500">Loading SSP analytics...</div>
         </div>
       </div>
     );
@@ -116,16 +116,16 @@ export default function SSPAnalytics() {
       <div className="p-6 space-y-6" data-testid="ssp-analytics-page">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#F8FAFC]">SSP Performance Analytics</h1>
-            <p className="text-sm text-[#94A3B8] mt-1">Monitor and analyze SSP performance metrics</p>
+            <h1 className="text-3xl font-bold text-slate-900">SSP Performance Analytics</h1>
+            <p className="text-sm text-slate-600 mt-1">Monitor and analyze SSP performance metrics</p>
           </div>
         </div>
         
         <Card className="surface-primary border-panel">
           <CardContent className="py-16 text-center">
-            <Server className="w-16 h-16 mx-auto text-[#64748B] mb-4" />
-            <h3 className="text-xl font-semibold text-[#F8FAFC] mb-2">No SSP Endpoints</h3>
-            <p className="text-[#94A3B8] max-w-md mx-auto mb-4">
+            <Server className="w-16 h-16 mx-auto text-slate-500 mb-4" />
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">No SSP Endpoints</h3>
+            <p className="text-slate-600 max-w-md mx-auto mb-4">
               Create SSP endpoints to start receiving bid requests and tracking performance metrics.
             </p>
             <Button 
@@ -145,8 +145,8 @@ export default function SSPAnalytics() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">SSP Performance Analytics</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">SSP Performance Analytics</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Monitor and analyze SSP performance metrics
           </p>
         </div>
@@ -169,8 +169,8 @@ export default function SSPAnalytics() {
                 <Server className="w-5 h-5 text-[#3B82F6]" />
               </div>
               <div>
-                <p className="text-xs text-[#64748B]">Total SSPs</p>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{overview.overview.total_ssps}</p>
+                <p className="text-xs text-slate-500">Total SSPs</p>
+                <p className="text-2xl font-bold text-slate-900">{overview.overview.total_ssps}</p>
                 <p className="text-xs text-[#10B981]">{overview.overview.active_ssps} active</p>
               </div>
             </div>
@@ -184,8 +184,8 @@ export default function SSPAnalytics() {
                 <Zap className="w-5 h-5 text-[#10B981]" />
               </div>
               <div>
-                <p className="text-xs text-[#64748B]">Total Requests</p>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{formatNumber(overview.overview.total_requests)}</p>
+                <p className="text-xs text-slate-500">Total Requests</p>
+                <p className="text-2xl font-bold text-slate-900">{formatNumber(overview.overview.total_requests)}</p>
               </div>
             </div>
           </CardContent>
@@ -198,8 +198,8 @@ export default function SSPAnalytics() {
                 <BarChart3 className="w-5 h-5 text-[#8B5CF6]" />
               </div>
               <div>
-                <p className="text-xs text-[#64748B]">Bid Rate</p>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{overview.overview.overall_bid_rate?.toFixed(1)}%</p>
+                <p className="text-xs text-slate-500">Bid Rate</p>
+                <p className="text-2xl font-bold text-slate-900">{overview.overview.overall_bid_rate?.toFixed(1)}%</p>
               </div>
             </div>
           </CardContent>
@@ -212,8 +212,8 @@ export default function SSPAnalytics() {
                 <TrendingUp className="w-5 h-5 text-[#F59E0B]" />
               </div>
               <div>
-                <p className="text-xs text-[#64748B]">Win Rate</p>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{overview.overview.overall_win_rate?.toFixed(1)}%</p>
+                <p className="text-xs text-slate-500">Win Rate</p>
+                <p className="text-2xl font-bold text-slate-900">{overview.overview.overall_win_rate?.toFixed(1)}%</p>
               </div>
             </div>
           </CardContent>
@@ -226,8 +226,8 @@ export default function SSPAnalytics() {
                 <DollarSign className="w-5 h-5 text-[#EC4899]" />
               </div>
               <div>
-                <p className="text-xs text-[#64748B]">Total Spend</p>
-                <p className="text-2xl font-bold text-[#F8FAFC]">${overview.overview.total_spend?.toFixed(2)}</p>
+                <p className="text-xs text-slate-500">Total Spend</p>
+                <p className="text-2xl font-bold text-slate-900">${overview.overview.total_spend?.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
@@ -239,7 +239,7 @@ export default function SSPAnalytics() {
         {/* Bid Rate Comparison */}
         <Card className="col-span-2 surface-primary border-panel">
           <CardHeader className="pb-0">
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-[#3B82F6]" />
               SSP Performance Comparison
             </CardTitle>
@@ -248,13 +248,13 @@ export default function SSPAnalytics() {
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={bidRateChartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 12 }} axisLine={{ stroke: '#1E293B' }} />
-                  <YAxis tick={{ fill: '#94A3B8', fontSize: 12 }} axisLine={{ stroke: '#1E293B' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                  <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 12 }} axisLine={{ stroke: '#E2E8F0' }} />
+                  <YAxis tick={{ fill: '#94A3B8', fontSize: 12 }} axisLine={{ stroke: '#E2E8F0' }} />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0A0F1C', 
-                      border: '1px solid #2D3B55',
+                      backgroundColor: '#F8FAFC', 
+                      border: '1px solid #E2E8F0',
                       borderRadius: '8px',
                       color: '#F8FAFC'
                     }}
@@ -265,7 +265,7 @@ export default function SSPAnalytics() {
                   />
                   <Legend 
                     wrapperStyle={{ paddingTop: '10px' }}
-                    formatter={(value) => <span className="text-[#94A3B8]">{value === 'bidRate' ? 'Bid Rate' : 'Win Rate'}</span>}
+                    formatter={(value) => <span className="text-slate-600">{value === 'bidRate' ? 'Bid Rate' : 'Win Rate'}</span>}
                   />
                   <Bar dataKey="bidRate" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="winRate" fill="#10B981" radius={[4, 4, 0, 0]} />
@@ -278,7 +278,7 @@ export default function SSPAnalytics() {
         {/* Request Distribution Pie */}
         <Card className="surface-primary border-panel">
           <CardHeader className="pb-0">
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <Activity className="w-5 h-5 text-[#8B5CF6]" />
               Request Distribution
             </CardTitle>
@@ -304,8 +304,8 @@ export default function SSPAnalytics() {
                   </Pie>
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0A0F1C', 
-                      border: '1px solid #2D3B55',
+                      backgroundColor: '#F8FAFC', 
+                      border: '1px solid #E2E8F0',
                       borderRadius: '8px',
                       color: '#F8FAFC'
                     }}
@@ -324,7 +324,7 @@ export default function SSPAnalytics() {
         <div className="col-span-2">
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                 <Server className="w-5 h-5 text-[#3B82F6]" />
                 SSP Rankings
               </CardTitle>
@@ -333,14 +333,14 @@ export default function SSPAnalytics() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#2D3B55]">
-                      <th className="text-left py-3 px-3 text-xs text-[#64748B] font-medium">SSP</th>
-                      <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Requests</th>
-                      <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Bids</th>
-                      <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Bid Rate</th>
-                      <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Win Rate</th>
-                      <th className="text-right py-3 px-3 text-xs text-[#64748B] font-medium">Latency</th>
-                      <th className="text-center py-3 px-3 text-xs text-[#64748B] font-medium"></th>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-3 text-xs text-slate-500 font-medium">SSP</th>
+                      <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Requests</th>
+                      <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Bids</th>
+                      <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Bid Rate</th>
+                      <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Win Rate</th>
+                      <th className="text-right py-3 px-3 text-xs text-slate-500 font-medium">Latency</th>
+                      <th className="text-center py-3 px-3 text-xs text-slate-500 font-medium"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -348,7 +348,7 @@ export default function SSPAnalytics() {
                       <tr 
                         key={ssp.id} 
                         data-testid={`ssp-row-${ssp.id}`}
-                        className={`border-b border-[#2D3B55]/30 cursor-pointer transition-colors hover:bg-[#151F32] ${
+                        className={`border-b border-slate-200/30 cursor-pointer transition-colors hover:bg-slate-100 ${
                           selectedSSP === ssp.id ? "bg-[#3B82F6]/10" : ""
                         }`}
                         onClick={() => fetchSSPDetails(ssp.id)}
@@ -358,30 +358,30 @@ export default function SSPAnalytics() {
                             {idx < 3 && (
                               <Badge className={`w-6 h-6 flex items-center justify-center p-0 text-xs ${
                                 idx === 0 ? "bg-[#F59E0B]/20 text-[#F59E0B]" :
-                                idx === 1 ? "bg-[#94A3B8]/20 text-[#94A3B8]" :
+                                idx === 1 ? "bg-[#94A3B8]/20 text-slate-600" :
                                 "bg-[#CD7F32]/20 text-[#CD7F32]"
                               }`}>
                                 {idx + 1}
                               </Badge>
                             )}
                             <div>
-                              <span className="text-sm font-medium text-[#F8FAFC]">{ssp.name}</span>
+                              <span className="text-sm font-medium text-slate-900">{ssp.name}</span>
                               <div className="flex items-center gap-1 mt-0.5">
                                 {getStatusIcon(ssp.status)}
-                                <span className="text-[10px] text-[#64748B]">{ssp.status}</span>
+                                <span className="text-[10px] text-slate-500">{ssp.status}</span>
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="py-3 px-3 text-right">
-                          <span className="text-sm font-mono text-[#F8FAFC]">{formatNumber(ssp.requests)}</span>
+                          <span className="text-sm font-mono text-slate-900">{formatNumber(ssp.requests)}</span>
                         </td>
                         <td className="py-3 px-3 text-right">
                           <span className="text-sm font-mono text-[#3B82F6]">{formatNumber(ssp.bids)}</span>
                         </td>
                         <td className="py-3 px-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <span className="text-sm font-mono text-[#F8FAFC]">{ssp.bid_rate?.toFixed(1)}%</span>
+                            <span className="text-sm font-mono text-slate-900">{ssp.bid_rate?.toFixed(1)}%</span>
                             {getTrendIcon(ssp.bid_rate, 5)}
                           </div>
                         </td>
@@ -389,7 +389,7 @@ export default function SSPAnalytics() {
                           <span className={`text-sm font-mono ${
                             ssp.win_rate >= 30 ? "text-[#10B981]" :
                             ssp.win_rate >= 15 ? "text-[#F59E0B]" :
-                            "text-[#64748B]"
+                            "text-slate-500"
                           }`}>
                             {ssp.win_rate?.toFixed(1)}%
                           </span>
@@ -405,7 +405,7 @@ export default function SSPAnalytics() {
                         </td>
                         <td className="py-3 px-3 text-center">
                           <ChevronRight className={`w-4 h-4 transition-colors ${
-                            selectedSSP === ssp.id ? "text-[#3B82F6]" : "text-[#64748B]"
+                            selectedSSP === ssp.id ? "text-[#3B82F6]" : "text-slate-500"
                           }`} />
                         </td>
                       </tr>
@@ -422,24 +422,24 @@ export default function SSPAnalytics() {
           {/* Top Performers */}
           <Card className="surface-primary border-panel">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                 <Award className="w-4 h-4 text-[#F59E0B]" />
                 Top Performers
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="requests" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 h-8 bg-[#0A0F1C]">
+                <TabsList className="grid w-full grid-cols-3 h-8 bg-slate-50">
                   <TabsTrigger value="requests" className="text-xs data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white">Requests</TabsTrigger>
                   <TabsTrigger value="winrate" className="text-xs data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white">Win Rate</TabsTrigger>
                   <TabsTrigger value="spend" className="text-xs data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white">Spend</TabsTrigger>
                 </TabsList>
                 <TabsContent value="requests" className="mt-3">
                   {overview?.top_performers?.by_requests?.slice(0, 3).map((ssp, idx) => (
-                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-[#2D3B55]/30 last:border-0">
+                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-slate-200/30 last:border-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#64748B] w-4">{idx + 1}.</span>
-                        <span className="text-sm text-[#F8FAFC]">{ssp.name}</span>
+                        <span className="text-xs text-slate-500 w-4">{idx + 1}.</span>
+                        <span className="text-sm text-slate-900">{ssp.name}</span>
                       </div>
                       <span className="text-sm font-mono text-[#3B82F6]">{formatNumber(ssp.requests)}</span>
                     </div>
@@ -447,10 +447,10 @@ export default function SSPAnalytics() {
                 </TabsContent>
                 <TabsContent value="winrate" className="mt-3">
                   {overview?.top_performers?.by_win_rate?.slice(0, 3).map((ssp, idx) => (
-                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-[#2D3B55]/30 last:border-0">
+                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-slate-200/30 last:border-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#64748B] w-4">{idx + 1}.</span>
-                        <span className="text-sm text-[#F8FAFC]">{ssp.name}</span>
+                        <span className="text-xs text-slate-500 w-4">{idx + 1}.</span>
+                        <span className="text-sm text-slate-900">{ssp.name}</span>
                       </div>
                       <span className="text-sm font-mono text-[#10B981]">{ssp.win_rate?.toFixed(1)}%</span>
                     </div>
@@ -458,10 +458,10 @@ export default function SSPAnalytics() {
                 </TabsContent>
                 <TabsContent value="spend" className="mt-3">
                   {overview?.top_performers?.by_spend?.slice(0, 3).map((ssp, idx) => (
-                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-[#2D3B55]/30 last:border-0">
+                    <div key={ssp.id} className="flex items-center justify-between py-2 border-b border-slate-200/30 last:border-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#64748B] w-4">{idx + 1}.</span>
-                        <span className="text-sm text-[#F8FAFC]">{ssp.name}</span>
+                        <span className="text-xs text-slate-500 w-4">{idx + 1}.</span>
+                        <span className="text-sm text-slate-900">{ssp.name}</span>
                       </div>
                       <span className="text-sm font-mono text-[#8B5CF6]">${ssp.spend?.toFixed(2)}</span>
                     </div>
@@ -476,17 +476,17 @@ export default function SSPAnalytics() {
             <Card className="surface-primary border-panel border-[#3B82F6]/30">
               <CardContent className="py-8 text-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3B82F6] mx-auto"></div>
-                <p className="text-sm text-[#64748B] mt-2">Loading details...</p>
+                <p className="text-sm text-slate-500 mt-2">Loading details...</p>
               </CardContent>
             </Card>
           ) : sspDetails && (
             <Card className="surface-primary border-panel border-[#3B82F6]/30">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base text-[#F8FAFC]">{sspDetails.ssp?.name}</CardTitle>
+                  <CardTitle className="text-base text-slate-900">{sspDetails.ssp?.name}</CardTitle>
                   {getStatusIcon(sspDetails.ssp?.status)}
                 </div>
-                <p className="text-xs text-[#64748B] mt-1 font-mono">
+                <p className="text-xs text-slate-500 mt-1 font-mono">
                   Token: {sspDetails.ssp?.endpoint_token?.slice(0, 8)}...
                 </p>
               </CardHeader>
@@ -494,11 +494,11 @@ export default function SSPAnalytics() {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 surface-secondary rounded-lg">
-                    <p className="text-[10px] text-[#64748B] uppercase tracking-wider">Bid Rate</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Bid Rate</p>
                     <p className="text-xl font-bold text-[#3B82F6]">{sspDetails.metrics?.bid_rate?.toFixed(1)}%</p>
                   </div>
                   <div className="p-3 surface-secondary rounded-lg">
-                    <p className="text-[10px] text-[#64748B] uppercase tracking-wider">Win Rate</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Win Rate</p>
                     <p className="text-xl font-bold text-[#10B981]">{sspDetails.metrics?.win_rate?.toFixed(1)}%</p>
                   </div>
                 </div>
@@ -506,11 +506,11 @@ export default function SSPAnalytics() {
                 {/* Response Time */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-[#64748B] flex items-center gap-1">
+                    <p className="text-xs text-slate-500 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       Response Time
                     </p>
-                    <span className="text-xs font-mono text-[#94A3B8]">
+                    <span className="text-xs font-mono text-slate-600">
                       avg {sspDetails.response_time_stats?.avg?.toFixed(0) || 0}ms
                     </span>
                   </div>
@@ -519,10 +519,10 @@ export default function SSPAnalytics() {
                     className="h-2"
                   />
                   <div className="flex justify-between mt-1">
-                    <span className="text-[10px] text-[#64748B]">
+                    <span className="text-[10px] text-slate-500">
                       min: {sspDetails.response_time_stats?.min || 0}ms
                     </span>
-                    <span className="text-[10px] text-[#64748B]">
+                    <span className="text-[10px] text-slate-500">
                       max: {sspDetails.response_time_stats?.max || 0}ms
                     </span>
                   </div>
@@ -531,7 +531,7 @@ export default function SSPAnalytics() {
                 {/* Hourly Distribution */}
                 {sspDetails.hourly_distribution?.length > 0 && (
                   <div>
-                    <p className="text-xs text-[#64748B] mb-2">Hourly Activity</p>
+                    <p className="text-xs text-slate-500 mb-2">Hourly Activity</p>
                     <div className="h-[80px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={sspDetails.hourly_distribution}>
@@ -549,8 +549,8 @@ export default function SSPAnalytics() {
                           />
                           <Tooltip 
                             contentStyle={{ 
-                              backgroundColor: '#0A0F1C', 
-                              border: '1px solid #2D3B55',
+                              backgroundColor: '#F8FAFC', 
+                              border: '1px solid #E2E8F0',
                               borderRadius: '8px',
                               color: '#F8FAFC',
                               fontSize: '12px'
@@ -566,22 +566,22 @@ export default function SSPAnalytics() {
                 {/* Campaign Distribution */}
                 {sspDetails.campaign_distribution?.length > 0 && (
                   <div>
-                    <p className="text-xs text-[#64748B] mb-2">Top Campaigns</p>
+                    <p className="text-xs text-slate-500 mb-2">Top Campaigns</p>
                     {sspDetails.campaign_distribution.slice(0, 3).map((camp, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-1.5 border-b border-[#2D3B55]/30 last:border-0">
-                        <span className="text-xs text-[#F8FAFC] truncate max-w-[140px]">{camp.name}</span>
-                        <span className="text-xs font-mono text-[#94A3B8]">{camp.bids} bids</span>
+                      <div key={idx} className="flex items-center justify-between py-1.5 border-b border-slate-200/30 last:border-0">
+                        <span className="text-xs text-slate-900 truncate max-w-[140px]">{camp.name}</span>
+                        <span className="text-xs font-mono text-slate-600">{camp.bids} bids</span>
                       </div>
                     ))}
                   </div>
                 )}
 
                 {/* Actions */}
-                <div className="pt-2 border-t border-[#2D3B55]">
+                <div className="pt-2 border-t border-slate-200">
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="w-full border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]"
+                    className="w-full border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     onClick={() => handleRegenerateToken(sspDetails.ssp?.id)}
                   >
                     <RefreshCw className="w-3 h-3 mr-2" />

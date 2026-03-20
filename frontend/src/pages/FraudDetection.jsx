@@ -54,7 +54,7 @@ export default function FraudDetection() {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Loading fraud stats...</div>
+        <div className="text-slate-500">Loading fraud stats...</div>
       </div>
     );
   }
@@ -64,8 +64,8 @@ export default function FraudDetection() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Fraud Detection</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Fraud Detection</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Monitor and detect invalid traffic patterns
           </p>
         </div>
@@ -86,8 +86,8 @@ export default function FraudDetection() {
               <Activity className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Bids</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{stats?.total_bids?.toLocaleString()}</p>
+              <p className="text-xs text-slate-500">Total Bids</p>
+              <p className="text-xl font-bold text-slate-900">{stats?.total_bids?.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
@@ -97,7 +97,7 @@ export default function FraudDetection() {
               <ShieldAlert className="w-5 h-5 text-[#EF4444]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Flagged Bids</p>
+              <p className="text-xs text-slate-500">Flagged Bids</p>
               <p className="text-xl font-bold text-[#EF4444]">{stats?.flagged_bids?.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -108,7 +108,7 @@ export default function FraudDetection() {
               <AlertTriangle className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Fraud Rate</p>
+              <p className="text-xs text-slate-500">Fraud Rate</p>
               <p className="text-xl font-bold text-[#F59E0B]">{stats?.fraud_rate}%</p>
             </div>
           </CardContent>
@@ -119,7 +119,7 @@ export default function FraudDetection() {
               <CheckCircle className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Clean Traffic</p>
+              <p className="text-xs text-slate-500">Clean Traffic</p>
               <p className="text-xl font-bold text-[#10B981]">
                 {(100 - (stats?.fraud_rate || 0)).toFixed(1)}%
               </p>
@@ -132,7 +132,7 @@ export default function FraudDetection() {
         {/* Fraud by Type */}
         <Card className="surface-primary border-panel">
           <CardHeader>
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <Bug className="w-5 h-5 text-[#EF4444]" />
               Fraud by Type
             </CardTitle>
@@ -142,7 +142,7 @@ export default function FraudDetection() {
               Object.entries(stats.fraud_by_type).map(([type, count]) => (
                 <div key={type} className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#94A3B8] capitalize">{type.replace("_", " ")}</span>
+                    <span className="text-slate-600 capitalize">{type.replace("_", " ")}</span>
                     <span className="text-[#EF4444] font-mono">{count}</span>
                   </div>
                   <Progress 
@@ -155,7 +155,7 @@ export default function FraudDetection() {
               <div className="text-center py-8">
                 <CheckCircle className="w-12 h-12 text-[#10B981] mx-auto mb-3" />
                 <p className="text-[#10B981]">No fraud detected</p>
-                <p className="text-xs text-[#64748B]">All traffic appears clean</p>
+                <p className="text-xs text-slate-500">All traffic appears clean</p>
               </div>
             )}
           </CardContent>
@@ -164,14 +164,14 @@ export default function FraudDetection() {
         {/* Detection Patterns */}
         <Card className="surface-primary border-panel">
           <CardHeader>
-            <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+            <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
               <Settings className="w-5 h-5 text-[#F59E0B]" />
               Detection Patterns
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Bot User Agents</Label>
+              <Label className="text-slate-600">Bot User Agents</Label>
               <div className="flex flex-wrap gap-2">
                 {stats?.patterns?.bot_user_agents?.map((ua, idx) => (
                   <Badge key={idx} variant="outline" className="text-[#EF4444] border-[#EF4444]/30">
@@ -181,13 +181,13 @@ export default function FraudDetection() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">High Frequency Threshold</Label>
-              <p className="text-sm text-[#F8FAFC] font-mono">
+              <Label className="text-slate-600">High Frequency Threshold</Label>
+              <p className="text-sm text-slate-900 font-mono">
                 {stats?.patterns?.high_frequency_threshold} requests/min
               </p>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Invalid Geo Patterns</Label>
+              <Label className="text-slate-600">Invalid Geo Patterns</Label>
               <div className="flex flex-wrap gap-2">
                 {stats?.patterns?.invalid_geo_patterns?.map((geo, idx) => (
                   <Badge key={idx} variant="outline" className="text-[#F59E0B] border-[#F59E0B]/30">
@@ -203,7 +203,7 @@ export default function FraudDetection() {
       {/* Fraud Checker */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
             <Eye className="w-5 h-5 text-[#3B82F6]" />
             Test Fraud Detection
           </CardTitle>
@@ -211,19 +211,19 @@ export default function FraudDetection() {
         <CardContent>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-3">
-              <Label className="text-[#94A3B8]">Bid Request JSON</Label>
+              <Label className="text-slate-600">Bid Request JSON</Label>
               <textarea
                 value={testRequest}
                 onChange={(e) => setTestRequest(e.target.value)}
                 rows={12}
-                className="w-full p-3 surface-secondary border border-[#2D3B55] rounded text-[#F8FAFC] font-mono text-sm"
+                className="w-full p-3 surface-secondary border border-slate-200 rounded text-slate-900 font-mono text-sm"
               />
               <Button onClick={handleCheck} className="w-full bg-[#3B82F6] hover:bg-[#60A5FA]">
                 Check for Fraud
               </Button>
             </div>
             <div>
-              <Label className="text-[#94A3B8] mb-3 block">Result</Label>
+              <Label className="text-slate-600 mb-3 block">Result</Label>
               {checkResult ? (
                 <div className={`p-4 rounded border ${
                   checkResult.is_fraudulent 
@@ -242,14 +242,14 @@ export default function FraudDetection() {
                       }`}>
                         {checkResult.is_fraudulent ? "Fraud Detected" : "Clean Traffic"}
                       </p>
-                      <p className="text-sm text-[#94A3B8]">
+                      <p className="text-sm text-slate-600">
                         Score: {checkResult.fraud_score}/100
                       </p>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-[#94A3B8]">Recommendation</p>
+                    <p className="text-sm font-medium text-slate-600">Recommendation</p>
                     <Badge className={
                       checkResult.recommendation === "block"
                         ? "bg-[#EF4444]/20 text-[#EF4444]"
@@ -261,7 +261,7 @@ export default function FraudDetection() {
                   
                   {checkResult.flags?.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <p className="text-sm font-medium text-[#94A3B8]">Flags</p>
+                      <p className="text-sm font-medium text-slate-600">Flags</p>
                       <div className="flex flex-wrap gap-2">
                         {checkResult.flags.map((flag, idx) => (
                           <Badge key={idx} variant="outline" className="text-[#EF4444] border-[#EF4444]/30">
@@ -275,8 +275,8 @@ export default function FraudDetection() {
                 </div>
               ) : (
                 <div className="p-8 surface-secondary rounded text-center">
-                  <Eye className="w-12 h-12 text-[#64748B] mx-auto mb-3" />
-                  <p className="text-[#64748B]">Enter a bid request and click check</p>
+                  <Eye className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+                  <p className="text-slate-500">Enter a bid request and click check</p>
                 </div>
               )}
             </div>

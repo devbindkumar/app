@@ -69,9 +69,9 @@ function MetricCard({ title, value, subtitle, icon: Icon, trend, color = "primar
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1">{title}</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">{title}</p>
             <p className={`text-2xl font-bold ${colorClasses[color]}`}>{value}</p>
-            {subtitle && <p className="text-xs text-[#94A3B8] mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-slate-600 mt-1">{subtitle}</p>}
           </div>
           <div className={`p-2.5 rounded-lg ${bgClasses[color]}`}>
             <Icon className={`w-5 h-5 ${colorClasses[color]}`} />
@@ -83,7 +83,7 @@ function MetricCard({ title, value, subtitle, icon: Icon, trend, color = "primar
             <span className={`text-xs ${trend >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
               {trend >= 0 ? '+' : ''}{trend}%
             </span>
-            <span className="text-xs text-[#64748B]">vs last period</span>
+            <span className="text-xs text-slate-500">vs last period</span>
           </div>
         )}
       </CardContent>
@@ -102,8 +102,8 @@ function AdvertiserDashboard({ data, chartData, formatNumber, formatCurrency }) 
       {/* Welcome Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#F8FAFC]">{data.welcome_message}</h2>
-          <p className="text-sm text-[#64748B]">Monitor your campaign performance and manage creatives</p>
+          <h2 className="text-xl font-semibold text-slate-900">{data.welcome_message}</h2>
+          <p className="text-sm text-slate-500">Monitor your campaign performance and manage creatives</p>
         </div>
         <Badge className="bg-[#3B82F6]/20 text-[#3B82F6]">Advertiser</Badge>
       </div>
@@ -149,7 +149,7 @@ function AdvertiserDashboard({ data, chartData, formatNumber, formatCurrency }) 
         {/* Bidding Activity Chart */}
         <Card className="surface-primary border-panel lg:col-span-8">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-[#F8FAFC]">Bidding Activity</CardTitle>
+            <CardTitle className="text-lg text-slate-900">Bidding Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[280px]">
@@ -165,11 +165,11 @@ function AdvertiserDashboard({ data, chartData, formatNumber, formatCurrency }) 
                       <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2D3B55" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                   <XAxis dataKey="date" stroke="#64748B" fontSize={12} />
                   <YAxis stroke="#64748B" fontSize={12} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#151F32', border: '1px solid #2D3B55', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '8px' }}
                     labelStyle={{ color: '#F8FAFC' }}
                   />
                   <Area type="monotone" dataKey="bids" stroke="#3B82F6" fillOpacity={1} fill="url(#colorBids)" name="Bids" />
@@ -183,28 +183,28 @@ function AdvertiserDashboard({ data, chartData, formatNumber, formatCurrency }) 
         {/* Top Campaigns */}
         <Card className="surface-primary border-panel lg:col-span-4">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-[#F8FAFC]">Top Campaigns</CardTitle>
-            <CardDescription className="text-[#64748B]">By performance</CardDescription>
+            <CardTitle className="text-base text-slate-900">Top Campaigns</CardTitle>
+            <CardDescription className="text-slate-500">By performance</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.top_campaigns?.length === 0 ? (
-              <p className="text-sm text-[#64748B] text-center py-4">No campaigns yet</p>
+              <p className="text-sm text-slate-500 text-center py-4">No campaigns yet</p>
             ) : (
               data.top_campaigns?.map((campaign, idx) => (
-                <div key={campaign.id} className="flex items-center justify-between p-2 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50">
+                <div key={campaign.id} className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200/50">
                   <div className="flex items-center gap-3">
                     <span className="w-6 h-6 rounded-full bg-[#3B82F6]/20 flex items-center justify-center text-xs text-[#3B82F6] font-medium">
                       {idx + 1}
                     </span>
                     <div>
-                      <p className="text-sm text-[#F8FAFC] truncate max-w-[120px]">{campaign.name}</p>
-                      <p className="text-xs text-[#64748B]">{campaign.wins} wins</p>
+                      <p className="text-sm text-slate-900 truncate max-w-[120px]">{campaign.name}</p>
+                      <p className="text-xs text-slate-500">{campaign.wins} wins</p>
                     </div>
                   </div>
                   <Badge className={
                     campaign.status === 'active' ? 'bg-[#10B981]/20 text-[#10B981]' :
                     campaign.status === 'paused' ? 'bg-[#F59E0B]/20 text-[#F59E0B]' :
-                    'bg-[#64748B]/20 text-[#64748B]'
+                    'bg-[#64748B]/20 text-slate-500'
                   }>
                     {campaign.status}
                   </Badge>
@@ -218,22 +218,22 @@ function AdvertiserDashboard({ data, chartData, formatNumber, formatCurrency }) 
       {/* Recent Creatives */}
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-[#F8FAFC]">Recent Creatives</CardTitle>
+          <CardTitle className="text-base text-slate-900">Recent Creatives</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {data.recent_creatives?.length === 0 ? (
-              <p className="text-sm text-[#64748B] col-span-full text-center py-4">No creatives yet</p>
+              <p className="text-sm text-slate-500 col-span-full text-center py-4">No creatives yet</p>
             ) : (
               data.recent_creatives?.map((creative) => (
-                <div key={creative.id} className="p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50">
+                <div key={creative.id} className="p-3 rounded-lg bg-white border border-slate-200/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Image className="w-4 h-4 text-[#3B82F6]" />
-                    <Badge variant="outline" className="text-xs border-[#2D3B55] text-[#94A3B8]">
+                    <Badge variant="outline" className="text-xs border-slate-200 text-slate-600">
                       {creative.type}
                     </Badge>
                   </div>
-                  <p className="text-sm text-[#F8FAFC] truncate">{creative.name}</p>
+                  <p className="text-sm text-slate-900 truncate">{creative.name}</p>
                 </div>
               ))
             )}
@@ -260,8 +260,8 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
       {/* Welcome Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#F8FAFC]">{data.welcome_message}</h2>
-          <p className="text-sm text-[#64748B]">Monitor your team's performance and manage advertisers</p>
+          <h2 className="text-xl font-semibold text-slate-900">{data.welcome_message}</h2>
+          <p className="text-sm text-slate-500">Monitor your team's performance and manage advertisers</p>
         </div>
         <Badge className="bg-[#10B981]/20 text-[#10B981]">Admin</Badge>
       </div>
@@ -307,26 +307,26 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
         {/* Top Advertisers */}
         <Card className="surface-primary border-panel lg:col-span-7">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-[#F8FAFC]">Top Advertisers</CardTitle>
-            <CardDescription className="text-[#64748B]">By spend</CardDescription>
+            <CardTitle className="text-base text-slate-900">Top Advertisers</CardTitle>
+            <CardDescription className="text-slate-500">By spend</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.top_advertisers?.length === 0 ? (
-              <p className="text-sm text-[#64748B] text-center py-4">No advertisers yet</p>
+              <p className="text-sm text-slate-500 text-center py-4">No advertisers yet</p>
             ) : (
               data.top_advertisers?.map((adv, idx) => (
-                <div key={adv.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50">
+                <div key={adv.id} className="flex items-center justify-between p-3 rounded-lg bg-white border border-slate-200/50">
                   <div className="flex items-center gap-3">
                     <span className="w-8 h-8 rounded-full bg-[#3B82F6]/20 flex items-center justify-center text-sm text-[#3B82F6] font-medium">
                       {adv.name?.charAt(0)}
                     </span>
                     <div>
-                      <p className="text-sm text-[#F8FAFC] font-medium">{adv.name}</p>
-                      <p className="text-xs text-[#64748B]">{adv.campaigns} campaigns</p>
+                      <p className="text-sm text-slate-900 font-medium">{adv.name}</p>
+                      <p className="text-xs text-slate-500">{adv.campaigns} campaigns</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-[#F8FAFC] font-medium">{formatCurrency(adv.spend)}</p>
+                    <p className="text-sm text-slate-900 font-medium">{formatCurrency(adv.spend)}</p>
                     <Badge className={adv.is_active ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}>
                       {adv.is_active ? "Active" : "Inactive"}
                     </Badge>
@@ -340,7 +340,7 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
         {/* Campaign Status Chart */}
         <Card className="surface-primary border-panel lg:col-span-5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-[#F8FAFC]">Campaigns by Status</CardTitle>
+            <CardTitle className="text-base text-slate-900">Campaigns by Status</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[220px]">
@@ -361,7 +361,7 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#151F32', border: '1px solid #2D3B55', borderRadius: '8px' }}
+                      contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '8px' }}
                     />
                     <Legend 
                       wrapperStyle={{ fontSize: '12px' }}
@@ -370,7 +370,7 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex items-center justify-center h-full text-[#64748B]">
+                <div className="flex items-center justify-center h-full text-slate-500">
                   No campaign data
                 </div>
               )}
@@ -382,25 +382,25 @@ function AdminDashboard({ data, formatNumber, formatCurrency }) {
       {/* Recent Activity */}
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-[#F8FAFC]">Team Activity</CardTitle>
+          <CardTitle className="text-base text-slate-900">Team Activity</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-[200px] overflow-y-auto">
             {data.recent_activity?.length === 0 ? (
-              <p className="text-sm text-[#64748B] text-center py-4">No recent activity</p>
+              <p className="text-sm text-slate-500 text-center py-4">No recent activity</p>
             ) : (
               data.recent_activity?.map((act, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#0B1221]">
+                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white">
                   <div className="w-8 h-8 rounded-full bg-[#3B82F6]/20 flex items-center justify-center">
                     <Activity className="w-4 h-4 text-[#3B82F6]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-[#F8FAFC]">
+                    <p className="text-sm text-slate-900">
                       <span className="font-medium">{act.actor_name}</span>
-                      <span className="text-[#64748B]"> {act.action?.replace(/\./g, ' ')}</span>
+                      <span className="text-slate-500"> {act.action?.replace(/\./g, ' ')}</span>
                     </p>
                   </div>
-                  <span className="text-xs text-[#64748B]">
+                  <span className="text-xs text-slate-500">
                     {new Date(act.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
@@ -430,30 +430,30 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
       {/* Welcome Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#F8FAFC]">{data.welcome_message}</h2>
-          <p className="text-sm text-[#64748B]">Platform health, all admins, and system-wide metrics</p>
+          <h2 className="text-xl font-semibold text-slate-900">{data.welcome_message}</h2>
+          <p className="text-sm text-slate-500">Platform health, all admins, and system-wide metrics</p>
         </div>
         <Badge className="bg-[#F59E0B]/20 text-[#F59E0B]">Super Admin</Badge>
       </div>
 
       {/* Platform Health Banner */}
-      <Card className="surface-secondary border-panel bg-gradient-to-r from-[#0B1221] to-[#151F32]">
+      <Card className="surface-secondary border-panel bg-gradient-to-r from-blue-50 to-slate-100">
         <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#10B981]" />
                 <div>
-                  <p className="text-2xl font-bold text-[#F8FAFC]">{health?.logins_24h || 0}</p>
-                  <p className="text-xs text-[#64748B]">Logins (24h)</p>
+                  <p className="text-2xl font-bold text-slate-900">{health?.logins_24h || 0}</p>
+                  <p className="text-xs text-slate-500">Logins (24h)</p>
                 </div>
               </div>
-              <div className="w-px h-10 bg-[#2D3B55]" />
+              <div className="w-px h-10 bg-slate-200" />
               <div className="flex items-center gap-2">
                 <AlertCircle className={`w-5 h-5 ${(health?.failed_logins_24h || 0) > 10 ? 'text-[#EF4444]' : 'text-[#F59E0B]'}`} />
                 <div>
-                  <p className="text-2xl font-bold text-[#F8FAFC]">{health?.failed_logins_24h || 0}</p>
-                  <p className="text-xs text-[#64748B]">Failed Logins (24h)</p>
+                  <p className="text-2xl font-bold text-slate-900">{health?.failed_logins_24h || 0}</p>
+                  <p className="text-xs text-slate-500">Failed Logins (24h)</p>
                 </div>
               </div>
             </div>
@@ -513,36 +513,36 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
         {/* Top Admins */}
         <Card className="surface-primary border-panel lg:col-span-7">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-[#F8FAFC]">Top Admins</CardTitle>
-            <CardDescription className="text-[#64748B]">By total spend across their teams</CardDescription>
+            <CardTitle className="text-base text-slate-900">Top Admins</CardTitle>
+            <CardDescription className="text-slate-500">By total spend across their teams</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.top_admins?.length === 0 ? (
-              <p className="text-sm text-[#64748B] text-center py-4">No admins yet</p>
+              <p className="text-sm text-slate-500 text-center py-4">No admins yet</p>
             ) : (
               data.top_admins?.map((admin) => (
-                <div key={admin.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50">
+                <div key={admin.id} className="flex items-center justify-between p-3 rounded-lg bg-white border border-slate-200/50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#10B981]/20 flex items-center justify-center">
                       <span className="text-[#10B981] font-medium">{admin.name?.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="text-sm text-[#F8FAFC] font-medium">{admin.name}</p>
-                      <p className="text-xs text-[#64748B]">{admin.email}</p>
+                      <p className="text-sm text-slate-900 font-medium">{admin.name}</p>
+                      <p className="text-xs text-slate-500">{admin.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-center">
-                      <p className="text-sm text-[#F8FAFC] font-medium">{admin.advertisers_count}</p>
-                      <p className="text-xs text-[#64748B]">Advertisers</p>
+                      <p className="text-sm text-slate-900 font-medium">{admin.advertisers_count}</p>
+                      <p className="text-xs text-slate-500">Advertisers</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-[#F8FAFC] font-medium">{admin.campaigns_count}</p>
-                      <p className="text-xs text-[#64748B]">Campaigns</p>
+                      <p className="text-sm text-slate-900 font-medium">{admin.campaigns_count}</p>
+                      <p className="text-xs text-slate-500">Campaigns</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-[#10B981] font-medium">{formatCurrency(admin.total_spend)}</p>
-                      <p className="text-xs text-[#64748B]">Spend</p>
+                      <p className="text-xs text-slate-500">Spend</p>
                     </div>
                   </div>
                 </div>
@@ -554,7 +554,7 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
         {/* Campaign Status */}
         <Card className="surface-primary border-panel lg:col-span-5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-[#F8FAFC]">Platform Campaigns</CardTitle>
+            <CardTitle className="text-base text-slate-900">Platform Campaigns</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[220px]">
@@ -575,7 +575,7 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#151F32', border: '1px solid #2D3B55', borderRadius: '8px' }}
+                      contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '8px' }}
                     />
                     <Legend 
                       wrapperStyle={{ fontSize: '12px' }}
@@ -584,7 +584,7 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex items-center justify-center h-full text-[#64748B]">
+                <div className="flex items-center justify-center h-full text-slate-500">
                   No campaign data
                 </div>
               )}
@@ -596,16 +596,16 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
       {/* Platform Activity */}
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-[#F8FAFC]">Platform Activity</CardTitle>
-          <CardDescription className="text-[#64748B]">Recent actions across all users</CardDescription>
+          <CardTitle className="text-base text-slate-900">Platform Activity</CardTitle>
+          <CardDescription className="text-slate-500">Recent actions across all users</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-[250px] overflow-y-auto">
             {data.recent_activity?.length === 0 ? (
-              <p className="text-sm text-[#64748B] text-center py-4">No recent activity</p>
+              <p className="text-sm text-slate-500 text-center py-4">No recent activity</p>
             ) : (
               data.recent_activity?.map((act, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#0B1221]">
+                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     act.success !== false ? 'bg-[#3B82F6]/20' : 'bg-[#EF4444]/20'
                   }`}>
@@ -616,13 +616,13 @@ function SuperAdminDashboard({ data, formatNumber, formatCurrency }) {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-[#F8FAFC]">
+                    <p className="text-sm text-slate-900">
                       <span className="font-medium">{act.actor_name}</span>
-                      <Badge className="ml-2 text-xs bg-[#2D3B55] text-[#94A3B8]">{act.actor_role}</Badge>
+                      <Badge className="ml-2 text-xs bg-slate-200 text-slate-600">{act.actor_role}</Badge>
                     </p>
-                    <p className="text-xs text-[#64748B]">{act.action?.replace(/\./g, ' ')}</p>
+                    <p className="text-xs text-slate-500">{act.action?.replace(/\./g, ' ')}</p>
                   </div>
-                  <span className="text-xs text-[#64748B]">
+                  <span className="text-xs text-slate-500">
                     {new Date(act.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
@@ -702,8 +702,8 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Dashboard</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm text-slate-600 mt-1">
             {roleData?.role === 'super_admin' ? 'Platform-wide overview and health metrics' :
              roleData?.role === 'admin' ? 'Team performance and advertiser management' :
              'Your campaign performance metrics'}
@@ -714,7 +714,7 @@ export default function Dashboard() {
             variant="outline" 
             size="sm" 
             onClick={fetchData}
-            className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+            className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             data-testid="refresh-btn"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -735,7 +735,7 @@ export default function Dashboard() {
       )}
       {!roleData && (
         <div className="text-center py-12">
-          <p className="text-[#64748B]">Unable to load dashboard data. Please try refreshing.</p>
+          <p className="text-slate-500">Unable to load dashboard data. Please try refreshing.</p>
         </div>
       )}
     </div>

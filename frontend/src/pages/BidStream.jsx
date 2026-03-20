@@ -178,7 +178,7 @@ export default function BidStream() {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Connecting to bid stream...</div>
+        <div className="text-slate-500">Connecting to bid stream...</div>
       </div>
     );
   }
@@ -188,8 +188,8 @@ export default function BidStream() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Real-Time Bid Stream</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Real-Time Bid Stream</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Live feed of bid requests and responses via WebSocket
           </p>
         </div>
@@ -242,8 +242,8 @@ export default function BidStream() {
               <Activity className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Requests</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{stats.total_requests.toLocaleString()}</p>
+              <p className="text-xs text-slate-500">Total Requests</p>
+              <p className="text-xl font-bold text-slate-900">{stats.total_requests.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
@@ -253,7 +253,7 @@ export default function BidStream() {
               <CheckCircle className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Bids Made</p>
+              <p className="text-xs text-slate-500">Bids Made</p>
               <p className="text-xl font-bold text-[#10B981]">{stats.total_bids.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -264,7 +264,7 @@ export default function BidStream() {
               <XCircle className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">No Bids</p>
+              <p className="text-xs text-slate-500">No Bids</p>
               <p className="text-xl font-bold text-[#F59E0B]">{stats.total_no_bids.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -275,7 +275,7 @@ export default function BidStream() {
               <Zap className="w-5 h-5 text-[#8B5CF6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Bid Rate</p>
+              <p className="text-xs text-slate-500">Bid Rate</p>
               <p className="text-xl font-bold text-[#8B5CF6]">
                 {stats.total_requests > 0 ? ((stats.total_bids / stats.total_requests) * 100).toFixed(1) : 0}%
               </p>
@@ -287,7 +287,7 @@ export default function BidStream() {
       {/* Bid Stream Table */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
             <Activity className="w-5 h-5 text-[#3B82F6]" />
             Live Bid Activity
             {!isPaused && (
@@ -302,23 +302,23 @@ export default function BidStream() {
           <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
             <table className="w-full">
               <thead className="sticky top-0 surface-primary">
-                <tr className="border-b border-[#2D3B55]">
-                  <th className="text-left py-2 px-3 text-xs text-[#64748B] font-medium">Time</th>
-                  <th className="text-center py-2 px-3 text-xs text-[#64748B] font-medium">Status</th>
-                  <th className="text-left py-2 px-3 text-xs text-[#64748B] font-medium">Campaign</th>
-                  <th className="text-right py-2 px-3 text-xs text-[#64748B] font-medium">Bid</th>
-                  <th className="text-left py-2 px-3 text-xs text-[#64748B] font-medium">Device</th>
-                  <th className="text-left py-2 px-3 text-xs text-[#64748B] font-medium">Geo</th>
-                  <th className="text-left py-2 px-3 text-xs text-[#64748B] font-medium">Domain</th>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Time</th>
+                  <th className="text-center py-2 px-3 text-xs text-slate-500 font-medium">Status</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Campaign</th>
+                  <th className="text-right py-2 px-3 text-xs text-slate-500 font-medium">Bid</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Device</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Geo</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Domain</th>
                 </tr>
               </thead>
               <tbody>
                 {[...bids].reverse().map((bid, idx) => (
                   <tr 
                     key={bid.id || idx} 
-                    className={`border-b border-[#2D3B55]/30 ${idx === 0 && !isPaused ? "animate-pulse bg-[#3B82F6]/5" : ""}`}
+                    className={`border-b border-slate-200/30 ${idx === 0 && !isPaused ? "animate-pulse bg-[#3B82F6]/5" : ""}`}
                   >
-                    <td className="py-2 px-3 text-xs text-[#94A3B8] font-mono">
+                    <td className="py-2 px-3 text-xs text-slate-600 font-mono">
                       {new Date(bid.timestamp).toLocaleTimeString()}
                     </td>
                     <td className="py-2 px-3 text-center">
@@ -327,12 +327,12 @@ export default function BidStream() {
                           BID
                         </Badge>
                       ) : (
-                        <Badge className="bg-[#64748B]/20 text-[#64748B] text-[10px]">
+                        <Badge className="bg-[#64748B]/20 text-slate-500 text-[10px]">
                           NO BID
                         </Badge>
                       )}
                     </td>
-                    <td className="py-2 px-3 text-sm text-[#F8FAFC]">
+                    <td className="py-2 px-3 text-sm text-slate-900">
                       {bid.campaign_name || "-"}
                     </td>
                     <td className="py-2 px-3 text-right">
@@ -341,19 +341,19 @@ export default function BidStream() {
                           ${bid.bid_price.toFixed(2)}
                         </span>
                       ) : (
-                        <span className="text-[#64748B]">-</span>
+                        <span className="text-slate-500">-</span>
                       )}
                     </td>
                     <td className="py-2 px-3">
-                      <div className="flex items-center gap-1 text-xs text-[#94A3B8]">
+                      <div className="flex items-center gap-1 text-xs text-slate-600">
                         {getDeviceIcon(bid.device_type)}
                         {getDeviceName(bid.device_type)}
                       </div>
                     </td>
-                    <td className="py-2 px-3 text-xs text-[#94A3B8]">
+                    <td className="py-2 px-3 text-xs text-slate-600">
                       {bid.geo_country || "-"}
                     </td>
-                    <td className="py-2 px-3 text-xs text-[#94A3B8] max-w-[150px] truncate">
+                    <td className="py-2 px-3 text-xs text-slate-600 max-w-[150px] truncate">
                       {bid.domain || "-"}
                     </td>
                   </tr>
@@ -362,7 +362,7 @@ export default function BidStream() {
             </table>
             
             {bids.length === 0 && (
-              <div className="text-center py-12 text-[#64748B]">
+              <div className="text-center py-12 text-slate-500">
                 <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No bid activity yet</p>
                 <p className="text-sm mt-1">Send a bid request to see it appear here in real-time</p>

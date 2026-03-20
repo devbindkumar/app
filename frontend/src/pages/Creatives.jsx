@@ -128,7 +128,7 @@ function CreativeFormatBadge({ format }) {
   const Icon = icons[format] || Code;
   
   return (
-    <Badge variant="outline" className="bg-[#64748B]/20 text-[#94A3B8] border-[#64748B]/30 text-[9px]">
+    <Badge variant="outline" className="bg-[#64748B]/20 text-slate-600 border-[#64748B]/30 text-[9px]">
       <Icon className="w-3 h-3 mr-1" />
       {labels[format] || format}
     </Badge>
@@ -180,9 +180,9 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* Live Preview */}
               <div className="p-4 surface-secondary rounded-lg">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Live Preview ({width}x{height})</p>
+                <p className="text-xs text-slate-500 mb-3 text-center">Live Preview ({width}x{height})</p>
                 <div 
-                  className="border border-[#2D3B55] rounded overflow-hidden bg-white mx-auto"
+                  className="border border-slate-200 rounded overflow-hidden bg-white mx-auto"
                   style={{ width: Math.min(width, 600), height: Math.min(height, 400) }}
                 >
                   <img 
@@ -216,9 +216,9 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* Live Preview in iframe */}
               <div className="p-4 surface-secondary rounded-lg">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Live Preview ({width}x{height})</p>
+                <p className="text-xs text-slate-500 mb-3 text-center">Live Preview ({width}x{height})</p>
                 <div 
-                  className="border border-[#2D3B55] rounded overflow-hidden bg-white mx-auto"
+                  className="border border-slate-200 rounded overflow-hidden bg-white mx-auto"
                   style={{ width: Math.min(width, 600), height: Math.min(height, 400) }}
                 >
                   <iframe
@@ -234,8 +234,8 @@ function CreativePreview({ creative, onClose }) {
               <Badge className="bg-[#3B82F6]/20 text-[#3B82F6]">{width} x {height} px</Badge>
               {/* HTML Code */}
               <div className="w-full">
-                <p className="text-xs text-[#64748B] mb-2">HTML Markup:</p>
-                <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[150px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                <p className="text-xs text-slate-500 mb-2">HTML Markup:</p>
+                <pre className="text-xs text-slate-600 font-mono overflow-auto max-h-[150px] p-3 bg-slate-50 rounded border border-slate-200">
                   {creative.banner_data.ad_markup}
                 </pre>
               </div>
@@ -253,11 +253,11 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* Video Preview */}
               <div className="p-4 surface-secondary rounded-lg w-full max-w-2xl">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Video Preview ({videoWidth}x{videoHeight}, {duration}s)</p>
+                <p className="text-xs text-slate-500 mb-3 text-center">Video Preview ({videoWidth}x{videoHeight}, {duration}s)</p>
                 <video 
                   src={creative.video_data.video_url} 
                   controls 
-                  className="w-full rounded border border-[#2D3B55]"
+                  className="w-full rounded border border-slate-200"
                   style={{ maxHeight: 400 }}
                   onError={(e) => {
                     // Hide video player and show fallback
@@ -275,8 +275,8 @@ function CreativePreview({ creative, onClose }) {
                 >
                   <Video className="w-12 h-12 text-[#F59E0B] mb-3 opacity-60" />
                   <p className="text-sm text-[#F59E0B]">Video unavailable</p>
-                  <p className="text-xs text-[#64748B] mt-1">The video file session has expired</p>
-                  <p className="text-xs text-[#64748B]">Re-upload the video to preview</p>
+                  <p className="text-xs text-slate-500 mt-1">The video file session has expired</p>
+                  <p className="text-xs text-slate-500">Re-upload the video to preview</p>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -290,8 +290,8 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* VAST URL Preview */}
               <div className="p-4 surface-secondary rounded-lg w-full">
-                <p className="text-xs text-[#64748B] mb-3">VAST Tag URL ({duration}s video)</p>
-                <div className="p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                <p className="text-xs text-slate-500 mb-3">VAST Tag URL ({duration}s video)</p>
+                <div className="p-3 bg-slate-50 rounded border border-slate-200">
                   <code className="text-xs text-[#3B82F6] font-mono break-all">
                     {creative.video_data.vast_url}
                   </code>
@@ -319,8 +319,8 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* VAST XML Preview */}
               <div className="p-4 surface-secondary rounded-lg w-full">
-                <p className="text-xs text-[#64748B] mb-3">VAST XML ({duration}s video)</p>
-                <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[250px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                <p className="text-xs text-slate-500 mb-3">VAST XML ({duration}s video)</p>
+                <pre className="text-xs text-slate-600 font-mono overflow-auto max-h-[250px] p-3 bg-slate-50 rounded border border-slate-200">
                   {creative.video_data.vast_xml}
                 </pre>
               </div>
@@ -340,7 +340,7 @@ function CreativePreview({ creative, onClose }) {
             <div className="flex flex-col items-center gap-4">
               {/* Native Ad Preview - Card Style */}
               <div className="p-4 surface-secondary rounded-lg">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Native Ad Preview</p>
+                <p className="text-xs text-slate-500 mb-3 text-center">Native Ad Preview</p>
                 <div className="w-[350px] bg-white rounded-lg shadow-lg overflow-hidden border">
                   {nd.image_url && (
                     <img 
@@ -399,9 +399,9 @@ function CreativePreview({ creative, onClose }) {
               {/* Companion Banner First (On Top) */}
               {companionUrl && (
                 <div className="w-full">
-                  <p className="text-xs text-[#64748B] mb-2 text-center">Companion Banner ({companionWidth}x{companionHeight})</p>
+                  <p className="text-xs text-slate-500 mb-2 text-center">Companion Banner ({companionWidth}x{companionHeight})</p>
                   <div 
-                    className="mx-auto rounded-lg border border-[#2D3B55] overflow-hidden bg-[#0F172A]"
+                    className="mx-auto rounded-lg border border-slate-200 overflow-hidden bg-slate-100"
                     style={{ 
                       width: Math.min(companionWidth, 400), 
                       height: Math.min(companionHeight, 300)
@@ -418,7 +418,7 @@ function CreativePreview({ creative, onClose }) {
               
               {/* Audio Player Below Banner */}
               <div className="p-4 surface-secondary rounded-lg w-full">
-                <p className="text-xs text-[#64748B] mb-3 text-center">Audio Preview ({creative.audio_data?.duration || 30}s)</p>
+                <p className="text-xs text-slate-500 mb-3 text-center">Audio Preview ({creative.audio_data?.duration || 30}s)</p>
                 
                 {creative.audio_data?.audio_url ? (
                   <audio 
@@ -432,7 +432,7 @@ function CreativePreview({ creative, onClose }) {
                   />
                 ) : creative.audio_data?.vast_url ? (
                   <div>
-                    <div className="p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                    <div className="p-3 bg-slate-50 rounded border border-slate-200">
                       <code className="text-xs text-[#EC4899] font-mono break-all">
                         {creative.audio_data.vast_url}
                       </code>
@@ -449,7 +449,7 @@ function CreativePreview({ creative, onClose }) {
                     </div>
                   </div>
                 ) : creative.audio_data?.vast_xml ? (
-                  <pre className="text-xs text-[#94A3B8] font-mono overflow-auto max-h-[200px] p-3 bg-[#020408] rounded border border-[#2D3B55]">
+                  <pre className="text-xs text-slate-600 font-mono overflow-auto max-h-[200px] p-3 bg-slate-50 rounded border border-slate-200">
                     {creative.audio_data.vast_xml}
                   </pre>
                 ) : null}
@@ -458,7 +458,7 @@ function CreativePreview({ creative, onClose }) {
                 <div className="hidden text-center py-4 text-[#F59E0B]">
                   <Music className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-xs">Audio file unavailable (session expired)</p>
-                  <p className="text-xs text-[#64748B] mt-1">Re-upload the audio file to preview</p>
+                  <p className="text-xs text-slate-500 mt-1">Re-upload the audio file to preview</p>
                 </div>
               </div>
               
@@ -522,12 +522,12 @@ function CreativePreview({ creative, onClose }) {
                   <Code className="w-5 h-5 text-[#F59E0B]" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#F8FAFC] font-medium">Third Party JS Tag</p>
+                  <p className="text-sm text-slate-900 font-medium">Third Party JS Tag</p>
                   <div className="flex items-center gap-2 mt-1">
                     {vendor && (
                       <Badge className="bg-[#F59E0B]/20 text-[#F59E0B] text-xs">{vendor}</Badge>
                     )}
-                    <Badge className="bg-[#64748B]/20 text-[#94A3B8] text-xs">{tagType}</Badge>
+                    <Badge className="bg-[#64748B]/20 text-slate-600 text-xs">{tagType}</Badge>
                     {isSecure && (
                       <Badge className="bg-[#10B981]/20 text-[#10B981] text-xs">HTTPS</Badge>
                     )}
@@ -543,7 +543,7 @@ function CreativePreview({ creative, onClose }) {
                 variant={!showLivePreview ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowLivePreview(false)}
-                className={!showLivePreview ? "bg-[#3B82F6] text-white" : "border-[#2D3B55] text-[#94A3B8]"}
+                className={!showLivePreview ? "bg-[#3B82F6] text-white" : "border-slate-200 text-slate-600"}
               >
                 <Code className="w-4 h-4 mr-1" />
                 Tag Code
@@ -552,7 +552,7 @@ function CreativePreview({ creative, onClose }) {
                 variant={showLivePreview ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowLivePreview(true)}
-                className={showLivePreview ? "bg-[#10B981] text-white" : "border-[#2D3B55] text-[#94A3B8]"}
+                className={showLivePreview ? "bg-[#10B981] text-white" : "border-slate-200 text-slate-600"}
               >
                 <Eye className="w-4 h-4 mr-1" />
                 Live Preview
@@ -565,33 +565,33 @@ function CreativePreview({ creative, onClose }) {
               <div className="w-full">
                 {tagContent ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-[#64748B]">Tag Content:</p>
-                    <div className="p-4 bg-[#020408] rounded-lg border border-[#2D3B55] overflow-hidden">
-                      <pre className="text-xs text-[#94A3B8] whitespace-pre-wrap break-all max-h-64 overflow-y-auto font-mono">
+                    <p className="text-xs text-slate-500">Tag Content:</p>
+                    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+                      <pre className="text-xs text-slate-600 whitespace-pre-wrap break-all max-h-64 overflow-y-auto font-mono">
                         {tagContent}
                       </pre>
                     </div>
                   </div>
                 ) : tagUrl ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-[#64748B]">Tag URL:</p>
-                    <div className="p-4 bg-[#020408] rounded-lg border border-[#2D3B55]">
+                    <p className="text-xs text-slate-500">Tag URL:</p>
+                    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                       <code className="text-xs text-[#3B82F6] font-mono break-all">{tagUrl}</code>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-[#64748B] text-center py-8">No tag content configured</p>
+                  <p className="text-sm text-slate-500 text-center py-8">No tag content configured</p>
                 )}
               </div>
             ) : (
               /* Live Preview */
               <div className="w-full space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-[#64748B]">Live Ad Preview (Simulated Environment)</p>
+                  <p className="text-xs text-slate-500">Live Ad Preview (Simulated Environment)</p>
                   <Badge className="bg-[#10B981]/20 text-[#10B981] text-xs animate-pulse">LIVE</Badge>
                 </div>
                 <div 
-                  className="mx-auto rounded-lg border-2 border-dashed border-[#3B82F6]/50 bg-[#0A0F1C] p-4 flex items-center justify-center"
+                  className="mx-auto rounded-lg border-2 border-dashed border-[#3B82F6]/50 bg-slate-50 p-4 flex items-center justify-center"
                   style={{ minHeight: Math.min(jsHeight + 40, 400) }}
                 >
                   {tagContent ? (
@@ -610,20 +610,20 @@ function CreativePreview({ creative, onClose }) {
                     />
                   ) : (
                     <div className="text-center py-8">
-                      <Code className="w-12 h-12 text-[#64748B] mx-auto mb-3 opacity-50" />
-                      <p className="text-sm text-[#64748B]">No tag content to preview</p>
-                      <p className="text-xs text-[#475569] mt-1">Add tag code to see live preview</p>
+                      <Code className="w-12 h-12 text-slate-500 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm text-slate-500">No tag content to preview</p>
+                      <p className="text-xs text-slate-400 mt-1">Add tag code to see live preview</p>
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] text-[#475569] text-center">
+                <p className="text-[10px] text-slate-400 text-center">
                   Note: Some third-party tags may not render in preview due to security restrictions
                 </p>
               </div>
             )}
 
             {/* Share for Approval Section */}
-            <div className="w-full pt-4 border-t border-[#2D3B55]">
+            <div className="w-full pt-4 border-t border-slate-200">
               <Button
                 variant="outline"
                 size="sm"
@@ -635,13 +635,13 @@ function CreativePreview({ creative, onClose }) {
               </Button>
               
               {showSharePanel && (
-                <div className="mt-3 p-4 surface-secondary rounded-lg border border-[#2D3B55] space-y-3">
-                  <p className="text-xs text-[#94A3B8]">Share this link with advertiser for approval:</p>
+                <div className="mt-3 p-4 surface-secondary rounded-lg border border-slate-200 space-y-3">
+                  <p className="text-xs text-slate-600">Share this link with advertiser for approval:</p>
                   <div className="flex gap-2">
                     <Input
                       value={previewUrl}
                       readOnly
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-xs font-mono"
+                      className="surface-primary border-slate-200 text-slate-900 text-xs font-mono"
                     />
                     <Button
                       size="sm"
@@ -656,7 +656,7 @@ function CreativePreview({ creative, onClose }) {
                       size="sm"
                       variant="outline"
                       onClick={() => window.open(previewUrl, '_blank')}
-                      className="flex-1 border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+                      className="flex-1 border-slate-200 text-slate-600 hover:text-slate-900"
                     >
                       <ExternalLink className="w-4 h-4 mr-1" />
                       Open Preview Page
@@ -669,7 +669,7 @@ function CreativePreview({ creative, onClose }) {
                         const body = encodeURIComponent(`Hi,\n\nPlease review and approve this creative:\n\nCreative Name: ${creative.name}\nType: Third Party JS Tag\nVendor: ${vendor || 'N/A'}\nSize: ${jsWidth}x${jsHeight}\n\nPreview Link: ${previewUrl}\n\nBest regards`);
                         window.open(`mailto:?subject=${subject}&body=${body}`);
                       }}
-                      className="flex-1 border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+                      className="flex-1 border-slate-200 text-slate-600 hover:text-slate-900"
                     >
                       <Share2 className="w-4 h-4 mr-1" />
                       Email Link
@@ -685,7 +685,7 @@ function CreativePreview({ creative, onClose }) {
     }
     
     return (
-      <div className="text-center p-8 text-[#64748B]">
+      <div className="text-center p-8 text-slate-500">
         <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p>No preview available for this creative</p>
         <p className="text-xs mt-1">Creative type: {creative.type}</p>
@@ -706,7 +706,7 @@ function CreativePreview({ creative, onClose }) {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="surface-primary border-panel max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-[#F8FAFC] flex items-center gap-2">
+          <DialogTitle className="text-slate-900 flex items-center gap-2">
             <Eye className="w-5 h-5" />
             Preview: {creative.name}
           </DialogTitle>
@@ -715,18 +715,18 @@ function CreativePreview({ creative, onClose }) {
           {renderPreview()}
         </div>
         {/* Creative Info */}
-        <div className="mt-4 pt-4 border-t border-[#2D3B55]">
+        <div className="mt-4 pt-4 border-t border-slate-200">
           <div className="grid grid-cols-3 gap-4 text-xs">
             <div>
-              <span className="text-[#64748B]">Type:</span>
-              <span className="text-[#F8FAFC] ml-2 capitalize">{creative.type}</span>
+              <span className="text-slate-500">Type:</span>
+              <span className="text-slate-900 ml-2 capitalize">{creative.type}</span>
             </div>
             <div>
-              <span className="text-[#64748B]">Format:</span>
-              <span className="text-[#F8FAFC] ml-2">{creative.format || 'N/A'}</span>
+              <span className="text-slate-500">Format:</span>
+              <span className="text-slate-900 ml-2">{creative.format || 'N/A'}</span>
             </div>
             <div>
-              <span className="text-[#64748B]">ID:</span>
+              <span className="text-slate-500">ID:</span>
               <span className="text-[#3B82F6] ml-2 font-mono">{creative.id?.substring(0, 8)}...</span>
             </div>
           </div>
@@ -861,20 +861,20 @@ export default function Creatives() {
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center">
                 <Code className="w-8 h-8 text-[#3B82F6] mx-auto mb-2" />
-                <p className="text-xs text-[#64748B]">HTML Banner</p>
+                <p className="text-xs text-slate-500">HTML Banner</p>
               </div>
             </div>
           )}
           {creative.type === "banner" && !creative.banner_data?.ad_markup && !isValidUrl(creative.banner_data?.image_url) && !isValidUrl(creative.iurl) && (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center">
-                <Image className="w-8 h-8 text-[#64748B] mx-auto mb-2" />
-                <p className="text-xs text-[#64748B]">No Preview</p>
+                <Image className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+                <p className="text-xs text-slate-500">No Preview</p>
               </div>
             </div>
           )}
           {creative.type === "video" && (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A0F1C] to-[#151F32]">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-[#10B981]/20 flex items-center justify-center mx-auto mb-2 group-hover:bg-[#10B981]/30 transition-colors">
                   <Play className="w-6 h-6 text-[#10B981] ml-1" />
@@ -922,7 +922,7 @@ export default function Creatives() {
                   {creative.js_tag_data?.vendor || "Third Party JS Tag"}
                 </p>
                 {creative.js_tag_data?.width && creative.js_tag_data?.height && (
-                  <p className="text-[10px] text-[#64748B] mt-1">
+                  <p className="text-[10px] text-slate-500 mt-1">
                     {creative.js_tag_data.width}x{creative.js_tag_data.height}
                   </p>
                 )}
@@ -947,7 +947,7 @@ export default function Creatives() {
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-[#F8FAFC] truncate">{creative.name}</h3>
+              <h3 className="text-sm font-semibold text-slate-900 truncate">{creative.name}</h3>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <CreativeTypeBadge type={creative.type} />
                 {creative.format && <CreativeFormatBadge format={creative.format} />}
@@ -968,21 +968,21 @@ export default function Creatives() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#F8FAFC] -mr-2">
+                <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-900 -mr-2">
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="surface-primary border-panel">
                 <DropdownMenuItem 
                   onClick={() => navigate(`/creative-editor/${creative.id}`)}
-                  className="text-[#94A3B8] focus:text-[#F8FAFC]"
+                  className="text-slate-600 focus:text-slate-900"
                 >
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setPreviewCreative(creative)}
-                  className="text-[#94A3B8] focus:text-[#F8FAFC]"
+                  className="text-slate-600 focus:text-slate-900"
                 >
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
@@ -998,7 +998,7 @@ export default function Creatives() {
             </DropdownMenu>
           </div>
           
-          <p className="text-[10px] text-[#64748B] font-mono truncate">ID: {creative.id}</p>
+          <p className="text-[10px] text-slate-500 font-mono truncate">ID: {creative.id}</p>
         </div>
       </CardContent>
     </Card>
@@ -1010,8 +1010,8 @@ export default function Creatives() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Creatives</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">Manage ad creatives for your campaigns</p>
+          <h1 className="text-3xl font-bold text-slate-900">Creatives</h1>
+          <p className="text-sm text-slate-600 mt-1">Manage ad creatives for your campaigns</p>
         </div>
         <Link to="/creative-editor">
           <Button 
@@ -1026,7 +1026,7 @@ export default function Creatives() {
 
       {/* Format Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start bg-[#0A0F1C] mb-6 p-1 h-auto">
+        <TabsList className="w-full justify-start bg-slate-50 mb-6 p-1 h-auto">
           <TabsTrigger 
             value="all" 
             className="data-[state=active]:bg-[#3B82F6] data-[state=active]:text-white px-4 py-2"
@@ -1075,14 +1075,14 @@ export default function Creatives() {
         <TabsContent value="all" className="mt-0">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="text-[#64748B]">Loading creatives...</div>
+              <div className="text-slate-500">Loading creatives...</div>
             </div>
           ) : filterCreatives("all").length === 0 ? (
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Image className="empty-state-icon" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No creatives yet</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create creatives to use in your campaigns</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No creatives yet</h3>
+                <p className="text-sm text-slate-600 mb-4">Create creatives to use in your campaigns</p>
                 <Link to="/creatives/new">
                   <Button className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white">
                     <Plus className="w-4 h-4 mr-2" />
@@ -1104,8 +1104,8 @@ export default function Creatives() {
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Monitor className="empty-state-icon text-[#3B82F6]" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No display creatives</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create banner ads for display campaigns</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No display creatives</h3>
+                <p className="text-sm text-slate-600 mb-4">Create banner ads for display campaigns</p>
               </CardContent>
             </Card>
           ) : (
@@ -1121,8 +1121,8 @@ export default function Creatives() {
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Film className="empty-state-icon text-[#10B981]" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No video creatives</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create video ads for video campaigns</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No video creatives</h3>
+                <p className="text-sm text-slate-600 mb-4">Create video ads for video campaigns</p>
               </CardContent>
             </Card>
           ) : (
@@ -1130,7 +1130,7 @@ export default function Creatives() {
               {/* Pre-roll 15s */}
               {filterCreatives("video").filter(c => c.video_data?.duration === 15).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-slate-900 mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-[#10B981]" />
                     Pre-roll 15s
                     <Badge className="bg-[#10B981]/20 text-[#10B981] ml-2">
@@ -1146,7 +1146,7 @@ export default function Creatives() {
               {/* Pre-roll 30s */}
               {filterCreatives("video").filter(c => c.video_data?.duration === 30).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-slate-900 mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-[#10B981]" />
                     Pre-roll 30s
                     <Badge className="bg-[#10B981]/20 text-[#10B981] ml-2">
@@ -1162,7 +1162,7 @@ export default function Creatives() {
               {/* Mid-roll / Other */}
               {filterCreatives("video").filter(c => c.video_data?.duration && c.video_data.duration !== 15 && c.video_data.duration !== 30).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-[#F8FAFC] mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-medium text-slate-900 mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-[#F59E0B]" />
                     Mid-roll / Other
                     <Badge className="bg-[#F59E0B]/20 text-[#F59E0B] ml-2">
@@ -1184,8 +1184,8 @@ export default function Creatives() {
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Smartphone className="empty-state-icon text-[#F59E0B]" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No native creatives</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create native ads that blend with content</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No native creatives</h3>
+                <p className="text-sm text-slate-600 mb-4">Create native ads that blend with content</p>
               </CardContent>
             </Card>
           ) : (
@@ -1201,8 +1201,8 @@ export default function Creatives() {
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Volume2 className="empty-state-icon text-[#EC4899]" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No audio creatives</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create audio ads for streaming and podcast platforms</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No audio creatives</h3>
+                <p className="text-sm text-slate-600 mb-4">Create audio ads for streaming and podcast platforms</p>
               </CardContent>
             </Card>
           ) : (
@@ -1218,8 +1218,8 @@ export default function Creatives() {
             <Card className="surface-primary border-panel">
               <CardContent className="empty-state py-16">
                 <Code className="empty-state-icon text-[#8B5CF6]" />
-                <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No JS tag creatives</h3>
-                <p className="text-sm text-[#94A3B8] mb-4">Create JavaScript tag based creatives</p>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No JS tag creatives</h3>
+                <p className="text-sm text-slate-600 mb-4">Create JavaScript tag based creatives</p>
               </CardContent>
             </Card>
           ) : (
@@ -1234,13 +1234,13 @@ export default function Creatives() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Delete Creative</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Delete Creative</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               Are you sure you want to delete this creative? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]">
+            <AlertDialogCancel className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 

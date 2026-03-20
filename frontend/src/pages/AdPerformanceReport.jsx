@@ -86,9 +86,9 @@ function SummaryCard({ label, value, icon: Icon, color, className = "" }) {
     <div className={`p-4 rounded-lg border ${className}`} style={{ borderColor: `${color}40`, backgroundColor: `${color}10` }}>
       <div className="flex items-center gap-2 mb-1">
         <Icon className="w-5 h-5" style={{ color }} />
-        <span className="text-sm text-[#94A3B8]">{label}</span>
+        <span className="text-sm text-slate-600">{label}</span>
       </div>
-      <p className="text-3xl font-bold text-[#F8FAFC]">{value}</p>
+      <p className="text-3xl font-bold text-slate-900">{value}</p>
     </div>
   );
 }
@@ -96,12 +96,12 @@ function SummaryCard({ label, value, icon: Icon, color, className = "" }) {
 // Metric Card
 function MetricCard({ label, value, icon: Icon, color }) {
   return (
-    <div className="p-3 surface-secondary rounded-lg border border-[#2D3B55]">
+    <div className="p-3 surface-secondary rounded-lg border border-slate-200">
       <div className="flex items-center gap-2 mb-1">
         <Icon className="w-4 h-4" style={{ color }} />
-        <span className="text-xs text-[#64748B] uppercase">{label}</span>
+        <span className="text-xs text-slate-500 uppercase">{label}</span>
       </div>
-      <p className="text-xl font-bold text-[#F8FAFC]">{value}</p>
+      <p className="text-xl font-bold text-slate-900">{value}</p>
     </div>
   );
 }
@@ -112,7 +112,7 @@ function TemplateCard({ template, onApply, onDelete, isCustom }) {
   
   return (
     <Card 
-      className="surface-secondary border-[#2D3B55] hover:border-[#3B82F6]/50 transition-all cursor-pointer group"
+      className="surface-secondary border-slate-200 hover:border-[#3B82F6]/50 transition-all cursor-pointer group"
       onClick={() => onApply(template)}
     >
       <CardContent className="p-4">
@@ -131,14 +131,14 @@ function TemplateCard({ template, onApply, onDelete, isCustom }) {
             </Button>
           )}
         </div>
-        <h3 className="text-sm font-semibold text-[#F8FAFC] mb-1">{template.name}</h3>
-        <p className="text-xs text-[#64748B] mb-3">{template.description}</p>
+        <h3 className="text-sm font-semibold text-slate-900 mb-1">{template.name}</h3>
+        <p className="text-xs text-slate-500 mb-3">{template.description}</p>
         <div className="flex flex-wrap gap-1">
           {template.dimensions.slice(0, 3).map((dim) => (
             <Badge key={dim} className="bg-[#10B981]/20 text-[#10B981] text-[10px]">{dim}</Badge>
           ))}
           {template.dimensions.length > 3 && (
-            <Badge className="bg-[#64748B]/20 text-[#64748B] text-[10px]">+{template.dimensions.length - 3}</Badge>
+            <Badge className="bg-[#64748B]/20 text-slate-500 text-[10px]">+{template.dimensions.length - 3}</Badge>
           )}
         </div>
       </CardContent>
@@ -438,12 +438,12 @@ export default function AdPerformanceReport() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Ad Performance Report</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">Comprehensive reporting with all dimensions and metrics</p>
+          <h1 className="text-3xl font-bold text-slate-900">Ad Performance Report</h1>
+          <p className="text-sm text-slate-600 mt-1">Comprehensive reporting with all dimensions and metrics</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Label className="text-[#94A3B8]">Real Data</Label>
+            <Label className="text-slate-600">Real Data</Label>
             <Switch checked={useRealData} onCheckedChange={setUseRealData} />
           </div>
           <Button variant="outline" onClick={handleExportCSV} className="border-[#10B981] text-[#10B981]">
@@ -456,7 +456,7 @@ export default function AdPerformanceReport() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-md grid-cols-3 mb-6 bg-[#0A0F1C]">
+        <TabsList className="grid w-full max-w-md grid-cols-3 mb-6 bg-slate-50">
           <TabsTrigger value="templates" className="data-[state=active]:bg-[#3B82F6]">
             <BookMarked className="w-4 h-4 mr-2" />Templates
           </TabsTrigger>
@@ -472,7 +472,7 @@ export default function AdPerformanceReport() {
         <TabsContent value="templates" className="space-y-6">
           {/* Built-in Templates */}
           <div>
-            <h3 className="text-lg font-semibold text-[#F8FAFC] mb-4">Quick Start Templates</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Start Templates</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {templates.built_in?.map((template) => (
                 <TemplateCard key={template.id} template={template} onApply={applyTemplate} onDelete={() => {}} isCustom={false} />
@@ -483,7 +483,7 @@ export default function AdPerformanceReport() {
           {/* Custom Templates */}
           {templates.custom?.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-[#F8FAFC] mb-4">Your Templates</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Templates</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {templates.custom.map((template) => (
                   <TemplateCard key={template.id} template={template} onApply={applyTemplate} onDelete={handleDeleteTemplate} isCustom={true} />
@@ -503,24 +503,24 @@ export default function AdPerformanceReport() {
         <TabsContent value="config" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Filters */}
-            <Card className="surface-secondary border-[#2D3B55]">
+            <Card className="surface-secondary border-slate-200">
               <CardHeader>
-                <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-slate-900 flex items-center gap-2">
                   <Filter className="w-5 h-5 text-[#3B82F6]" />Filters
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Campaign Filter */}
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Campaign</Label>
+                  <Label className="text-slate-600">Campaign</Label>
                   <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-                    <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                    <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                       <SelectValue placeholder="All Campaigns" />
                     </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55]">
-                      <SelectItem value="all" className="text-[#F8FAFC]">All Campaigns</SelectItem>
+                    <SelectContent className="surface-primary border-slate-200">
+                      <SelectItem value="all" className="text-slate-900">All Campaigns</SelectItem>
                       {campaigns.map((c) => (
-                        <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                        <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -528,15 +528,15 @@ export default function AdPerformanceReport() {
 
                 {/* Creative Filter */}
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Creative</Label>
+                  <Label className="text-slate-600">Creative</Label>
                   <Select value={selectedCreative} onValueChange={setSelectedCreative}>
-                    <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                    <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                       <SelectValue placeholder="All Creatives" />
                     </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55]">
-                      <SelectItem value="all" className="text-[#F8FAFC]">All Creatives</SelectItem>
+                    <SelectContent className="surface-primary border-slate-200">
+                      <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
                       {creatives.map((c) => (
-                        <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                        <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -545,36 +545,36 @@ export default function AdPerformanceReport() {
                 {/* Date Range */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Start Date</Label>
+                    <Label className="text-slate-600">Start Date</Label>
                     <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]" />
+                      className="surface-primary border-slate-200 text-slate-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">End Date</Label>
+                    <Label className="text-slate-600">End Date</Label>
                     <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]" />
+                      className="surface-primary border-slate-200 text-slate-900" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Dimensions */}
-            <Card className="surface-secondary border-[#2D3B55]">
+            <Card className="surface-secondary border-slate-200">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+                  <CardTitle className="text-slate-900 flex items-center gap-2">
                     <Layers className="w-5 h-5 text-[#10B981]" />Dimensions (Group By)
                   </CardTitle>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={selectAllDimensions} className="border-[#10B981] text-[#10B981]">
                       Select All
                     </Button>
-                    <Button size="sm" variant="outline" onClick={clearAllDimensions} className="border-[#64748B] text-[#64748B]">
+                    <Button size="sm" variant="outline" onClick={clearAllDimensions} className="border-[#64748B] text-slate-500">
                       Clear
                     </Button>
                   </div>
                 </div>
-                <p className="text-xs text-[#64748B] mt-1">{selectedDimensions.length} of {DIMENSIONS.length} dimensions selected</p>
+                <p className="text-xs text-slate-500 mt-1">{selectedDimensions.length} of {DIMENSIONS.length} dimensions selected</p>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -586,14 +586,14 @@ export default function AdPerformanceReport() {
                         key={dim.id}
                         onClick={() => toggleDimension(dim.id)}
                         className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
-                          isSelected ? "bg-[#10B981]/20 border-[#10B981]" : "surface-primary border-[#2D3B55] hover:border-[#10B981]/50"
+                          isSelected ? "bg-[#10B981]/20 border-[#10B981]" : "surface-primary border-slate-200 hover:border-[#10B981]/50"
                         }`}
                       >
                         <Checkbox checked={isSelected} onChange={() => {}} />
-                        <Icon className={`w-5 h-5 ${isSelected ? "text-[#10B981]" : "text-[#64748B]"}`} />
+                        <Icon className={`w-5 h-5 ${isSelected ? "text-[#10B981]" : "text-slate-500"}`} />
                         <div>
-                          <p className="text-sm font-medium text-[#F8FAFC]">{dim.label}</p>
-                          <p className="text-xs text-[#64748B]">{dim.description}</p>
+                          <p className="text-sm font-medium text-slate-900">{dim.label}</p>
+                          <p className="text-xs text-slate-500">{dim.description}</p>
                         </div>
                       </div>
                     );
@@ -604,14 +604,14 @@ export default function AdPerformanceReport() {
           </div>
 
           {/* Metrics Selection */}
-          <Card className="surface-secondary border-[#2D3B55]">
+          <Card className="surface-secondary border-slate-200">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+                  <CardTitle className="text-slate-900 flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-[#3B82F6]" />Select Metrics
                   </CardTitle>
-                  <CardDescription className="text-[#64748B]">Choose which metrics to include in your report</CardDescription>
+                  <CardDescription className="text-slate-500">Choose which metrics to include in your report</CardDescription>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={selectAllMetrics} className="border-[#3B82F6] text-[#3B82F6]">All</Button>
@@ -624,7 +624,7 @@ export default function AdPerformanceReport() {
               <div className="space-y-4">
                 {/* Core Performance Metrics */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#94A3B8] mb-2">Core Metrics</h4>
+                  <h4 className="text-sm font-medium text-slate-600 mb-2">Core Metrics</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                     {PERFORMANCE_METRICS.map((m) => {
                       const isSelected = selectedMetrics.includes(m.id);
@@ -633,11 +633,11 @@ export default function AdPerformanceReport() {
                           key={m.id}
                           onClick={() => toggleMetric(m.id)}
                           className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer border transition-all ${
-                            isSelected ? "border-[#3B82F6] bg-[#3B82F6]/20" : "border-[#2D3B55] hover:border-[#3B82F6]/50"
+                            isSelected ? "border-[#3B82F6] bg-[#3B82F6]/20" : "border-slate-200 hover:border-[#3B82F6]/50"
                           }`}
                         >
                           <Checkbox checked={isSelected} onChange={() => {}} />
-                          <span className="text-sm text-[#F8FAFC]">{m.label}</span>
+                          <span className="text-sm text-slate-900">{m.label}</span>
                         </div>
                       );
                     })}
@@ -646,7 +646,7 @@ export default function AdPerformanceReport() {
 
                 {/* Derived Metrics */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#94A3B8] mb-2">Derived Metrics</h4>
+                  <h4 className="text-sm font-medium text-slate-600 mb-2">Derived Metrics</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                     {DERIVED_METRICS.map((m) => {
                       const isSelected = selectedMetrics.includes(m.id);
@@ -655,11 +655,11 @@ export default function AdPerformanceReport() {
                           key={m.id}
                           onClick={() => toggleMetric(m.id)}
                           className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer border transition-all ${
-                            isSelected ? "border-[#14B8A6] bg-[#14B8A6]/20" : "border-[#2D3B55] hover:border-[#14B8A6]/50"
+                            isSelected ? "border-[#14B8A6] bg-[#14B8A6]/20" : "border-slate-200 hover:border-[#14B8A6]/50"
                           }`}
                         >
                           <Checkbox checked={isSelected} onChange={() => {}} />
-                          <span className="text-sm text-[#F8FAFC]">{m.label}</span>
+                          <span className="text-sm text-slate-900">{m.label}</span>
                         </div>
                       );
                     })}
@@ -668,7 +668,7 @@ export default function AdPerformanceReport() {
 
                 {/* Video Metrics */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#94A3B8] mb-2">Video Metrics</h4>
+                  <h4 className="text-sm font-medium text-slate-600 mb-2">Video Metrics</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                     {VIDEO_METRICS.map((m) => {
                       const isSelected = selectedMetrics.includes(m.id);
@@ -677,18 +677,18 @@ export default function AdPerformanceReport() {
                           key={m.id}
                           onClick={() => toggleMetric(m.id)}
                           className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer border transition-all ${
-                            isSelected ? "border-[#8B5CF6] bg-[#8B5CF6]/20" : "border-[#2D3B55] hover:border-[#8B5CF6]/50"
+                            isSelected ? "border-[#8B5CF6] bg-[#8B5CF6]/20" : "border-slate-200 hover:border-[#8B5CF6]/50"
                           }`}
                         >
                           <Checkbox checked={isSelected} onChange={() => {}} />
-                          <span className="text-sm text-[#F8FAFC]">{m.label}</span>
+                          <span className="text-sm text-slate-900">{m.label}</span>
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-[#64748B]">
+                <div className="flex items-center gap-2 text-xs text-slate-500">
                   <CheckCircle className="w-4 h-4 text-[#10B981]" />
                   <span>{selectedMetrics.length} metrics selected</span>
                 </div>
@@ -722,18 +722,18 @@ export default function AdPerformanceReport() {
               </div>
 
               {/* Filters and Search Bar */}
-              <Card className="surface-secondary border-[#2D3B55]">
+              <Card className="surface-secondary border-slate-200">
                 <CardContent className="p-4">
                   <div className="flex flex-wrap items-center gap-4">
                     {/* Search */}
                     <div className="flex-1 min-w-[200px]">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                         <Input
                           placeholder="Search in results..."
                           value={searchTerm}
                           onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                          className="pl-10 surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                          className="pl-10 surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                     </div>
@@ -762,13 +762,13 @@ export default function AdPerformanceReport() {
                         setLoading(false);
                       }
                     }}>
-                      <SelectTrigger className="w-[200px] surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                      <SelectTrigger className="w-[200px] surface-primary border-slate-200 text-slate-900">
                         <SelectValue placeholder="All Campaigns" />
                       </SelectTrigger>
-                      <SelectContent className="surface-primary border-[#2D3B55]">
-                        <SelectItem value="all" className="text-[#F8FAFC]">All Campaigns</SelectItem>
+                      <SelectContent className="surface-primary border-slate-200">
+                        <SelectItem value="all" className="text-slate-900">All Campaigns</SelectItem>
                         {campaigns.map((c) => (
-                          <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -797,13 +797,13 @@ export default function AdPerformanceReport() {
                         setLoading(false);
                       }
                     }}>
-                      <SelectTrigger className="w-[200px] surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                      <SelectTrigger className="w-[200px] surface-primary border-slate-200 text-slate-900">
                         <SelectValue placeholder="All Creatives" />
                       </SelectTrigger>
-                      <SelectContent className="surface-primary border-[#2D3B55]">
-                        <SelectItem value="all" className="text-[#F8FAFC]">All Creatives</SelectItem>
+                      <SelectContent className="surface-primary border-slate-200">
+                        <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
                         {creatives.map((c) => (
-                          <SelectItem key={c.id} value={c.id} className="text-[#F8FAFC]">{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -815,22 +815,22 @@ export default function AdPerformanceReport() {
                     </Badge>
 
                     {/* Row count */}
-                    <span className="text-sm text-[#94A3B8]">{filteredAndSortedData.length} rows</span>
+                    <span className="text-sm text-slate-600">{filteredAndSortedData.length} rows</span>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Data Table */}
-              <Card className="surface-secondary border-[#2D3B55]">
+              <Card className="surface-secondary border-slate-200">
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-b border-[#2D3B55] hover:bg-transparent">
+                        <TableRow className="border-b border-slate-200 hover:bg-transparent">
                           {columns.map((col) => (
                             <TableHead
                               key={col.key}
-                              className={`text-[#94A3B8] font-semibold ${col.sortable ? 'cursor-pointer hover:text-[#F8FAFC]' : ''}`}
+                              className={`text-slate-600 font-semibold ${col.sortable ? 'cursor-pointer hover:text-slate-900' : ''}`}
                               onClick={() => col.sortable && handleSort(col.key)}
                             >
                               <div className="flex items-center gap-1">
@@ -845,9 +845,9 @@ export default function AdPerformanceReport() {
                       </TableHeader>
                       <TableBody>
                         {paginatedData.map((row, idx) => (
-                          <TableRow key={idx} className="border-b border-[#2D3B55]/50 hover:bg-[#1E293B]/50">
+                          <TableRow key={idx} className="border-b border-slate-200/50 hover:bg-slate-100/50">
                             {columns.map((col) => (
-                              <TableCell key={col.key} className="text-[#F8FAFC]">
+                              <TableCell key={col.key} className="text-slate-900">
                                 {col.format ? col.format(row[col.key]) : (typeof row[col.key] === 'number' ? formatNumber(row[col.key]) : row[col.key] || '-')}
                               </TableCell>
                             ))}
@@ -855,7 +855,7 @@ export default function AdPerformanceReport() {
                         ))}
                         {paginatedData.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center text-[#64748B] py-8">
+                            <TableCell colSpan={columns.length} className="text-center text-slate-500 py-8">
                               No data found
                             </TableCell>
                           </TableRow>
@@ -865,41 +865,41 @@ export default function AdPerformanceReport() {
                   </div>
 
                   {/* Pagination */}
-                  <div className="flex items-center justify-between p-4 border-t border-[#2D3B55]">
+                  <div className="flex items-center justify-between p-4 border-t border-slate-200">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-[#64748B]">Rows per page:</span>
+                      <span className="text-sm text-slate-500">Rows per page:</span>
                       <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
-                        <SelectTrigger className="w-[80px] surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                        <SelectTrigger className="w-[80px] surface-primary border-slate-200 text-slate-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="surface-primary border-[#2D3B55]">
-                          <SelectItem value="10" className="text-[#F8FAFC]">10</SelectItem>
-                          <SelectItem value="25" className="text-[#F8FAFC]">25</SelectItem>
-                          <SelectItem value="50" className="text-[#F8FAFC]">50</SelectItem>
-                          <SelectItem value="100" className="text-[#F8FAFC]">100</SelectItem>
+                        <SelectContent className="surface-primary border-slate-200">
+                          <SelectItem value="10" className="text-slate-900">10</SelectItem>
+                          <SelectItem value="25" className="text-slate-900">25</SelectItem>
+                          <SelectItem value="50" className="text-slate-900">50</SelectItem>
+                          <SelectItem value="100" className="text-slate-900">100</SelectItem>
                         </SelectContent>
                       </Select>
-                      <span className="text-sm text-[#94A3B8]">
+                      <span className="text-sm text-slate-600">
                         Showing {((currentPage - 1) * rowsPerPage) + 1}-{Math.min(currentPage * rowsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}
-                        className="border-[#2D3B55] text-[#94A3B8]">
+                        className="border-slate-200 text-slate-600">
                         <ChevronsLeft className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
-                        className="border-[#2D3B55] text-[#94A3B8]">
+                        className="border-slate-200 text-slate-600">
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <span className="text-sm text-[#F8FAFC] px-2">Page {currentPage} of {totalPages || 1}</span>
+                      <span className="text-sm text-slate-900 px-2">Page {currentPage} of {totalPages || 1}</span>
                       <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}
-                        className="border-[#2D3B55] text-[#94A3B8]">
+                        className="border-slate-200 text-slate-600">
                         <ChevronRight className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} disabled={currentPage >= totalPages}
-                        className="border-[#2D3B55] text-[#94A3B8]">
+                        className="border-slate-200 text-slate-600">
                         <ChevronsRight className="w-4 h-4" />
                       </Button>
                     </div>
@@ -908,11 +908,11 @@ export default function AdPerformanceReport() {
               </Card>
             </>
           ) : (
-            <Card className="surface-secondary border-[#2D3B55]">
+            <Card className="surface-secondary border-slate-200">
               <CardContent className="py-16 text-center">
                 <BarChart3 className="w-16 h-16 mx-auto text-[#3B82F6] mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold text-[#F8FAFC] mb-2">No Report Generated</h3>
-                <p className="text-sm text-[#64748B] mb-4">Configure your report and click Generate</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No Report Generated</h3>
+                <p className="text-sm text-slate-500 mb-4">Configure your report and click Generate</p>
                 <Button onClick={() => setActiveTab("config")} className="bg-[#3B82F6]">
                   <Filter className="w-4 h-4 mr-2" />Configure Report
                 </Button>
@@ -924,23 +924,23 @@ export default function AdPerformanceReport() {
 
       {/* Save Template Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent className="surface-primary border-[#2D3B55]">
+        <DialogContent className="surface-primary border-slate-200">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Save Report Template</DialogTitle>
+            <DialogTitle className="text-slate-900">Save Report Template</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Template Name</Label>
+              <Label className="text-slate-600">Template Name</Label>
               <Input value={newTemplateName} onChange={(e) => setNewTemplateName(e.target.value)}
-                placeholder="My Custom Report" className="surface-secondary border-[#2D3B55] text-[#F8FAFC]" />
+                placeholder="My Custom Report" className="surface-secondary border-slate-200 text-slate-900" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Description</Label>
+              <Label className="text-slate-600">Description</Label>
               <Input value={newTemplateDesc} onChange={(e) => setNewTemplateDesc(e.target.value)}
-                placeholder="Optional description" className="surface-secondary border-[#2D3B55] text-[#F8FAFC]" />
+                placeholder="Optional description" className="surface-secondary border-slate-200 text-slate-900" />
             </div>
-            <div className="p-3 rounded-lg bg-[#1E293B]">
-              <p className="text-xs text-[#64748B] mb-2">Selected Dimensions:</p>
+            <div className="p-3 rounded-lg bg-slate-100">
+              <p className="text-xs text-slate-500 mb-2">Selected Dimensions:</p>
               <div className="flex flex-wrap gap-1">
                 {selectedDimensions.map((dim) => (
                   <Badge key={dim} className="bg-[#10B981]/20 text-[#10B981]">{dim}</Badge>
@@ -949,7 +949,7 @@ export default function AdPerformanceReport() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)} className="border-[#2D3B55] text-[#94A3B8]">Cancel</Button>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)} className="border-slate-200 text-slate-600">Cancel</Button>
             <Button onClick={handleSaveTemplate} className="bg-[#3B82F6]">Save Template</Button>
           </DialogFooter>
         </DialogContent>

@@ -16,11 +16,11 @@ import { getBidLogs, getBidLog } from "../lib/api";
 // Simple JSON display component without recursion
 function SimpleJsonViewer({ data }) {
   if (!data || typeof data !== 'object') {
-    return <span className="text-[#94A3B8] font-mono text-xs">{String(data)}</span>;
+    return <span className="text-slate-600 font-mono text-xs">{String(data)}</span>;
   }
   
   return (
-    <pre className="text-xs font-mono text-[#94A3B8] whitespace-pre-wrap overflow-auto max-h-64">
+    <pre className="text-xs font-mono text-slate-600 whitespace-pre-wrap overflow-auto max-h-64">
       {JSON.stringify(data, null, 2)}
     </pre>
   );
@@ -29,8 +29,8 @@ function SimpleJsonViewer({ data }) {
 function BidLogEntry({ log, onSelect, isSelected }) {
   return (
     <div 
-      className={`log-entry p-3 border-b border-[#2D3B55] cursor-pointer transition-colors duration-150 ${
-        isSelected ? 'bg-[#3B82F6]/10 border-l-2 border-l-[#3B82F6]' : 'hover:bg-[#151F32]/50'
+      className={`log-entry p-3 border-b border-slate-200 cursor-pointer transition-colors duration-150 ${
+        isSelected ? 'bg-[#3B82F6]/10 border-l-2 border-l-[#3B82F6]' : 'hover:bg-slate-100/50'
       }`}
       onClick={() => onSelect(log)}
       data-testid={`bid-log-${log.id}`}
@@ -42,7 +42,7 @@ function BidLogEntry({ log, onSelect, isSelected }) {
           ) : (
             <XCircle className="w-4 h-4 text-[#EF4444]" />
           )}
-          <span className="text-sm font-medium text-[#F8FAFC]">
+          <span className="text-sm font-medium text-slate-900">
             {log.bid_made ? 'Bid Made' : 'No Bid'}
           </span>
           <Badge 
@@ -55,7 +55,7 @@ function BidLogEntry({ log, onSelect, isSelected }) {
             v{log.openrtb_version}
           </Badge>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[#64748B]">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
           <Clock className="w-3 h-3" />
           {log.processing_time_ms?.toFixed(1)}ms
         </div>
@@ -63,12 +63,12 @@ function BidLogEntry({ log, onSelect, isSelected }) {
       
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div>
-          <span className="text-[#64748B]">Request: </span>
-          <span className="text-[#94A3B8] font-mono">{log.request_id?.substring(0, 16)}...</span>
+          <span className="text-slate-500">Request: </span>
+          <span className="text-slate-600 font-mono">{log.request_id?.substring(0, 16)}...</span>
         </div>
         {log.bid_made && log.bid_price && (
           <div>
-            <span className="text-[#64748B]">Bid: </span>
+            <span className="text-slate-500">Bid: </span>
             <span className="text-[#3B82F6] font-mono">${log.bid_price.toFixed(2)}</span>
           </div>
         )}
@@ -77,17 +77,17 @@ function BidLogEntry({ log, onSelect, isSelected }) {
       {log.request_summary && (
         <div className="mt-2 flex flex-wrap gap-1">
           {log.request_summary.inventory_type && (
-            <Badge variant="outline" className="text-[10px] bg-[#151F32] text-[#94A3B8] border-[#2D3B55]">
+            <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-600 border-slate-200">
               {log.request_summary.inventory_type}
             </Badge>
           )}
           {log.request_summary.country && (
-            <Badge variant="outline" className="text-[10px] bg-[#151F32] text-[#94A3B8] border-[#2D3B55]">
+            <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-600 border-slate-200">
               {log.request_summary.country}
             </Badge>
           )}
           {log.request_summary.os && (
-            <Badge variant="outline" className="text-[10px] bg-[#151F32] text-[#94A3B8] border-[#2D3B55]">
+            <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-600 border-slate-200">
               {log.request_summary.os}
             </Badge>
           )}
@@ -144,16 +144,16 @@ export default function BidLogs() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Bid Logs</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Bid Logs</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Real-time bid request and response monitoring
-            {total > 0 && <span className="ml-2 text-[#64748B]">({total} total)</span>}
+            {total > 0 && <span className="ml-2 text-slate-500">({total} total)</span>}
           </p>
         </div>
         <Button 
           variant="outline"
           onClick={fetchLogs}
-          className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+          className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           data-testid="refresh-logs-btn"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
@@ -163,22 +163,22 @@ export default function BidLogs() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading logs...</div>
+          <div className="text-slate-500">Loading logs...</div>
         </div>
       ) : logs.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="empty-state py-16">
             <Zap className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No bid logs yet</h3>
-            <p className="text-sm text-[#94A3B8]">Bid requests will appear here once SSPs start sending traffic</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No bid logs yet</h3>
+            <p className="text-sm text-slate-600">Bid requests will appear here once SSPs start sending traffic</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-12 gap-4 h-[calc(100%-80px)]">
           {/* Log List */}
           <Card className="surface-primary border-panel col-span-5 flex flex-col">
-            <CardHeader className="py-3 px-4 border-b border-[#2D3B55]">
-              <CardTitle className="text-sm text-[#F8FAFC]">Recent Requests</CardTitle>
+            <CardHeader className="py-3 px-4 border-b border-slate-200">
+              <CardTitle className="text-sm text-slate-900">Recent Requests</CardTitle>
             </CardHeader>
             <ScrollArea className="flex-1">
               {logs.map((log) => (
@@ -194,8 +194,8 @@ export default function BidLogs() {
 
           {/* Log Detail */}
           <Card className="surface-primary border-panel col-span-7 flex flex-col">
-            <CardHeader className="py-3 px-4 border-b border-[#2D3B55]">
-              <CardTitle className="text-sm text-[#F8FAFC]">Request Details</CardTitle>
+            <CardHeader className="py-3 px-4 border-b border-slate-200">
+              <CardTitle className="text-sm text-slate-900">Request Details</CardTitle>
             </CardHeader>
             <ScrollArea className="flex-1 p-4">
               {selectedLog ? (
@@ -203,11 +203,11 @@ export default function BidLogs() {
                   {/* Summary */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Request ID</p>
-                      <p className="text-xs font-mono text-[#F8FAFC]">{selectedLog.request_id}</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Request ID</p>
+                      <p className="text-xs font-mono text-slate-900">{selectedLog.request_id}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">OpenRTB Version</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">OpenRTB Version</p>
                       <Badge 
                         variant="outline" 
                         className={selectedLog.openrtb_version === "2.6" 
@@ -219,7 +219,7 @@ export default function BidLogs() {
                       </Badge>
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Result</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Result</p>
                       <div className="flex items-center gap-1">
                         {selectedLog.bid_made ? (
                           <>
@@ -235,27 +235,27 @@ export default function BidLogs() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Processing Time</p>
-                      <p className="text-xs font-mono text-[#F8FAFC]">{selectedLog.processing_time_ms?.toFixed(2)}ms</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Processing Time</p>
+                      <p className="text-xs font-mono text-slate-900">{selectedLog.processing_time_ms?.toFixed(2)}ms</p>
                     </div>
                   </div>
 
                   {/* Bid Info */}
                   {selectedLog.bid_made && (
-                    <div className="p-3 surface-secondary rounded border border-[#2D3B55]">
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-2">Winning Bid</p>
+                    <div className="p-3 surface-secondary rounded border border-slate-200">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Winning Bid</p>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <p className="text-[10px] text-[#64748B]">Price (CPM)</p>
+                          <p className="text-[10px] text-slate-500">Price (CPM)</p>
                           <p className="text-sm font-mono text-[#3B82F6]">${selectedLog.bid_price?.toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-[#64748B]">Campaign</p>
-                          <p className="text-xs font-mono text-[#F8FAFC] truncate">{selectedLog.campaign_id?.substring(0, 12)}...</p>
+                          <p className="text-[10px] text-slate-500">Campaign</p>
+                          <p className="text-xs font-mono text-slate-900 truncate">{selectedLog.campaign_id?.substring(0, 12)}...</p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-[#64748B]">Creative</p>
-                          <p className="text-xs font-mono text-[#F8FAFC] truncate">{selectedLog.creative_id?.substring(0, 12)}...</p>
+                          <p className="text-[10px] text-slate-500">Creative</p>
+                          <p className="text-xs font-mono text-slate-900 truncate">{selectedLog.creative_id?.substring(0, 12)}...</p>
                         </div>
                       </div>
                     </div>
@@ -276,7 +276,7 @@ export default function BidLogs() {
                   {/* Matched Campaigns */}
                   {selectedLog.matched_campaigns?.length > 0 && (
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-2">Matched Campaigns</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Matched Campaigns</p>
                       <div className="flex flex-wrap gap-1">
                         {selectedLog.matched_campaigns.map((id, i) => (
                           <Badge key={i} variant="outline" className="text-[10px] bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30">
@@ -290,15 +290,15 @@ export default function BidLogs() {
                   {/* Request Summary JSON */}
                   {selectedLog.request_summary && (
                     <div>
-                      <p className="text-[10px] text-[#64748B] uppercase tracking-wider mb-2">Request Summary</p>
-                      <div className="p-3 bg-[#020408] rounded border border-[#2D3B55] overflow-auto max-h-64">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Request Summary</p>
+                      <div className="p-3 bg-slate-50 rounded border border-slate-200 overflow-auto max-h-64">
                         <SimpleJsonViewer data={selectedLog.request_summary} />
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-full text-[#64748B]">
+                <div className="flex items-center justify-center h-full text-slate-500">
                   Select a log entry to view details
                 </div>
               )}

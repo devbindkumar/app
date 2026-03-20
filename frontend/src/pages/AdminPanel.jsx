@@ -511,7 +511,7 @@ export default function AdminPanel() {
       case "super_admin": return "bg-[#F59E0B]/20 text-[#F59E0B]";
       case "admin": return "bg-[#10B981]/20 text-[#10B981]";
       case "advertiser": return "bg-[#3B82F6]/20 text-[#3B82F6]";
-      default: return "bg-[#64748B]/20 text-[#64748B]";
+      default: return "bg-[#64748B]/20 text-slate-500";
     }
   };
 
@@ -538,7 +538,7 @@ export default function AdminPanel() {
     <div className="flex items-center gap-2 text-sm mb-4" data-testid="breadcrumb-nav">
       <button 
         onClick={() => { setViewMode("overview"); setViewingAdmin(null); setViewingAdvertiser(null); }}
-        className={`flex items-center gap-1 ${viewMode === "overview" ? "text-[#3B82F6]" : "text-[#64748B] hover:text-[#F8FAFC]"}`}
+        className={`flex items-center gap-1 ${viewMode === "overview" ? "text-[#3B82F6]" : "text-slate-500 hover:text-slate-900"}`}
       >
         <Home className="w-4 h-4" />
         Admin Panel
@@ -546,7 +546,7 @@ export default function AdminPanel() {
       
       {viewMode === "admin" && viewingAdmin && (
         <>
-          <ChevronRight className="w-4 h-4 text-[#64748B]" />
+          <ChevronRight className="w-4 h-4 text-slate-500" />
           <span className="text-[#3B82F6] flex items-center gap-1">
             <Building2 className="w-4 h-4" />
             {viewingAdmin.admin.name}
@@ -556,17 +556,17 @@ export default function AdminPanel() {
       
       {viewMode === "advertiser" && viewingAdvertiser && (
         <>
-          <ChevronRight className="w-4 h-4 text-[#64748B]" />
+          <ChevronRight className="w-4 h-4 text-slate-500" />
           {viewingAdmin && (
             <>
               <button 
                 onClick={() => { setViewMode("admin"); setViewingAdvertiser(null); }}
-                className="text-[#64748B] hover:text-[#F8FAFC] flex items-center gap-1"
+                className="text-slate-500 hover:text-slate-900 flex items-center gap-1"
               >
                 <Building2 className="w-4 h-4" />
                 {viewingAdmin.admin.name}
               </button>
-              <ChevronRight className="w-4 h-4 text-[#64748B]" />
+              <ChevronRight className="w-4 h-4 text-slate-500" />
             </>
           )}
           <span className="text-[#3B82F6] flex items-center gap-1">
@@ -589,8 +589,8 @@ export default function AdminPanel() {
                 <Shield className="w-5 h-5 text-[#10B981]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{stats?.total_admins || 0}</p>
-                <p className="text-xs text-[#64748B]">Total Admins</p>
+                <p className="text-2xl font-bold text-slate-900">{stats?.total_admins || 0}</p>
+                <p className="text-xs text-slate-500">Total Admins</p>
               </div>
             </div>
           </CardContent>
@@ -604,8 +604,8 @@ export default function AdminPanel() {
               <Users className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">{stats?.total_advertisers || 0}</p>
-              <p className="text-xs text-[#64748B]">Advertisers</p>
+              <p className="text-2xl font-bold text-slate-900">{stats?.total_advertisers || 0}</p>
+              <p className="text-xs text-slate-500">Advertisers</p>
             </div>
           </div>
         </CardContent>
@@ -618,8 +618,8 @@ export default function AdminPanel() {
               <Target className="w-5 h-5 text-[#8B5CF6]" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">{stats?.total_campaigns || 0}</p>
-              <p className="text-xs text-[#64748B]">Campaigns</p>
+              <p className="text-2xl font-bold text-slate-900">{stats?.total_campaigns || 0}</p>
+              <p className="text-xs text-slate-500">Campaigns</p>
             </div>
           </div>
         </CardContent>
@@ -632,8 +632,8 @@ export default function AdminPanel() {
               <TrendingUp className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">{stats?.active_campaigns || 0}</p>
-              <p className="text-xs text-[#64748B]">Active</p>
+              <p className="text-2xl font-bold text-slate-900">{stats?.active_campaigns || 0}</p>
+              <p className="text-xs text-slate-500">Active</p>
             </div>
           </div>
         </CardContent>
@@ -646,8 +646,8 @@ export default function AdminPanel() {
               <BarChart3 className="w-5 h-5 text-[#EC4899]" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#F8FAFC]">{stats?.total_creatives || 0}</p>
-              <p className="text-xs text-[#64748B]">Creatives</p>
+              <p className="text-2xl font-bold text-slate-900">{stats?.total_creatives || 0}</p>
+              <p className="text-xs text-slate-500">Creatives</p>
             </div>
           </div>
         </CardContent>
@@ -660,20 +660,20 @@ export default function AdminPanel() {
     <Card className="surface-primary border-panel" data-testid="activity-timeline">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle className="text-[#F8FAFC] text-base">Recent Activity</CardTitle>
-          <CardDescription className="text-[#64748B]">Latest actions across the platform</CardDescription>
+          <CardTitle className="text-slate-900 text-base">Recent Activity</CardTitle>
+          <CardDescription className="text-slate-500">Latest actions across the platform</CardDescription>
         </div>
-        <Button variant="ghost" size="sm" onClick={fetchData} className="text-[#64748B]">
+        <Button variant="ghost" size="sm" onClick={fetchData} className="text-slate-500">
           <RefreshCw className="w-4 h-4" />
         </Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-3 max-h-[280px] overflow-y-auto">
           {activityTimeline.length === 0 ? (
-            <p className="text-[#64748B] text-sm text-center py-4">No recent activity</p>
+            <p className="text-slate-500 text-sm text-center py-4">No recent activity</p>
           ) : (
             activityTimeline.map((activity, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-2 rounded-lg hover:bg-[#0B1221]">
+              <div key={idx} className="flex items-start gap-3 p-2 rounded-lg hover:bg-white">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                   activity.action.includes('login') ? 'bg-[#3B82F6]/20' :
                   activity.action.includes('2fa') ? 'bg-[#F59E0B]/20' :
@@ -684,19 +684,19 @@ export default function AdminPanel() {
                     activity.action.includes('login') ? 'text-[#3B82F6]' :
                     activity.action.includes('2fa') ? 'text-[#F59E0B]' :
                     activity.action.includes('user') ? 'text-[#10B981]' :
-                    'text-[#64748B]'
+                    'text-slate-500'
                   }`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#F8FAFC] truncate">
+                  <p className="text-sm text-slate-900 truncate">
                     <span className="font-medium">{activity.actor_name}</span>
-                    <span className="text-[#64748B]"> {activity.action.replace(/\./g, ' ')}</span>
+                    <span className="text-slate-500"> {activity.action.replace(/\./g, ' ')}</span>
                   </p>
                   {activity.target_name && (
-                    <p className="text-xs text-[#64748B]">{activity.target_type}: {activity.target_name}</p>
+                    <p className="text-xs text-slate-500">{activity.target_type}: {activity.target_name}</p>
                   )}
                 </div>
-                <span className="text-xs text-[#64748B] flex-shrink-0">{formatTimeAgo(activity.timestamp)}</span>
+                <span className="text-xs text-slate-500 flex-shrink-0">{formatTimeAgo(activity.timestamp)}</span>
               </div>
             ))
           )}
@@ -710,8 +710,8 @@ export default function AdminPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-[#F8FAFC]">{viewingAdmin.admin.name}'s Dashboard</h2>
-          <p className="text-[#64748B]">{viewingAdmin.admin.email}</p>
+          <h2 className="text-xl font-bold text-slate-900">{viewingAdmin.admin.name}'s Dashboard</h2>
+          <p className="text-slate-500">{viewingAdmin.admin.email}</p>
         </div>
         <Badge className={viewingAdmin.admin.is_active ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}>
           {viewingAdmin.admin.is_active ? "Active" : "Inactive"}
@@ -722,26 +722,26 @@ export default function AdminPanel() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdmin.stats.total_advertisers}</p>
-            <p className="text-sm text-[#64748B]">Advertisers</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdmin.stats.total_advertisers}</p>
+            <p className="text-sm text-slate-500">Advertisers</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdmin.stats.total_campaigns}</p>
-            <p className="text-sm text-[#64748B]">Campaigns</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdmin.stats.total_campaigns}</p>
+            <p className="text-sm text-slate-500">Campaigns</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdmin.stats.active_campaigns}</p>
-            <p className="text-sm text-[#64748B]">Active</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdmin.stats.active_campaigns}</p>
+            <p className="text-sm text-slate-500">Active</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">${viewingAdmin.stats.total_spend?.toFixed(2) || '0.00'}</p>
-            <p className="text-sm text-[#64748B]">Total Spend</p>
+            <p className="text-2xl font-bold text-slate-900">${viewingAdmin.stats.total_spend?.toFixed(2) || '0.00'}</p>
+            <p className="text-sm text-slate-500">Total Spend</p>
           </CardContent>
         </Card>
       </div>
@@ -749,17 +749,17 @@ export default function AdminPanel() {
       {/* Admin's Advertisers */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-[#F8FAFC]">Advertisers</CardTitle>
+          <CardTitle className="text-slate-900">Advertisers</CardTitle>
         </CardHeader>
         <CardContent>
           {viewingAdmin.advertisers.length === 0 ? (
-            <p className="text-[#64748B] text-center py-4">No advertisers yet</p>
+            <p className="text-slate-500 text-center py-4">No advertisers yet</p>
           ) : (
             <div className="space-y-2">
               {viewingAdmin.advertisers.map((adv) => (
                 <div 
                   key={adv.id} 
-                  className="flex items-center justify-between p-3 rounded-lg border border-[#2D3B55] hover:border-[#3B82F6]/50 cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-[#3B82F6]/50 cursor-pointer"
                   onClick={() => viewAdvertiserDashboard(adv.id)}
                 >
                   <div className="flex items-center gap-3">
@@ -767,15 +767,15 @@ export default function AdminPanel() {
                       <span className="text-[#3B82F6] font-medium">{adv.name?.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="text-[#F8FAFC] font-medium">{adv.name}</p>
-                      <p className="text-sm text-[#64748B]">{adv.email}</p>
+                      <p className="text-slate-900 font-medium">{adv.name}</p>
+                      <p className="text-sm text-slate-500">{adv.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className={adv.is_active ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}>
                       {adv.is_active ? "Active" : "Inactive"}
                     </Badge>
-                    <ArrowRight className="w-4 h-4 text-[#64748B]" />
+                    <ArrowRight className="w-4 h-4 text-slate-500" />
                   </div>
                 </div>
               ))}
@@ -791,8 +791,8 @@ export default function AdminPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-[#F8FAFC]">{viewingAdvertiser.advertiser.name}'s Dashboard</h2>
-          <p className="text-[#64748B]">{viewingAdvertiser.advertiser.email}</p>
+          <h2 className="text-xl font-bold text-slate-900">{viewingAdvertiser.advertiser.name}'s Dashboard</h2>
+          <p className="text-slate-500">{viewingAdvertiser.advertiser.email}</p>
         </div>
         <Badge className={viewingAdvertiser.advertiser.is_active ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}>
           {viewingAdvertiser.advertiser.is_active ? "Active" : "Inactive"}
@@ -803,32 +803,32 @@ export default function AdminPanel() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdvertiser.stats.total_campaigns}</p>
-            <p className="text-sm text-[#64748B]">Campaigns</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdvertiser.stats.total_campaigns}</p>
+            <p className="text-sm text-slate-500">Campaigns</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdvertiser.stats.active_campaigns}</p>
-            <p className="text-sm text-[#64748B]">Active</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdvertiser.stats.active_campaigns}</p>
+            <p className="text-sm text-slate-500">Active</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdvertiser.stats.total_creatives}</p>
-            <p className="text-sm text-[#64748B]">Creatives</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdvertiser.stats.total_creatives}</p>
+            <p className="text-sm text-slate-500">Creatives</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">${viewingAdvertiser.stats.total_spend?.toFixed(2) || '0.00'}</p>
-            <p className="text-sm text-[#64748B]">Spend</p>
+            <p className="text-2xl font-bold text-slate-900">${viewingAdvertiser.stats.total_spend?.toFixed(2) || '0.00'}</p>
+            <p className="text-sm text-slate-500">Spend</p>
           </CardContent>
         </Card>
         <Card className="surface-secondary border-panel">
           <CardContent className="pt-4">
-            <p className="text-2xl font-bold text-[#F8FAFC]">{viewingAdvertiser.stats.total_impressions?.toLocaleString() || 0}</p>
-            <p className="text-sm text-[#64748B]">Impressions</p>
+            <p className="text-2xl font-bold text-slate-900">{viewingAdvertiser.stats.total_impressions?.toLocaleString() || 0}</p>
+            <p className="text-sm text-slate-500">Impressions</p>
           </CardContent>
         </Card>
       </div>
@@ -836,34 +836,34 @@ export default function AdminPanel() {
       {/* Recent Campaigns */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-[#F8FAFC]">Recent Campaigns</CardTitle>
+          <CardTitle className="text-slate-900">Recent Campaigns</CardTitle>
         </CardHeader>
         <CardContent>
           {viewingAdvertiser.campaigns.length === 0 ? (
-            <p className="text-[#64748B] text-center py-4">No campaigns yet</p>
+            <p className="text-slate-500 text-center py-4">No campaigns yet</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-[#2D3B55]">
-                  <TableHead className="text-[#94A3B8]">Name</TableHead>
-                  <TableHead className="text-[#94A3B8]">Status</TableHead>
-                  <TableHead className="text-[#94A3B8]">Bids</TableHead>
-                  <TableHead className="text-[#94A3B8]">Wins</TableHead>
+                <TableRow className="border-slate-200">
+                  <TableHead className="text-slate-600">Name</TableHead>
+                  <TableHead className="text-slate-600">Status</TableHead>
+                  <TableHead className="text-slate-600">Bids</TableHead>
+                  <TableHead className="text-slate-600">Wins</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {viewingAdvertiser.campaigns.map((c) => (
-                  <TableRow key={c.id} className="border-[#2D3B55]">
-                    <TableCell className="text-[#F8FAFC]">{c.name}</TableCell>
+                  <TableRow key={c.id} className="border-slate-200">
+                    <TableCell className="text-slate-900">{c.name}</TableCell>
                     <TableCell>
                       <Badge className={
                         c.status === 'active' ? 'bg-[#10B981]/20 text-[#10B981]' :
                         c.status === 'paused' ? 'bg-[#F59E0B]/20 text-[#F59E0B]' :
-                        'bg-[#64748B]/20 text-[#64748B]'
+                        'bg-[#64748B]/20 text-slate-500'
                       }>{c.status}</Badge>
                     </TableCell>
-                    <TableCell className="text-[#64748B]">{c.bids || 0}</TableCell>
-                    <TableCell className="text-[#64748B]">{c.wins || 0}</TableCell>
+                    <TableCell className="text-slate-500">{c.bids || 0}</TableCell>
+                    <TableCell className="text-slate-500">{c.wins || 0}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -906,8 +906,8 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#F8FAFC]">Admin Panel</h1>
-          <p className="text-[#64748B]">
+          <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
+          <p className="text-slate-500">
             {isSuperAdmin 
               ? "Manage admins, advertisers, and platform settings"
               : "Manage your advertisers"}
@@ -925,7 +925,7 @@ export default function AdminPanel() {
         {/* Main Content Area */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="users" className="space-y-4">
-            <TabsList className="surface-secondary border border-[#2D3B55]">
+            <TabsList className="surface-secondary border border-slate-200">
               <TabsTrigger value="users" className="data-[state=active]:bg-[#3B82F6]" data-testid="tab-users">
                 <Users className="w-4 h-4 mr-2" /> {isSuperAdmin ? "All Users" : "Advertisers"}
               </TabsTrigger>
@@ -955,33 +955,33 @@ export default function AdminPanel() {
                 <CardHeader>
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                      <CardTitle className="text-[#F8FAFC]">
+                      <CardTitle className="text-slate-900">
                         {isSuperAdmin ? "All Users" : "My Advertisers"}
                       </CardTitle>
-                      <CardDescription className="text-[#64748B]">
+                      <CardDescription className="text-slate-500">
                         {users.length} total
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
                       {/* Search */}
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                         <Input
                           placeholder="Search..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && searchUsers()}
-                          className="pl-9 w-40 surface-secondary border-[#2D3B55]"
+                          className="pl-9 w-40 surface-secondary border-slate-200"
                           data-testid="search-users-input"
                         />
                       </div>
                       {/* Role Filter */}
                       {isSuperAdmin && (
                         <Select value={roleFilter || "all"} onValueChange={(v) => { setRoleFilter(v === "all" ? "" : v); }}>
-                          <SelectTrigger className="w-32 surface-secondary border-[#2D3B55]">
+                          <SelectTrigger className="w-32 surface-secondary border-slate-200">
                             <SelectValue placeholder="All Roles" />
                           </SelectTrigger>
-                          <SelectContent className="surface-primary border-[#2D3B55]">
+                          <SelectContent className="surface-primary border-slate-200">
                             <SelectItem value="all">All Roles</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="advertiser">Advertiser</SelectItem>
@@ -989,7 +989,7 @@ export default function AdminPanel() {
                         </Select>
                       )}
                       {/* Export */}
-                      <Button variant="outline" size="sm" onClick={exportUsersCSV} className="border-[#2D3B55]" data-testid="export-csv-btn">
+                      <Button variant="outline" size="sm" onClick={exportUsersCSV} className="border-slate-200" data-testid="export-csv-btn">
                         <Download className="w-4 h-4" />
                       </Button>
                       {/* Bulk Delete (Super Admin only) */}
@@ -1014,7 +1014,7 @@ export default function AdminPanel() {
                 <CardContent>
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-[#2D3B55]">
+                      <TableRow className="border-slate-200">
                         {isSuperAdmin && (
                           <TableHead className="w-10">
                             <Checkbox 
@@ -1025,16 +1025,16 @@ export default function AdminPanel() {
                             />
                           </TableHead>
                         )}
-                        <TableHead className="text-[#94A3B8]">User</TableHead>
-                        <TableHead className="text-[#94A3B8]">Role</TableHead>
-                        <TableHead className="text-[#94A3B8]">Status</TableHead>
-                        <TableHead className="text-[#94A3B8]">Created</TableHead>
-                        <TableHead className="text-[#94A3B8]">Actions</TableHead>
+                        <TableHead className="text-slate-600">User</TableHead>
+                        <TableHead className="text-slate-600">Role</TableHead>
+                        <TableHead className="text-slate-600">Status</TableHead>
+                        <TableHead className="text-slate-600">Created</TableHead>
+                        <TableHead className="text-slate-600">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {users.map((u) => (
-                        <TableRow key={u.id} className={`border-[#2D3B55] ${selectedUsers.includes(u.id) ? 'bg-[#3B82F6]/5' : ''}`}>
+                        <TableRow key={u.id} className={`border-slate-200 ${selectedUsers.includes(u.id) ? 'bg-[#3B82F6]/5' : ''}`}>
                           {isSuperAdmin && (
                             <TableCell>
                               {u.id !== user?.id && (
@@ -1053,8 +1053,8 @@ export default function AdminPanel() {
                                 <span className="text-sm font-medium">{u.name?.charAt(0)}</span>
                               </div>
                               <div>
-                                <p className="text-[#F8FAFC] font-medium">{u.name}</p>
-                                <p className="text-[#64748B] text-sm">{u.email}</p>
+                                <p className="text-slate-900 font-medium">{u.name}</p>
+                                <p className="text-slate-500 text-sm">{u.email}</p>
                               </div>
                             </div>
                           </TableCell>
@@ -1068,7 +1068,7 @@ export default function AdminPanel() {
                               {u.is_active ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-[#64748B]">
+                          <TableCell className="text-slate-500">
                             {new Date(u.created_at).toLocaleDateString()}
                           </TableCell>
                           <TableCell>
@@ -1091,7 +1091,7 @@ export default function AdminPanel() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => toggleUserStatus(u.id, u.is_active)}
-                                  className="text-[#64748B] hover:text-[#F8FAFC]"
+                                  className="text-slate-500 hover:text-slate-900"
                                   title={u.is_active ? "Deactivate" : "Activate"}
                                 >
                                   {u.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1123,8 +1123,8 @@ export default function AdminPanel() {
               <TabsContent value="hierarchy">
                 <Card className="surface-primary border-panel">
                   <CardHeader>
-                    <CardTitle className="text-[#F8FAFC]">Organization Hierarchy</CardTitle>
-                    <CardDescription className="text-[#64748B]">
+                    <CardTitle className="text-slate-900">Organization Hierarchy</CardTitle>
+                    <CardDescription className="text-slate-500">
                       Super Admin → Admins → Advertisers
                     </CardDescription>
                   </CardHeader>
@@ -1136,24 +1136,24 @@ export default function AdminPanel() {
                         onOpenChange={() => toggleAdminExpand(admin.id)}
                       >
                         <CollapsibleTrigger asChild>
-                          <div className="flex items-center justify-between p-4 rounded-lg border border-[#2D3B55] hover:border-[#3B82F6]/50 cursor-pointer transition-colors">
+                          <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-[#3B82F6]/50 cursor-pointer transition-colors">
                             <div className="flex items-center gap-4">
                               {expandedAdmins[admin.id] ? (
-                                <ChevronDown className="w-5 h-5 text-[#64748B]" />
+                                <ChevronDown className="w-5 h-5 text-slate-500" />
                               ) : (
-                                <ChevronRight className="w-5 h-5 text-[#64748B]" />
+                                <ChevronRight className="w-5 h-5 text-slate-500" />
                               )}
                               <div className="w-10 h-10 rounded-full bg-[#10B981]/20 flex items-center justify-center">
                                 <span className="text-[#10B981] font-medium">{admin.name?.charAt(0)}</span>
                               </div>
                               <div>
-                                <p className="text-[#F8FAFC] font-medium">{admin.name}</p>
-                                <p className="text-[#64748B] text-sm">{admin.email}</p>
+                                <p className="text-slate-900 font-medium">{admin.name}</p>
+                                <p className="text-slate-500 text-sm">{admin.email}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
                               <Badge className="bg-[#10B981]/20 text-[#10B981]">Admin</Badge>
-                              <Badge variant="outline" className="border-[#2D3B55] text-[#94A3B8]">
+                              <Badge variant="outline" className="border-slate-200 text-slate-600">
                                 {admin.children_count} advertisers
                               </Badge>
                               <Button
@@ -1171,7 +1171,7 @@ export default function AdminPanel() {
                           {admin.children?.map((child) => (
                             <div 
                               key={child.id}
-                              className="flex items-center justify-between p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]/50 cursor-pointer hover:border-[#3B82F6]/30"
+                              className="flex items-center justify-between p-3 rounded-lg bg-white border border-slate-200/50 cursor-pointer hover:border-[#3B82F6]/30"
                               onClick={() => viewAdvertiserDashboard(child.id)}
                             >
                               <div className="flex items-center gap-3">
@@ -1179,25 +1179,25 @@ export default function AdminPanel() {
                                   <span className="text-[#3B82F6] text-sm">{child.name?.charAt(0)}</span>
                                 </div>
                                 <div>
-                                  <p className="text-[#F8FAFC] text-sm">{child.name}</p>
-                                  <p className="text-[#64748B] text-xs">{child.email}</p>
+                                  <p className="text-slate-900 text-sm">{child.name}</p>
+                                  <p className="text-slate-500 text-xs">{child.email}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge className="bg-[#3B82F6]/20 text-[#3B82F6]">Advertiser</Badge>
-                                <ArrowRight className="w-4 h-4 text-[#64748B]" />
+                                <ArrowRight className="w-4 h-4 text-slate-500" />
                               </div>
                             </div>
                           ))}
                           {admin.children?.length === 0 && (
-                            <p className="text-[#64748B] text-sm p-3">No advertisers yet</p>
+                            <p className="text-slate-500 text-sm p-3">No advertisers yet</p>
                           )}
                         </CollapsibleContent>
                       </Collapsible>
                     ))}
                     
                     {hierarchy?.admins?.length === 0 && (
-                      <p className="text-[#64748B] text-center py-8">No admins created yet</p>
+                      <p className="text-slate-500 text-center py-8">No admins created yet</p>
                     )}
                   </CardContent>
                 </Card>
@@ -1210,17 +1210,17 @@ export default function AdminPanel() {
                 <Card className="surface-primary border-panel">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                      <CardTitle className="text-[#F8FAFC]">Access Control</CardTitle>
-                      <CardDescription className="text-[#64748B]">
+                      <CardTitle className="text-slate-900">Access Control</CardTitle>
+                      <CardDescription className="text-slate-500">
                         Configure sidebar and permissions by role
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-3">
                       <Select value={selectedRole} onValueChange={setSelectedRole}>
-                        <SelectTrigger className="w-40 surface-secondary border-[#2D3B55]">
+                        <SelectTrigger className="w-40 surface-secondary border-slate-200">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="surface-primary border-[#2D3B55]">
+                        <SelectContent className="surface-primary border-slate-200">
                           <SelectItem value="advertiser">Advertiser</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="super_admin">Super Admin</SelectItem>
@@ -1238,7 +1238,7 @@ export default function AdminPanel() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <h3 className="text-[#F8FAFC] font-medium mb-3 flex items-center gap-2">
+                      <h3 className="text-slate-900 font-medium mb-3 flex items-center gap-2">
                         <LayoutDashboard className="w-4 h-4 text-[#3B82F6]" />
                         Sidebar Access
                       </h3>
@@ -1250,19 +1250,19 @@ export default function AdminPanel() {
                               key={item.id}
                               onClick={() => toggleSidebarItem(item.id)}
                               className={`flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-all ${
-                                isChecked ? "border-[#3B82F6] bg-[#3B82F6]/10" : "border-[#2D3B55] hover:border-[#3B82F6]/50 bg-[#0B1221]"
+                                isChecked ? "border-[#3B82F6] bg-[#3B82F6]/10" : "border-slate-200 hover:border-[#3B82F6]/50 bg-white"
                               }`}
                             >
                               <Checkbox checked={isChecked} className="pointer-events-none data-[state=checked]:bg-[#3B82F6]" />
-                              <span className="text-sm text-[#F8FAFC] truncate">{item.label}</span>
+                              <span className="text-sm text-slate-900 truncate">{item.label}</span>
                             </div>
                           );
                         })}
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-[#2D3B55]">
-                      <h3 className="text-[#F8FAFC] font-medium mb-3 flex items-center gap-2">
+                    <div className="pt-4 border-t border-slate-200">
+                      <h3 className="text-slate-900 font-medium mb-3 flex items-center gap-2">
                         <Shield className="w-4 h-4 text-[#10B981]" />
                         Permissions
                       </h3>
@@ -1274,11 +1274,11 @@ export default function AdminPanel() {
                               key={perm.id}
                               onClick={() => togglePermission(perm.id)}
                               className={`flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-all ${
-                                isChecked ? "border-[#10B981] bg-[#10B981]/10" : "border-[#2D3B55] hover:border-[#10B981]/50 bg-[#0B1221]"
+                                isChecked ? "border-[#10B981] bg-[#10B981]/10" : "border-slate-200 hover:border-[#10B981]/50 bg-white"
                               }`}
                             >
                               <Checkbox checked={isChecked} className="pointer-events-none data-[state=checked]:bg-[#10B981]" />
-                              <span className="text-sm text-[#F8FAFC] truncate">{perm.label}</span>
+                              <span className="text-sm text-slate-900 truncate">{perm.label}</span>
                             </div>
                           );
                         })}
@@ -1301,10 +1301,10 @@ export default function AdminPanel() {
                 <Card className="surface-primary border-panel">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                      <CardTitle className="text-[#F8FAFC]">Audit Logs</CardTitle>
-                      <CardDescription className="text-[#64748B]">Track all actions</CardDescription>
+                      <CardTitle className="text-slate-900">Audit Logs</CardTitle>
+                      <CardDescription className="text-slate-500">Track all actions</CardDescription>
                     </div>
-                    <Button onClick={fetchAuditLogs} variant="outline" className="border-[#2D3B55]">
+                    <Button onClick={fetchAuditLogs} variant="outline" className="border-slate-200">
                       <RefreshCw className={`w-4 h-4 mr-2 ${auditLoading ? 'animate-spin' : ''}`} /> Refresh
                     </Button>
                   </CardHeader>
@@ -1314,29 +1314,29 @@ export default function AdminPanel() {
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3B82F6]"></div>
                       </div>
                     ) : auditLogs.length === 0 ? (
-                      <p className="text-[#64748B] text-center py-8">No audit logs</p>
+                      <p className="text-slate-500 text-center py-8">No audit logs</p>
                     ) : (
                       <div className="space-y-2 max-h-[400px] overflow-y-auto">
                         {auditLogs.map((log, idx) => (
-                          <div key={idx} className="p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+                          <div key={idx} className="p-3 rounded-lg bg-white border border-slate-200">
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-2">
                                 <Badge className={
                                   log.action.includes('login') ? 'bg-[#3B82F6]/20 text-[#3B82F6]' :
                                   log.action.includes('2fa') ? 'bg-[#F59E0B]/20 text-[#F59E0B]' :
                                   log.action.includes('user') ? 'bg-[#10B981]/20 text-[#10B981]' :
-                                  'bg-[#64748B]/20 text-[#64748B]'
+                                  'bg-[#64748B]/20 text-slate-500'
                                 }>
                                   {log.action}
                                 </Badge>
-                                <span className="text-sm text-[#F8FAFC]">{log.actor?.email}</span>
+                                <span className="text-sm text-slate-900">{log.actor?.email}</span>
                               </div>
-                              <span className="text-xs text-[#64748B]">
+                              <span className="text-xs text-slate-500">
                                 {new Date(log.timestamp).toLocaleString()}
                               </span>
                             </div>
                             {log.target?.name && (
-                              <p className="text-xs text-[#94A3B8] mt-1">Target: {log.target.type} - {log.target.name}</p>
+                              <p className="text-xs text-slate-600 mt-1">Target: {log.target.type} - {log.target.name}</p>
                             )}
                             {!log.success && (
                               <p className="text-xs text-[#EF4444] mt-1">{log.error_message}</p>
@@ -1355,19 +1355,19 @@ export default function AdminPanel() {
               <TabsContent value="security">
                 <Card className="surface-primary border-panel">
                   <CardHeader>
-                    <CardTitle className="text-[#F8FAFC]">Security Settings</CardTitle>
-                    <CardDescription className="text-[#64748B]">Two-factor authentication</CardDescription>
+                    <CardTitle className="text-slate-900">Security Settings</CardTitle>
+                    <CardDescription className="text-slate-500">Two-factor authentication</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="p-4 rounded-lg border border-[#2D3B55] bg-[#0B1221]">
+                    <div className="p-4 rounded-lg border border-slate-200 bg-white">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${twoFAStatus.enabled ? 'bg-[#10B981]/20' : 'bg-[#64748B]/20'}`}>
-                            <Smartphone className={`w-5 h-5 ${twoFAStatus.enabled ? 'text-[#10B981]' : 'text-[#64748B]'}`} />
+                            <Smartphone className={`w-5 h-5 ${twoFAStatus.enabled ? 'text-[#10B981]' : 'text-slate-500'}`} />
                           </div>
                           <div>
-                            <h3 className="text-[#F8FAFC] font-medium">Two-Factor Authentication</h3>
-                            <p className="text-sm text-[#64748B]">
+                            <h3 className="text-slate-900 font-medium">Two-Factor Authentication</h3>
+                            <p className="text-sm text-slate-500">
                               {twoFAStatus.enabled ? "2FA is enabled" : "Add extra security"}
                             </p>
                           </div>
@@ -1406,12 +1406,12 @@ export default function AdminPanel() {
       <Dialog open={show2FASetup} onOpenChange={setShow2FASetup}>
         <DialogContent className="surface-primary border-panel max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Setup 2FA</DialogTitle>
+            <DialogTitle className="text-slate-900">Setup 2FA</DialogTitle>
           </DialogHeader>
           {twoFASetup && (
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
-                <p className="text-sm text-[#94A3B8] mb-3">Scan with authenticator app:</p>
+              <div className="p-4 rounded-lg bg-white border border-slate-200">
+                <p className="text-sm text-slate-600 mb-3">Scan with authenticator app:</p>
                 <div className="flex justify-center p-4 bg-white rounded-lg">
                   <img 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(twoFASetup.qr_code_url)}`}
@@ -1420,10 +1420,10 @@ export default function AdminPanel() {
                   />
                 </div>
               </div>
-              <div className="p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
-                <p className="text-sm text-[#94A3B8] mb-2">Or enter manually:</p>
+              <div className="p-4 rounded-lg bg-white border border-slate-200">
+                <p className="text-sm text-slate-600 mb-2">Or enter manually:</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 p-2 bg-[#020408] rounded text-[#F8FAFC] text-sm font-mono">{twoFASetup.secret}</code>
+                  <code className="flex-1 p-2 bg-slate-50 rounded text-slate-900 text-sm font-mono">{twoFASetup.secret}</code>
                   <Button variant="ghost" size="sm" onClick={() => copyToClipboard(twoFASetup.secret)} className="text-[#3B82F6]">
                     {copiedSecret ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
@@ -1433,24 +1433,24 @@ export default function AdminPanel() {
                 <p className="text-sm text-[#F59E0B] font-medium mb-2">Backup codes:</p>
                 <div className="grid grid-cols-2 gap-2">
                   {twoFASetup.backup_codes.map((code, idx) => (
-                    <code key={idx} className="p-1 bg-[#020408] rounded text-center text-sm text-[#F8FAFC] font-mono">{code}</code>
+                    <code key={idx} className="p-1 bg-slate-50 rounded text-center text-sm text-slate-900 font-mono">{code}</code>
                   ))}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Enter 6-digit code:</Label>
+                <Label className="text-slate-600">Enter 6-digit code:</Label>
                 <Input
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   placeholder="000000"
                   maxLength={6}
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC] text-center text-lg tracking-widest"
+                  className="surface-secondary border-slate-200 text-slate-900 text-center text-lg tracking-widest"
                 />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShow2FASetup(false)} className="border-[#2D3B55]">Cancel</Button>
+            <Button variant="outline" onClick={() => setShow2FASetup(false)} className="border-slate-200">Cancel</Button>
             <Button onClick={enable2FA} disabled={verificationCode.length !== 6} className="bg-[#10B981]">Verify & Enable</Button>
           </DialogFooter>
         </DialogContent>
@@ -1460,48 +1460,48 @@ export default function AdminPanel() {
       <Dialog open={showCreateUser} onOpenChange={setShowCreateUser}>
         <DialogContent className="surface-primary border-panel">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">
+            <DialogTitle className="text-slate-900">
               Create New {isSuperAdmin ? "Admin" : "Advertiser"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Name</Label>
+              <Label className="text-slate-600">Name</Label>
               <Input
                 value={newUser.name}
                 onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                 placeholder="Full name"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Email</Label>
+              <Label className="text-slate-600">Email</Label>
               <Input
                 type="email"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                 placeholder="email@example.com"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Password</Label>
+              <Label className="text-slate-600">Password</Label>
               <Input
                 type="password"
                 value={newUser.password}
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                 placeholder="Min 6 characters"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             {getAllowedRoles().length > 1 && (
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Role</Label>
+                <Label className="text-slate-600">Role</Label>
                 <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
-                  <SelectTrigger className="surface-secondary border-[#2D3B55]">
+                  <SelectTrigger className="surface-secondary border-slate-200">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     {getAllowedRoles().map(role => (
                       <SelectItem key={role} value={role}>
                         {role.charAt(0).toUpperCase() + role.slice(1).replace("_", " ")}
@@ -1511,12 +1511,12 @@ export default function AdminPanel() {
                 </Select>
               </div>
             )}
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-slate-500">
               {isSuperAdmin ? "As Super Admin, you can create Admin accounts" : "As Admin, you can create Advertiser accounts"}
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateUser(false)} className="border-[#2D3B55]">Cancel</Button>
+            <Button variant="outline" onClick={() => setShowCreateUser(false)} className="border-slate-200">Cancel</Button>
             <Button onClick={createUser} className="bg-[#3B82F6]">Create</Button>
           </DialogFooter>
         </DialogContent>
@@ -1526,7 +1526,7 @@ export default function AdminPanel() {
       <Dialog open={showBulkDeleteConfirm} onOpenChange={setShowBulkDeleteConfirm}>
         <DialogContent className="surface-primary border-panel">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Confirm Bulk Delete</DialogTitle>
+            <DialogTitle className="text-slate-900">Confirm Bulk Delete</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="p-4 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/30">
@@ -1535,11 +1535,11 @@ export default function AdminPanel() {
               </p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-[#94A3B8]">Selected users:</p>
+              <p className="text-sm text-slate-600">Selected users:</p>
               <div className="max-h-40 overflow-y-auto space-y-1">
                 {users.filter(u => selectedUsers.includes(u.id)).map(u => (
-                  <div key={u.id} className="flex items-center gap-2 p-2 rounded bg-[#0B1221]">
-                    <span className="text-sm text-[#F8FAFC]">{u.name}</span>
+                  <div key={u.id} className="flex items-center gap-2 p-2 rounded bg-white">
+                    <span className="text-sm text-slate-900">{u.name}</span>
                     <Badge className={getRoleBadgeColor(u.role)} size="sm">{u.role}</Badge>
                   </div>
                 ))}
@@ -1550,7 +1550,7 @@ export default function AdminPanel() {
             <Button 
               variant="outline" 
               onClick={() => setShowBulkDeleteConfirm(false)} 
-              className="border-[#2D3B55]"
+              className="border-slate-200"
             >
               Cancel
             </Button>

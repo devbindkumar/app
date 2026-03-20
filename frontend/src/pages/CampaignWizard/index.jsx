@@ -152,10 +152,10 @@ export default function CampaignWizard() {
                     <Sparkles className="w-5 h-5 text-[#10B981]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[#F8FAFC]">
+                    <h3 className="text-sm font-medium text-slate-900">
                       Created from Media Plan
                     </h3>
-                    <p className="text-xs text-[#94A3B8] mt-0.5">
+                    <p className="text-xs text-slate-600 mt-0.5">
                       Settings pre-filled based on your media plan recommendations
                     </p>
                     <div className="flex flex-wrap gap-3 mt-2">
@@ -177,7 +177,7 @@ export default function CampaignWizard() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPlanBanner(false)}
-                  className="text-[#64748B] hover:text-[#F8FAFC] -mt-1 -mr-1"
+                  className="text-slate-500 hover:text-slate-900 -mt-1 -mr-1"
                 >
                   x
                 </Button>
@@ -188,12 +188,12 @@ export default function CampaignWizard() {
           {renderStepContent()}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-[#2D3B55]">
+          <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
             <Button
               variant="outline"
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               disabled={currentStep === 1}
-              className="border-[#2D3B55] text-[#94A3B8]"
+              className="border-slate-200 text-slate-600"
             >
               Previous
             </Button>

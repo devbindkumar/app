@@ -61,7 +61,7 @@ function SortableHeader({ label, sortKey, currentSort, onSort }) {
   return (
     <button
       onClick={() => onSort(sortKey)}
-      className="flex items-center gap-1 text-xs text-[#64748B] hover:text-[#F8FAFC] transition-colors group"
+      className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 transition-colors group"
     >
       {label}
       <span className="opacity-50 group-hover:opacity-100">
@@ -273,8 +273,8 @@ export default function Campaigns() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Campaigns</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">Manage your advertising campaigns</p>
+          <h1 className="text-3xl font-bold text-slate-900">Campaigns</h1>
+          <p className="text-sm text-slate-600 mt-1">Manage your advertising campaigns</p>
         </div>
         <Link to="/campaigns/new">
           <Button 
@@ -292,7 +292,7 @@ export default function Campaigns() {
         <div className="mb-4 p-3 rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CheckSquare className="w-5 h-5 text-[#3B82F6]" />
-            <span className="text-sm text-[#F8FAFC]">
+            <span className="text-sm text-slate-900">
               {selectedIds.size} campaign{selectedIds.size > 1 ? 's' : ''} selected
             </span>
           </div>
@@ -328,7 +328,7 @@ export default function Campaigns() {
               size="sm"
               variant="ghost"
               onClick={clearSelection}
-              className="text-[#64748B] hover:text-[#F8FAFC]"
+              className="text-slate-500 hover:text-slate-900"
             >
               <X className="w-3 h-3 mr-1" />
               Clear
@@ -340,14 +340,14 @@ export default function Campaigns() {
       {/* Campaigns List */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading campaigns...</div>
+          <div className="text-slate-500">Loading campaigns...</div>
         </div>
       ) : campaigns.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="empty-state py-16">
             <Target className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No campaigns yet</h3>
-            <p className="text-sm text-[#94A3B8] mb-4">Create your first campaign to start bidding</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No campaigns yet</h3>
+            <p className="text-sm text-slate-600 mb-4">Create your first campaign to start bidding</p>
             <Link to="/campaigns/new">
               <Button className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white">
                 <Plus className="w-4 h-4 mr-2" />
@@ -359,12 +359,12 @@ export default function Campaigns() {
       ) : (
         <div className="space-y-2" data-testid="campaigns-list">
           {/* Table Header */}
-          <div className="px-4 py-2 flex items-center gap-4 text-xs text-[#64748B]">
+          <div className="px-4 py-2 flex items-center gap-4 text-xs text-slate-500">
             <div className="w-8">
               <Checkbox
                 checked={isAllSelected}
                 onCheckedChange={toggleSelectAll}
-                className="border-[#2D3B55] data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]"
+                className="border-slate-200 data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]"
               />
             </div>
             <div className="flex-1 min-w-[200px]">
@@ -407,14 +407,14 @@ export default function Campaigns() {
                     <Checkbox
                       checked={selectedIds.has(campaign.id)}
                       onCheckedChange={() => toggleSelect(campaign.id)}
-                      className="border-[#2D3B55] data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]"
+                      className="border-slate-200 data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]"
                     />
                   </div>
                   
                   {/* Name & ID */}
                   <div className="flex-1 min-w-[200px]">
-                    <h3 className="text-sm font-semibold text-[#F8FAFC]">{campaign.name}</h3>
-                    <p className="text-xs text-[#64748B] mt-0.5 font-mono truncate">ID: {campaign.id}</p>
+                    <h3 className="text-sm font-semibold text-slate-900">{campaign.name}</h3>
+                    <p className="text-xs text-slate-500 mt-0.5 font-mono truncate">ID: {campaign.id}</p>
                   </div>
                   
                   {/* Status */}
@@ -429,12 +429,12 @@ export default function Campaigns() {
                   
                   {/* Daily Budget */}
                   <div className="w-28 text-right">
-                    <p className="text-sm font-mono text-[#F8FAFC]">{formatCurrency(campaign.budget?.daily_budget)}</p>
+                    <p className="text-sm font-mono text-slate-900">{formatCurrency(campaign.budget?.daily_budget)}</p>
                   </div>
                   
                   {/* Bids */}
                   <div className="w-20 text-right">
-                    <p className="text-sm font-mono text-[#F8FAFC]">{formatNumber(campaign.bids)}</p>
+                    <p className="text-sm font-mono text-slate-900">{formatNumber(campaign.bids)}</p>
                   </div>
                   
                   {/* Wins */}
@@ -476,7 +476,7 @@ export default function Campaigns() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="h-8 w-8 p-0 text-[#64748B] hover:text-[#F8FAFC]"
+                          className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
@@ -501,7 +501,7 @@ export default function Campaigns() {
                           <Copy className="w-4 h-4 mr-2" />
                           Duplicate
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-[#2D3B55]" />
+                        <DropdownMenuSeparator className="bg-slate-200" />
                         <DropdownMenuItem 
                           onClick={() => setDeleteId(campaign.id)}
                           className="text-[#EF4444] focus:text-[#EF4444] cursor-pointer"
@@ -523,13 +523,13 @@ export default function Campaigns() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Delete Campaign</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Delete Campaign</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               Are you sure you want to delete this campaign? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]">
+            <AlertDialogCancel className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -546,14 +546,14 @@ export default function Campaigns() {
       <AlertDialog open={showBulkDelete} onOpenChange={setShowBulkDelete}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Delete {selectedIds.size} Campaigns</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Delete {selectedIds.size} Campaigns</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               Are you sure you want to delete {selectedIds.size} campaign{selectedIds.size > 1 ? 's' : ''}? 
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]">
+            <AlertDialogCancel className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 

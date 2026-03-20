@@ -47,8 +47,8 @@ export function ScheduleStep({ form, updateField }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Schedule & Pacing</h2>
-        <p className="text-sm text-[#64748B]">Set campaign flight dates, frequency caps, and dayparting</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Schedule & Pacing</h2>
+        <p className="text-sm text-slate-500">Set campaign flight dates, frequency caps, and dayparting</p>
       </div>
 
       {/* Flight Dates */}
@@ -59,22 +59,22 @@ export function ScheduleStep({ form, updateField }) {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Start Date *</Label>
+              <Label className="text-slate-600">Start Date *</Label>
               <Input
                 type="date"
                 value={form.start_date}
                 onChange={(e) => updateField("start_date", e.target.value)}
-                className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-primary border-slate-200 text-slate-900"
                 data-testid="start-date-input"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">End Date (Optional)</Label>
+              <Label className="text-slate-600">End Date (Optional)</Label>
               <Input
                 type="date"
                 value={form.end_date}
                 onChange={(e) => updateField("end_date", e.target.value)}
-                className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-primary border-slate-200 text-slate-900"
                 min={form.start_date}
               />
             </div>
@@ -97,22 +97,22 @@ export function ScheduleStep({ form, updateField }) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Max Impressions</Label>
+                <Label className="text-slate-600">Max Impressions</Label>
                 <Input
                   type="number"
                   value={form.frequency_cap_count}
                   onChange={(e) => updateField("frequency_cap_count", parseInt(e.target.value) || 1)}
-                  className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                  className="surface-primary border-slate-200 text-slate-900"
                   min={1}
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Period</Label>
+                <Label className="text-slate-600">Period</Label>
                 <Select value={form.frequency_cap_period} onValueChange={(v) => updateField("frequency_cap_period", v)}>
-                  <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     <SelectItem value="hour">Per Hour</SelectItem>
                     <SelectItem value="day">Per Day</SelectItem>
                     <SelectItem value="week">Per Week</SelectItem>
@@ -122,12 +122,12 @@ export function ScheduleStep({ form, updateField }) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Cap Type</Label>
+                <Label className="text-slate-600">Cap Type</Label>
                 <Select value={form.frequency_cap_type} onValueChange={(v) => updateField("frequency_cap_type", v)}>
-                  <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     <SelectItem value="user">Per User</SelectItem>
                     <SelectItem value="campaign">Per Campaign</SelectItem>
                   </SelectContent>
@@ -138,23 +138,23 @@ export function ScheduleStep({ form, updateField }) {
             {form.frequency_cap_type === "user" && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Daily Cap (per user)</Label>
+                  <Label className="text-slate-600">Daily Cap (per user)</Label>
                   <Input
                     type="number"
                     value={form.frequency_cap_daily || ""}
                     onChange={(e) => updateField("frequency_cap_daily", parseInt(e.target.value) || 0)}
-                    className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                    className="surface-primary border-slate-200 text-slate-900"
                     placeholder="Unlimited"
                     min={0}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Lifetime Cap (per user)</Label>
+                  <Label className="text-slate-600">Lifetime Cap (per user)</Label>
                   <Input
                     type="number"
                     value={form.frequency_cap_lifetime || ""}
                     onChange={(e) => updateField("frequency_cap_lifetime", parseInt(e.target.value) || 0)}
-                    className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                    className="surface-primary border-slate-200 text-slate-900"
                     placeholder="Unlimited"
                     min={0}
                   />
@@ -180,14 +180,14 @@ export function ScheduleStep({ form, updateField }) {
           <CardContent className="space-y-4">
             {/* Timezone */}
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Timezone</Label>
+              <Label className="text-slate-600">Timezone</Label>
               <Select value={form.timezone} onValueChange={(v) => updateField("timezone", v)}>
-                <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
+                <SelectContent className="surface-primary border-slate-200">
                   {TIMEZONES.map((tz) => (
-                    <SelectItem key={tz} value={tz} className="text-[#F8FAFC]">{tz}</SelectItem>
+                    <SelectItem key={tz} value={tz} className="text-slate-900">{tz}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -195,7 +195,7 @@ export function ScheduleStep({ form, updateField }) {
 
             {/* Days of Week */}
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Days of Week</Label>
+              <Label className="text-slate-600">Days of Week</Label>
               <div className="flex gap-2">
                 {DAYS_OF_WEEK.map((day) => (
                   <button
@@ -204,7 +204,7 @@ export function ScheduleStep({ form, updateField }) {
                     className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
                       form.days_of_week.includes(day.value)
                         ? "bg-[#8B5CF6] text-white"
-                        : "surface-primary border border-[#2D3B55] text-[#64748B] hover:border-[#8B5CF6]/50"
+                        : "surface-primary border border-slate-200 text-slate-500 hover:border-[#8B5CF6]/50"
                     }`}
                   >
                     {day.label}
@@ -216,7 +216,7 @@ export function ScheduleStep({ form, updateField }) {
             {/* Hours of Day */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-[#94A3B8]">Hours of Day</Label>
+                <Label className="text-slate-600">Hours of Day</Label>
                 <div className="flex gap-2">
                   <button onClick={selectAllHours} className="text-xs text-[#3B82F6] hover:underline">All</button>
                   <button onClick={selectBusinessHours} className="text-xs text-[#10B981] hover:underline">Business</button>
@@ -231,14 +231,14 @@ export function ScheduleStep({ form, updateField }) {
                     className={`py-2 rounded text-xs font-medium transition-all ${
                       form.hours_of_day.includes(hour)
                         ? "bg-[#8B5CF6] text-white"
-                        : "surface-primary border border-[#2D3B55] text-[#64748B] hover:border-[#8B5CF6]/50"
+                        : "surface-primary border border-slate-200 text-slate-500 hover:border-[#8B5CF6]/50"
                     }`}
                   >
                     {hour.toString().padStart(2, '0')}
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-slate-500">
                 Selected: {form.hours_of_day.length} hours
                 {form.hours_of_day.length > 0 && ` (${Math.min(...form.hours_of_day)}:00 - ${Math.max(...form.hours_of_day)}:59)`}
               </p>

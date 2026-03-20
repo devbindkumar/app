@@ -46,10 +46,10 @@ function MetricBox({ label, value, subValue, color = "primary" }) {
   };
   
   return (
-    <div className="p-4 surface-secondary rounded border border-[#2D3B55]">
-      <p className="text-xs text-[#64748B] uppercase tracking-wider mb-1">{label}</p>
+    <div className="p-4 surface-secondary rounded border border-slate-200">
+      <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">{label}</p>
       <p className={`text-2xl font-bold ${colors[color]}`}>{value}</p>
-      {subValue && <p className="text-xs text-[#94A3B8] mt-1">{subValue}</p>}
+      {subValue && <p className="text-xs text-slate-600 mt-1">{subValue}</p>}
     </div>
   );
 }
@@ -134,12 +134,12 @@ export default function Reports() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Performance Reports</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">Campaign analytics and bid shading insights</p>
+          <h1 className="text-3xl font-bold text-slate-900">Performance Reports</h1>
+          <p className="text-sm text-slate-600 mt-1">Campaign analytics and bid shading insights</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-32 surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+            <SelectTrigger className="w-32 surface-secondary border-slate-200 text-slate-900">
               <Calendar className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
@@ -151,7 +151,7 @@ export default function Reports() {
           </Select>
           
           <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-            <SelectTrigger className="w-48 surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+            <SelectTrigger className="w-48 surface-secondary border-slate-200 text-slate-900">
               <SelectValue placeholder="All Campaigns" />
             </SelectTrigger>
             <SelectContent className="surface-primary border-panel">
@@ -165,7 +165,7 @@ export default function Reports() {
           <Button 
             variant="outline"
             onClick={fetchData}
-            className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+            className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -208,7 +208,7 @@ export default function Reports() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading reports...</div>
+          <div className="text-slate-500">Loading reports...</div>
         </div>
       ) : (
         <>
@@ -250,7 +250,7 @@ export default function Reports() {
           {campaignReport?.bid_shading && (
             <Card className="surface-primary border-panel mb-6">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-[#3B82F6]" />
                   Bid Shading Performance
                 </CardTitle>
@@ -258,31 +258,31 @@ export default function Reports() {
               <CardContent>
                 <div className="grid grid-cols-4 gap-4">
                   <div>
-                    <p className="text-xs text-[#64748B]">Status</p>
+                    <p className="text-xs text-slate-500">Status</p>
                     <Badge 
                       variant="outline" 
                       className={campaignReport.bid_shading.enabled 
                         ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30"
-                        : "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30"
+                        : "bg-[#64748B]/20 text-slate-500 border-[#64748B]/30"
                       }
                     >
                       {campaignReport.bid_shading.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </div>
                   <div>
-                    <p className="text-xs text-[#64748B]">Current Shade Factor</p>
+                    <p className="text-xs text-slate-500">Current Shade Factor</p>
                     <p className="text-lg font-mono text-[#3B82F6]">
                       {(campaignReport.bid_shading.current_factor * 100).toFixed(0)}%
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#64748B]">Target Win Rate</p>
+                    <p className="text-xs text-slate-500">Target Win Rate</p>
                     <p className="text-lg font-mono text-[#F59E0B]">
                       {(campaignReport.bid_shading.target_win_rate * 100).toFixed(0)}%
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#64748B]">Actual Win Rate</p>
+                    <p className="text-xs text-slate-500">Actual Win Rate</p>
                     <p className="text-lg font-mono text-[#10B981]">
                       {(campaignReport.bid_shading.actual_win_rate * 100).toFixed(1)}%
                     </p>
@@ -297,13 +297,13 @@ export default function Reports() {
             {/* Bids vs Wins Chart */}
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-[#F8FAFC]">Bids vs Wins</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Bids vs Wins</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[280px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={displayData?.daily_data || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2D3B55" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                       <XAxis 
                         dataKey="date" 
                         tick={{ fill: '#64748B', fontSize: 10 }} 
@@ -315,8 +315,8 @@ export default function Reports() {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0B1221', 
-                          border: '1px solid #2D3B55',
+                          backgroundColor: '#F8FAFC', 
+                          border: '1px solid #E2E8F0',
                           borderRadius: '4px',
                           color: '#F8FAFC'
                         }}
@@ -333,13 +333,13 @@ export default function Reports() {
             {/* Win Rate Trend */}
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-[#F8FAFC]">Win Rate Trend</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Win Rate Trend</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[280px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={displayData?.daily_data || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2D3B55" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                       <XAxis 
                         dataKey="date" 
                         tick={{ fill: '#64748B', fontSize: 10 }} 
@@ -353,8 +353,8 @@ export default function Reports() {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0B1221', 
-                          border: '1px solid #2D3B55',
+                          backgroundColor: '#F8FAFC', 
+                          border: '1px solid #E2E8F0',
                           borderRadius: '4px',
                           color: '#F8FAFC'
                         }}
@@ -379,7 +379,7 @@ export default function Reports() {
           {campaignReport && (
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-[#F8FAFC]">Bid Price vs Win Price</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Bid Price vs Win Price</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[280px]">
@@ -395,7 +395,7 @@ export default function Reports() {
                           <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2D3B55" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                       <XAxis 
                         dataKey="date" 
                         tick={{ fill: '#64748B', fontSize: 10 }} 
@@ -408,8 +408,8 @@ export default function Reports() {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0B1221', 
-                          border: '1px solid #2D3B55',
+                          backgroundColor: '#F8FAFC', 
+                          border: '1px solid #E2E8F0',
                           borderRadius: '4px',
                           color: '#F8FAFC'
                         }}
@@ -441,12 +441,12 @@ export default function Reports() {
           {selectedCampaign === "all" && campaigns.length > 0 && (
             <Card className="surface-primary border-panel mt-6">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-[#F8FAFC]">Campaign Breakdown</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Campaign Breakdown</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <table className="w-full data-table">
                   <thead>
-                    <tr className="border-b border-[#2D3B55]">
+                    <tr className="border-b border-slate-200">
                       <th>Campaign</th>
                       <th>Status</th>
                       <th>Bids</th>
@@ -458,14 +458,14 @@ export default function Reports() {
                   </thead>
                   <tbody>
                     {campaigns.map(c => (
-                      <tr key={c.id} className="border-b border-[#2D3B55] hover:bg-[#151F32]/50">
-                        <td className="text-[#F8FAFC]">{c.name}</td>
+                      <tr key={c.id} className="border-b border-slate-200 hover:bg-slate-100/50">
+                        <td className="text-slate-900">{c.name}</td>
                         <td>
                           <Badge 
                             variant="outline"
                             className={c.status === "active" 
                               ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30"
-                              : "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30"
+                              : "bg-[#64748B]/20 text-slate-500 border-[#64748B]/30"
                             }
                           >
                             {c.status}
@@ -483,7 +483,7 @@ export default function Reports() {
                               {(c.bid_shading.current_shade_factor * 100).toFixed(0)}%
                             </span>
                           ) : (
-                            <span className="text-[#64748B]">Off</span>
+                            <span className="text-slate-500">Off</span>
                           )}
                         </td>
                       </tr>

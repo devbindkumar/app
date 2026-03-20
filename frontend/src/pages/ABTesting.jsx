@@ -120,14 +120,14 @@ export default function ABTesting() {
       case "active": return "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30";
       case "paused": return "bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30";
       case "completed": return "bg-[#3B82F6]/20 text-[#3B82F6] border-[#3B82F6]/30";
-      default: return "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30";
+      default: return "bg-[#64748B]/20 text-slate-500 border-[#64748B]/30";
     }
   };
 
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Loading A/B tests...</div>
+        <div className="text-slate-500">Loading A/B tests...</div>
       </div>
     );
   }
@@ -137,8 +137,8 @@ export default function ABTesting() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">A/B Testing</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">A/B Testing</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Split test campaigns to find the best performer
           </p>
         </div>
@@ -160,8 +160,8 @@ export default function ABTesting() {
               <FlaskConical className="w-5 h-5 text-[#8B5CF6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Tests</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{tests.length}</p>
+              <p className="text-xs text-slate-500">Total Tests</p>
+              <p className="text-xl font-bold text-slate-900">{tests.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -171,7 +171,7 @@ export default function ABTesting() {
               <Play className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Active</p>
+              <p className="text-xs text-slate-500">Active</p>
               <p className="text-xl font-bold text-[#10B981]">
                 {tests.filter(t => t.status === "active").length}
               </p>
@@ -184,7 +184,7 @@ export default function ABTesting() {
               <Trophy className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Completed</p>
+              <p className="text-xs text-slate-500">Completed</p>
               <p className="text-xl font-bold text-[#3B82F6]">
                 {tests.filter(t => t.status === "completed").length}
               </p>
@@ -197,8 +197,8 @@ export default function ABTesting() {
               <Users className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Campaigns in Tests</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">
+              <p className="text-xs text-slate-500">Campaigns in Tests</p>
+              <p className="text-xl font-bold text-slate-900">
                 {tests.reduce((sum, t) => sum + (t.campaign_ids?.length || 0), 0)}
               </p>
             </div>
@@ -209,13 +209,13 @@ export default function ABTesting() {
       {/* Tests List */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-[#F8FAFC]">Tests</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Tests</h2>
           {tests.length === 0 ? (
             <Card className="surface-primary border-panel">
               <CardContent className="p-8 text-center">
-                <FlaskConical className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
-                <p className="text-[#F8FAFC] font-medium">No A/B tests yet</p>
-                <p className="text-sm text-[#64748B]">Create your first test to compare campaigns</p>
+                <FlaskConical className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+                <p className="text-slate-900 font-medium">No A/B tests yet</p>
+                <p className="text-sm text-slate-500">Create your first test to compare campaigns</p>
               </CardContent>
             </Card>
           ) : (
@@ -231,17 +231,17 @@ export default function ABTesting() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <FlaskConical className="w-4 h-4 text-[#8B5CF6]" />
-                      <h3 className="font-medium text-[#F8FAFC]">{test.name}</h3>
+                      <h3 className="font-medium text-slate-900">{test.name}</h3>
                     </div>
                     <Badge variant="outline" className={getStatusColor(test.status)}>
                       {test.status}
                     </Badge>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-[#64748B]">
+                    <p className="text-xs text-slate-500">
                       {test.campaign_names?.join(" vs ")}
                     </p>
-                    <p className="text-xs text-[#94A3B8]">
+                    <p className="text-xs text-slate-600">
                       Traffic: {test.traffic_split?.map(t => `${t}%`).join(" / ")}
                     </p>
                   </div>
@@ -285,21 +285,21 @@ export default function ABTesting() {
 
         {/* Test Details */}
         <div>
-          <h2 className="text-lg font-semibold text-[#F8FAFC] mb-4">Test Details</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Test Details</h2>
           {selectedTest ? (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC]">{selectedTest.name}</CardTitle>
+                <CardTitle className="text-lg text-slate-900">{selectedTest.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Traffic Split */}
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#94A3B8]">Traffic Split</p>
+                  <p className="text-sm font-medium text-slate-600">Traffic Split</p>
                   {selectedTest.campaign_names?.map((name, idx) => (
                     <div key={idx} className="space-y-1">
                       <div className="flex justify-between text-xs">
-                        <span className="text-[#F8FAFC]">{name}</span>
-                        <span className="text-[#94A3B8]">{selectedTest.traffic_split?.[idx]}%</span>
+                        <span className="text-slate-900">{name}</span>
+                        <span className="text-slate-600">{selectedTest.traffic_split?.[idx]}%</span>
                       </div>
                       <Progress value={selectedTest.traffic_split?.[idx]} className="h-2" />
                     </div>
@@ -308,7 +308,7 @@ export default function ABTesting() {
 
                 {/* Performance Stats */}
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#94A3B8]">Performance</p>
+                  <p className="text-sm font-medium text-slate-600">Performance</p>
                   <div className="space-y-2">
                     {Object.entries(selectedTest.stats || {}).map(([cid, stats], idx) => (
                       <div 
@@ -320,7 +320,7 @@ export default function ABTesting() {
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-[#F8FAFC]">
+                          <span className="text-sm text-slate-900">
                             {selectedTest.campaign_names?.[idx]}
                           </span>
                           {selectedTest.winner === cid && (
@@ -332,15 +332,15 @@ export default function ABTesting() {
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-xs">
                           <div>
-                            <span className="text-[#64748B]">Bids: </span>
-                            <span className="text-[#F8FAFC] font-mono">{stats.bids || 0}</span>
+                            <span className="text-slate-500">Bids: </span>
+                            <span className="text-slate-900 font-mono">{stats.bids || 0}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Wins: </span>
+                            <span className="text-slate-500">Wins: </span>
                             <span className="text-[#10B981] font-mono">{stats.wins || 0}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Win Rate: </span>
+                            <span className="text-slate-500">Win Rate: </span>
                             <span className="text-[#3B82F6] font-mono">{stats.win_rate || 0}%</span>
                           </div>
                         </div>
@@ -353,8 +353,8 @@ export default function ABTesting() {
           ) : (
             <Card className="surface-primary border-panel">
               <CardContent className="p-8 text-center">
-                <BarChart2 className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
-                <p className="text-[#64748B]">Select a test to view details</p>
+                <BarChart2 className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+                <p className="text-slate-500">Select a test to view details</p>
               </CardContent>
             </Card>
           )}
@@ -365,20 +365,20 @@ export default function ABTesting() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="surface-primary border-panel max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Create A/B Test</DialogTitle>
+            <DialogTitle className="text-slate-900">Create A/B Test</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Test Name</Label>
+              <Label className="text-slate-600">Test Name</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Q1 Banner Test"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Select Campaigns (2-4)</Label>
+              <Label className="text-slate-600">Select Campaigns (2-4)</Label>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {campaigns.map(c => (
                   <div 
@@ -387,23 +387,23 @@ export default function ABTesting() {
                     className={`p-2 rounded border cursor-pointer ${
                       form.campaign_ids.includes(c.id)
                         ? "border-[#8B5CF6] bg-[#8B5CF6]/10"
-                        : "border-[#2D3B55] hover:border-[#8B5CF6]/50"
+                        : "border-slate-200 hover:border-[#8B5CF6]/50"
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#F8FAFC]">{c.name}</span>
+                      <span className="text-sm text-slate-900">{c.name}</span>
                       <Checkbox checked={form.campaign_ids.includes(c.id)} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-slate-500">
               Traffic will be split equally between selected campaigns by default.
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreate(false)} className="border-[#2D3B55]">
+            <Button variant="outline" onClick={() => setShowCreate(false)} className="border-slate-200">
               Cancel
             </Button>
             <Button onClick={handleCreate} className="bg-[#8B5CF6] hover:bg-[#A78BFA]">

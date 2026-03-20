@@ -121,15 +121,15 @@ export default function Settings() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#F8FAFC]">Email Preferences</h1>
-          <p className="text-[#64748B]">Manage your email notification settings</p>
+          <h1 className="text-2xl font-bold text-slate-900">Email Preferences</h1>
+          <p className="text-slate-500">Manage your email notification settings</p>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             onClick={resetPreferences}
             disabled={saving}
-            className="border-[#2D3B55] text-[#64748B]"
+            className="border-slate-200 text-slate-500"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
@@ -148,24 +148,24 @@ export default function Settings() {
       {/* Notification Types */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-slate-900 flex items-center gap-2">
             <Bell className="w-5 h-5 text-[#3B82F6]" />
             Notification Types
           </CardTitle>
-          <CardDescription className="text-[#64748B]">
+          <CardDescription className="text-slate-500">
             Choose which notifications you want to receive
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Security Alerts */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#EF4444]/10 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-[#EF4444]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Security Alerts</Label>
-                <p className="text-sm text-[#64748B]">New sign-in from unknown device/location</p>
+                <Label className="text-slate-900 font-medium">Security Alerts</Label>
+                <p className="text-sm text-slate-500">New sign-in from unknown device/location</p>
               </div>
             </div>
             <Switch
@@ -176,14 +176,14 @@ export default function Settings() {
           </div>
 
           {/* Budget Alerts */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/10 flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-[#F59E0B]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Budget Alerts</Label>
-                <p className="text-sm text-[#64748B]">When campaign budget reaches threshold</p>
+                <Label className="text-slate-900 font-medium">Budget Alerts</Label>
+                <p className="text-sm text-slate-500">When campaign budget reaches threshold</p>
               </div>
             </div>
             <Switch
@@ -195,14 +195,14 @@ export default function Settings() {
 
           {/* New User Notifications (Admin/Super Admin only) */}
           {(user?.role === "admin" || user?.role === "super_admin") && (
-            <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-[#3B82F6]" />
                 </div>
                 <div>
-                  <Label className="text-[#F8FAFC] font-medium">New User Notifications</Label>
-                  <p className="text-sm text-[#64748B]">When a new user is created under your account</p>
+                  <Label className="text-slate-900 font-medium">New User Notifications</Label>
+                  <p className="text-sm text-slate-500">When a new user is created under your account</p>
                 </div>
               </div>
               <Switch
@@ -214,14 +214,14 @@ export default function Settings() {
           )}
 
           {/* Password Reset */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#8B5CF6]/10 flex items-center justify-center">
                 <Key className="w-5 h-5 text-[#8B5CF6]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Password Reset</Label>
-                <p className="text-sm text-[#64748B]">Password reset confirmation emails</p>
+                <Label className="text-slate-900 font-medium">Password Reset</Label>
+                <p className="text-sm text-slate-500">Password reset confirmation emails</p>
               </div>
             </div>
             <Switch
@@ -232,14 +232,14 @@ export default function Settings() {
           </div>
 
           {/* System Announcements */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#10B981]/10 flex items-center justify-center">
                 <Megaphone className="w-5 h-5 text-[#10B981]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">System Announcements</Label>
-                <p className="text-sm text-[#64748B]">Platform updates and announcements</p>
+                <Label className="text-slate-900 font-medium">System Announcements</Label>
+                <p className="text-sm text-slate-500">Platform updates and announcements</p>
               </div>
             </div>
             <Switch
@@ -254,11 +254,11 @@ export default function Settings() {
       {/* Budget Alert Thresholds */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-slate-900 flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-[#F59E0B]" />
             Budget Alert Thresholds
           </CardTitle>
-          <CardDescription className="text-[#64748B]">
+          <CardDescription className="text-slate-500">
             Customize when you receive budget alerts
           </CardDescription>
         </CardHeader>
@@ -266,7 +266,7 @@ export default function Settings() {
           {/* Warning Threshold */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-[#F8FAFC]">Warning Threshold</Label>
+              <Label className="text-slate-900">Warning Threshold</Label>
               <span className="text-lg font-bold text-[#F59E0B]">{preferences?.budget_warning_threshold ?? 75}%</span>
             </div>
             <Slider
@@ -278,7 +278,7 @@ export default function Settings() {
               className="w-full"
               disabled={!preferences?.budget_alerts}
             />
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-slate-500">
               Receive a warning when budget usage reaches this percentage
             </p>
           </div>
@@ -286,7 +286,7 @@ export default function Settings() {
           {/* Critical Threshold */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-[#F8FAFC]">Critical Threshold</Label>
+              <Label className="text-slate-900">Critical Threshold</Label>
               <span className="text-lg font-bold text-[#EF4444]">{preferences?.budget_critical_threshold ?? 90}%</span>
             </div>
             <Slider
@@ -298,7 +298,7 @@ export default function Settings() {
               className="w-full"
               disabled={!preferences?.budget_alerts}
             />
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-slate-500">
               Receive a critical alert when budget usage reaches this percentage
             </p>
           </div>
@@ -308,24 +308,24 @@ export default function Settings() {
       {/* Delivery Preferences */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-slate-900 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-[#3B82F6]" />
             Delivery Preferences
           </CardTitle>
-          <CardDescription className="text-[#64748B]">
+          <CardDescription className="text-slate-500">
             Control how and when you receive notifications
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Weekly Digest */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-[#3B82F6]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Weekly Digest</Label>
-                <p className="text-sm text-[#64748B]">Receive a summary instead of individual emails</p>
+                <Label className="text-slate-900 font-medium">Weekly Digest</Label>
+                <p className="text-sm text-slate-500">Receive a summary instead of individual emails</p>
               </div>
             </div>
             <Switch
@@ -337,19 +337,19 @@ export default function Settings() {
 
           {/* Digest Day */}
           {preferences?.weekly_digest && (
-            <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Digest Day</Label>
-                <p className="text-sm text-[#64748B]">When to receive your weekly digest</p>
+                <Label className="text-slate-900 font-medium">Digest Day</Label>
+                <p className="text-sm text-slate-500">When to receive your weekly digest</p>
               </div>
               <Select
                 value={preferences?.digest_day ?? "monday"}
                 onValueChange={(value) => updatePreference("digest_day", value)}
               >
-                <SelectTrigger className="w-36 surface-secondary border-[#2D3B55]">
+                <SelectTrigger className="w-36 surface-secondary border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
+                <SelectContent className="surface-primary border-slate-200">
                   <SelectItem value="monday">Monday</SelectItem>
                   <SelectItem value="tuesday">Tuesday</SelectItem>
                   <SelectItem value="wednesday">Wednesday</SelectItem>
@@ -363,14 +363,14 @@ export default function Settings() {
           )}
 
           {/* Quiet Hours */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#8B5CF6]/10 flex items-center justify-center">
                 <Moon className="w-5 h-5 text-[#8B5CF6]" />
               </div>
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Quiet Hours</Label>
-                <p className="text-sm text-[#64748B]">Pause non-critical notifications during set hours</p>
+                <Label className="text-slate-900 font-medium">Quiet Hours</Label>
+                <p className="text-sm text-slate-500">Pause non-critical notifications during set hours</p>
               </div>
             </div>
             <Switch
@@ -382,10 +382,10 @@ export default function Settings() {
 
           {/* Quiet Hours Time */}
           {preferences?.quiet_hours_enabled && (
-            <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B1221] border border-[#2D3B55]">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-slate-200">
               <div>
-                <Label className="text-[#F8FAFC] font-medium">Quiet Hours Period</Label>
-                <p className="text-sm text-[#64748B]">
+                <Label className="text-slate-900 font-medium">Quiet Hours Period</Label>
+                <p className="text-sm text-slate-500">
                   {preferences?.quiet_hours_start ?? 22}:00 - {preferences?.quiet_hours_end ?? 8}:00
                 </p>
               </div>
@@ -394,24 +394,24 @@ export default function Settings() {
                   value={String(preferences?.quiet_hours_start ?? 22)}
                   onValueChange={(value) => updatePreference("quiet_hours_start", parseInt(value))}
                 >
-                  <SelectTrigger className="w-20 surface-secondary border-[#2D3B55]">
+                  <SelectTrigger className="w-20 surface-secondary border-slate-200">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55] max-h-48">
+                  <SelectContent className="surface-primary border-slate-200 max-h-48">
                     {Array.from({ length: 24 }, (_, i) => (
                       <SelectItem key={i} value={String(i)}>{String(i).padStart(2, '0')}:00</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <span className="text-[#64748B] self-center">to</span>
+                <span className="text-slate-500 self-center">to</span>
                 <Select
                   value={String(preferences?.quiet_hours_end ?? 8)}
                   onValueChange={(value) => updatePreference("quiet_hours_end", parseInt(value))}
                 >
-                  <SelectTrigger className="w-20 surface-secondary border-[#2D3B55]">
+                  <SelectTrigger className="w-20 surface-secondary border-slate-200">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55] max-h-48">
+                  <SelectContent className="surface-primary border-slate-200 max-h-48">
                     {Array.from({ length: 24 }, (_, i) => (
                       <SelectItem key={i} value={String(i)}>{String(i).padStart(2, '0')}:00</SelectItem>
                     ))}

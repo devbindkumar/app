@@ -557,7 +557,7 @@ export default function CreativeEditor() {
             background: form.backgroundColor,
             overflow: "hidden"
           }}
-          className="border border-[#2D3B55] rounded"
+          className="border border-slate-200 rounded"
         >
           {form.imageUrl ? (
             <img 
@@ -566,7 +566,7 @@ export default function CreativeEditor() {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-[#64748B]">
+            <div className="flex items-center justify-center h-full text-slate-500">
               <Image className="w-8 h-8" />
             </div>
           )}
@@ -576,7 +576,7 @@ export default function CreativeEditor() {
     
     if (creativeType === "native") {
       return (
-        <div className="w-[320px] p-4 bg-white rounded border border-[#2D3B55]">
+        <div className="w-[320px] p-4 bg-white rounded border border-slate-200">
           <div className="flex items-start gap-3">
             {form.nativeIconUrl && (
               <img src={form.nativeIconUrl} alt="Icon" className="w-12 h-12 rounded" />
@@ -606,7 +606,7 @@ export default function CreativeEditor() {
     
     if (creativeType === "video") {
       return (
-        <div className="w-full max-w-[480px] aspect-video bg-[#000] rounded border border-[#2D3B55] overflow-hidden">
+        <div className="w-full max-w-[480px] aspect-video bg-[#000] rounded border border-slate-200 overflow-hidden">
           {videoSourceType === "upload" && form.videoUrl ? (
             <video 
               src={form.videoUrl} 
@@ -619,14 +619,14 @@ export default function CreativeEditor() {
           ) : videoSourceType === "vast" && form.vastUrl ? (
             <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
               <Film className="w-16 h-16 text-[#3B82F6] mb-4" />
-              <p className="text-[#F8FAFC] font-medium">VAST Tag Preview</p>
+              <p className="text-slate-900 font-medium">VAST Tag Preview</p>
               <Badge className="mt-2 bg-[#3B82F6]/20 text-[#3B82F6]">
                 VAST {form.vastVersion}
               </Badge>
-              <p className="text-xs text-[#64748B] mt-3 break-all max-w-full">
+              <p className="text-xs text-slate-500 mt-3 break-all max-w-full">
                 {form.vastUrl.length > 60 ? form.vastUrl.substring(0, 60) + "..." : form.vastUrl}
               </p>
-              <p className="text-xs text-[#94A3B8] mt-2">Duration: {form.videoDuration}s</p>
+              <p className="text-xs text-slate-600 mt-2">Duration: {form.videoDuration}s</p>
               <Button
                 size="sm"
                 className="mt-4 bg-[#10B981] hover:bg-[#10B981]/90"
@@ -637,7 +637,7 @@ export default function CreativeEditor() {
               </Button>
             </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#64748B]">
+            <div className="w-full h-full flex items-center justify-center text-slate-500">
               <Video className="w-12 h-12" />
             </div>
           )}
@@ -654,7 +654,7 @@ export default function CreativeEditor() {
           {/* Companion Banner Preview - Shown First */}
           {form.companionBannerUrl && (
             <div 
-              className="rounded-lg border border-[#2D3B55] overflow-hidden bg-[#0F172A]"
+              className="rounded-lg border border-slate-200 overflow-hidden bg-slate-100"
               style={{ 
                 width: Math.min(previewWidth, 380), 
                 height: Math.min(previewHeight, 300),
@@ -674,7 +674,7 @@ export default function CreativeEditor() {
           )}
           
           {/* Audio Player Section - Below Banner */}
-          <div className="p-4 bg-gradient-to-br from-[#EC4899]/10 to-[#8B5CF6]/10 rounded-lg border border-[#2D3B55]">
+          <div className="p-4 bg-gradient-to-br from-[#EC4899]/10 to-[#8B5CF6]/10 rounded-lg border border-slate-200">
             {audioSourceType === "upload" && form.audioUrl ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -682,8 +682,8 @@ export default function CreativeEditor() {
                     <Music className="w-6 h-6 text-[#EC4899]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-[#F8FAFC] font-medium">Audio Preview</p>
-                    <p className="text-xs text-[#94A3B8]">Duration: {form.audioDuration}s</p>
+                    <p className="text-sm text-slate-900 font-medium">Audio Preview</p>
+                    <p className="text-xs text-slate-600">Duration: {form.audioDuration}s</p>
                   </div>
                 </div>
                 <audio src={form.audioUrl} controls className="w-full" />
@@ -695,7 +695,7 @@ export default function CreativeEditor() {
                     <Music className="w-6 h-6 text-[#EC4899]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-[#F8FAFC] font-medium">Audio VAST Tag</p>
+                    <p className="text-sm text-slate-900 font-medium">Audio VAST Tag</p>
                     <Badge className="mt-1 bg-[#EC4899]/20 text-[#EC4899]">
                       {form.audioDuration}s Audio
                     </Badge>
@@ -703,7 +703,7 @@ export default function CreativeEditor() {
                 </div>
                 {form.audioVastUrl && (
                   <>
-                    <p className="text-xs text-[#64748B] break-all">
+                    <p className="text-xs text-slate-500 break-all">
                       {form.audioVastUrl.length > 50 ? form.audioVastUrl.substring(0, 50) + "..." : form.audioVastUrl}
                     </p>
                     <Button
@@ -717,7 +717,7 @@ export default function CreativeEditor() {
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-6 text-[#64748B]">
+              <div className="flex flex-col items-center justify-center py-6 text-slate-500">
                 <Music className="w-10 h-10 mb-2" />
                 <p className="text-sm">Configure audio settings</p>
               </div>
@@ -726,7 +726,7 @@ export default function CreativeEditor() {
           
           {/* Size info display */}
           {form.companionBannerUrl && (
-            <p className="text-xs text-center text-[#64748B]">
+            <p className="text-xs text-center text-slate-500">
               Banner: {previewWidth}x{previewHeight}px
             </p>
           )}
@@ -780,14 +780,14 @@ export default function CreativeEditor() {
                 <Code className="w-5 h-5 text-[#F59E0B]" />
               </div>
               <div>
-                <p className="text-sm text-[#F8FAFC] font-medium">Third Party JS Tag</p>
+                <p className="text-sm text-slate-900 font-medium">Third Party JS Tag</p>
                 <div className="flex items-center gap-2 mt-1">
                   {form.jsTagVendor && (
                     <Badge className="bg-[#F59E0B]/20 text-[#F59E0B] text-xs">
                       {form.jsTagVendor}
                     </Badge>
                   )}
-                  <Badge className="bg-[#64748B]/20 text-[#94A3B8] text-xs">
+                  <Badge className="bg-[#64748B]/20 text-slate-600 text-xs">
                     {form.jsTagType}
                   </Badge>
                   {form.jsTagIsSecure && (
@@ -807,11 +807,11 @@ export default function CreativeEditor() {
           {form.jsTagContent ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-[#64748B]">Live Ad Preview</p>
+                <p className="text-xs text-slate-500">Live Ad Preview</p>
                 <Badge className="bg-[#10B981]/20 text-[#10B981] text-xs animate-pulse">LIVE</Badge>
               </div>
               <div 
-                className="rounded-lg border-2 border-dashed border-[#3B82F6]/30 bg-[#0A0F1C] p-4 flex items-center justify-center"
+                className="rounded-lg border-2 border-dashed border-[#3B82F6]/30 bg-slate-50 p-4 flex items-center justify-center"
                 style={{ minHeight: Math.min((form.jsTagHeight || 250) + 40, 350) }}
               >
                 <div className="bg-white rounded shadow-lg overflow-hidden">
@@ -828,25 +828,25 @@ export default function CreativeEditor() {
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-[#475569] text-center">
+              <p className="text-[10px] text-slate-400 text-center">
                 Note: Some third-party tags may not render in preview due to security restrictions
               </p>
               
               {/* Tag Code Preview (Collapsed) */}
               <details className="mt-2">
-                <summary className="text-xs text-[#64748B] cursor-pointer hover:text-[#94A3B8]">
+                <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-600">
                   View Tag Code
                 </summary>
-                <div className="mt-2 p-3 bg-[#0F172A] rounded border border-[#2D3B55] overflow-hidden">
-                  <pre className="text-xs text-[#94A3B8] whitespace-pre-wrap break-all max-h-32 overflow-y-auto font-mono">
+                <div className="mt-2 p-3 bg-slate-100 rounded border border-slate-200 overflow-hidden">
+                  <pre className="text-xs text-slate-600 whitespace-pre-wrap break-all max-h-32 overflow-y-auto font-mono">
                     {form.jsTagContent.length > 300 ? form.jsTagContent.substring(0, 300) + "..." : form.jsTagContent}
                   </pre>
                 </div>
               </details>
             </div>
           ) : form.jsTagUrl ? (
-            <div className="p-6 bg-gradient-to-br from-[#F59E0B]/10 to-[#EF4444]/10 rounded-lg border border-[#2D3B55]">
-              <p className="text-xs text-[#64748B] mb-2">Tag URL:</p>
+            <div className="p-6 bg-gradient-to-br from-[#F59E0B]/10 to-[#EF4444]/10 rounded-lg border border-slate-200">
+              <p className="text-xs text-slate-500 mb-2">Tag URL:</p>
               <p className="text-xs text-[#3B82F6] break-all mb-3">{form.jsTagUrl}</p>
               <Button
                 size="sm"
@@ -857,10 +857,10 @@ export default function CreativeEditor() {
               </Button>
             </div>
           ) : (
-            <div className="p-8 bg-gradient-to-br from-[#F59E0B]/5 to-[#EF4444]/5 rounded-lg border border-dashed border-[#2D3B55] text-center">
-              <Code className="w-12 h-12 text-[#64748B] mx-auto mb-3 opacity-50" />
-              <p className="text-sm text-[#64748B]">No tag content configured</p>
-              <p className="text-xs text-[#475569] mt-1">Add tag code to see live preview</p>
+            <div className="p-8 bg-gradient-to-br from-[#F59E0B]/5 to-[#EF4444]/5 rounded-lg border border-dashed border-slate-200 text-center">
+              <Code className="w-12 h-12 text-slate-500 mx-auto mb-3 opacity-50" />
+              <p className="text-sm text-slate-500">No tag content configured</p>
+              <p className="text-xs text-slate-400 mt-1">Add tag code to see live preview</p>
             </div>
           )}
         </div>
@@ -878,15 +878,15 @@ export default function CreativeEditor() {
           <Button 
             variant="ghost" 
             onClick={() => navigate("/creatives")}
-            className="text-[#94A3B8] hover:text-[#F8FAFC]"
+            className="text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-[#F8FAFC]">
+            <h1 className="text-2xl font-bold text-slate-900">
               {isEdit ? "Edit Creative" : "Advanced Creative Editor"}
             </h1>
-            <p className="text-sm text-[#94A3B8]">
+            <p className="text-sm text-slate-600">
               {isEdit ? "Update your creative settings" : "Create rich ad creatives with templates and uploads"}
             </p>
           </div>
@@ -895,7 +895,7 @@ export default function CreativeEditor() {
           <Button 
             variant="outline" 
             onClick={() => setShowPreview(true)}
-            className="border-[#2D3B55] text-[#94A3B8] hover:bg-[#1E293B]"
+            className="border-slate-200 text-slate-600 hover:bg-slate-100"
           >
             <Eye className="w-4 h-4 mr-2" />
             Preview
@@ -917,53 +917,53 @@ export default function CreativeEditor() {
           {/* Basic Info */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-[#F8FAFC]">Basic Information</CardTitle>
+              <CardTitle className="text-lg text-slate-900">Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Creative Name *</Label>
+                  <Label className="text-slate-600">Creative Name *</Label>
                   <Input
                     value={form.name}
                     onChange={(e) => updateField("name", e.target.value)}
                     placeholder="My Creative"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    className="surface-secondary border-slate-200 text-slate-900"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Creative Type</Label>
+                  <Label className="text-slate-600">Creative Type</Label>
                   <Select value={creativeType} onValueChange={setCreativeType}>
-                    <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                    <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
-                      <SelectItem value="banner" className="text-[#F8FAFC]">Banner</SelectItem>
-                      <SelectItem value="native" className="text-[#F8FAFC]">Native</SelectItem>
-                      <SelectItem value="video" className="text-[#F8FAFC]">Video</SelectItem>
-                      <SelectItem value="audio" className="text-[#F8FAFC]">Audio</SelectItem>
-                      <SelectItem value="js_tag" className="text-[#F8FAFC]">Third Party JS Tag</SelectItem>
+                    <SelectContent className="surface-primary border-slate-200">
+                      <SelectItem value="banner" className="text-slate-900">Banner</SelectItem>
+                      <SelectItem value="native" className="text-slate-900">Native</SelectItem>
+                      <SelectItem value="video" className="text-slate-900">Video</SelectItem>
+                      <SelectItem value="audio" className="text-slate-900">Audio</SelectItem>
+                      <SelectItem value="js_tag" className="text-slate-900">Third Party JS Tag</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Click URL</Label>
+                <Label className="text-slate-600">Click URL</Label>
                 <Input
                   value={form.clickUrl}
                   onChange={(e) => updateField("clickUrl", e.target.value)}
                   placeholder="https://..."
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Advertiser Domains (ADM)</Label>
+                <Label className="text-slate-600">Advertiser Domains (ADM)</Label>
                 <Input
                   value={form.adomain}
                   onChange={(e) => updateField("adomain", e.target.value)}
                   placeholder="example.com, brand.com"
-                  className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                  className="surface-secondary border-slate-200 text-slate-900"
                 />
-                <p className="text-xs text-[#64748B]">Comma-separated list of advertiser domains. Passed in bid response as 'adomain'.</p>
+                <p className="text-xs text-slate-500">Comma-separated list of advertiser domains. Passed in bid response as 'adomain'.</p>
               </div>
             </CardContent>
           </Card>
@@ -972,20 +972,20 @@ export default function CreativeEditor() {
           {creativeType === "banner" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC]">Banner Settings</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Banner Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Banner Size</Label>
+                  <Label className="text-slate-600">Banner Size</Label>
                   <div className="flex items-center gap-4 mb-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useCustomSize}
                         onChange={(e) => setUseCustomSize(e.target.checked)}
-                        className="w-4 h-4 rounded border-[#2D3B55] bg-[#0F172A] text-[#3B82F6]"
+                        className="w-4 h-4 rounded border-slate-200 bg-slate-100 text-[#3B82F6]"
                       />
-                      <span className="text-sm text-[#94A3B8]">Use Custom Size</span>
+                      <span className="text-sm text-slate-600">Use Custom Size</span>
                     </label>
                   </div>
                   
@@ -997,12 +997,12 @@ export default function CreativeEditor() {
                         setSelectedSize({ w, h, label: BANNER_SIZES.find(s => s.w === w && s.h === h)?.label || 'Custom' });
                       }}
                     >
-                      <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                      <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
+                      <SelectContent className="surface-primary border-slate-200">
                         {BANNER_SIZES.map(size => (
-                          <SelectItem key={`${size.w}x${size.h}`} value={`${size.w}x${size.h}`} className="text-[#F8FAFC]">
+                          <SelectItem key={`${size.w}x${size.h}`} value={`${size.w}x${size.h}`} className="text-slate-900">
                             {size.label} ({size.w}x{size.h})
                           </SelectItem>
                         ))}
@@ -1011,7 +1011,7 @@ export default function CreativeEditor() {
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-xs text-[#64748B]">Width (px)</Label>
+                        <Label className="text-xs text-slate-500">Width (px)</Label>
                         <Input
                           type="number"
                           value={customWidth}
@@ -1020,11 +1020,11 @@ export default function CreativeEditor() {
                             setCustomWidth(w);
                             setSelectedSize({ w, h: customHeight, label: 'Custom' });
                           }}
-                          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-secondary border-slate-200 text-slate-900"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-[#64748B]">Height (px)</Label>
+                        <Label className="text-xs text-slate-500">Height (px)</Label>
                         <Input
                           type="number"
                           value={customHeight}
@@ -1033,7 +1033,7 @@ export default function CreativeEditor() {
                             setCustomHeight(h);
                             setSelectedSize({ w: customWidth, h, label: 'Custom' });
                           }}
-                          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-secondary border-slate-200 text-slate-900"
                         />
                       </div>
                     </div>
@@ -1041,28 +1041,28 @@ export default function CreativeEditor() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Image URL (or upload below)</Label>
+                  <Label className="text-slate-600">Image URL (or upload below)</Label>
                   <Input
                     value={form.imageUrl}
                     onChange={(e) => updateField("imageUrl", e.target.value)}
                     placeholder="https://..."
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    className="surface-secondary border-slate-200 text-slate-900"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Background Color</Label>
+                  <Label className="text-slate-600">Background Color</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
                       value={form.backgroundColor}
                       onChange={(e) => updateField("backgroundColor", e.target.value)}
-                      className="w-12 h-10 p-1 surface-secondary border-[#2D3B55]"
+                      className="w-12 h-10 p-1 surface-secondary border-slate-200"
                     />
                     <Input
                       value={form.backgroundColor}
                       onChange={(e) => updateField("backgroundColor", e.target.value)}
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-secondary border-slate-200 text-slate-900"
                     />
                   </div>
                 </div>
@@ -1074,65 +1074,65 @@ export default function CreativeEditor() {
           {creativeType === "native" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC]">Native Ad Settings</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Native Ad Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Title *</Label>
+                  <Label className="text-slate-600">Title *</Label>
                   <Input
                     value={form.nativeTitle}
                     onChange={(e) => updateField("nativeTitle", e.target.value)}
                     placeholder="Ad headline"
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    className="surface-secondary border-slate-200 text-slate-900"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Description</Label>
+                  <Label className="text-slate-600">Description</Label>
                   <Textarea
                     value={form.nativeDescription}
                     onChange={(e) => updateField("nativeDescription", e.target.value)}
                     placeholder="Ad description..."
-                    className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                    className="surface-secondary border-slate-200 text-slate-900"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Icon URL</Label>
+                    <Label className="text-slate-600">Icon URL</Label>
                     <Input
                       value={form.nativeIconUrl}
                       onChange={(e) => updateField("nativeIconUrl", e.target.value)}
                       placeholder="https://..."
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-secondary border-slate-200 text-slate-900"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Main Image URL</Label>
+                    <Label className="text-slate-600">Main Image URL</Label>
                     <Input
                       value={form.nativeImageUrl}
                       onChange={(e) => updateField("nativeImageUrl", e.target.value)}
                       placeholder="https://..."
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-secondary border-slate-200 text-slate-900"
                     />
                   </div>
                 </div>
                 {/* CTA Button Settings */}
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#2D3B55]">
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Button Text</Label>
+                    <Label className="text-slate-600">Button Text</Label>
                     <Input
                       value={form.nativeCtaText}
                       onChange={(e) => updateField("nativeCtaText", e.target.value)}
                       placeholder="Learn More"
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-secondary border-slate-200 text-slate-900"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Button Click URL *</Label>
+                    <Label className="text-slate-600">Button Click URL *</Label>
                     <Input
                       value={form.nativeClickUrl}
                       onChange={(e) => updateField("nativeClickUrl", e.target.value)}
                       placeholder="https://..."
-                      className="surface-secondary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-secondary border-slate-200 text-slate-900"
                     />
                   </div>
                 </div>
@@ -1144,12 +1144,12 @@ export default function CreativeEditor() {
           {creativeType === "video" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC]">Video Ad Settings</CardTitle>
+                <CardTitle className="text-lg text-slate-900">Video Ad Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Video Source Type Selection */}
                 <div className="space-y-3">
-                  <Label className="text-[#94A3B8]">Video Source Type</Label>
+                  <Label className="text-slate-600">Video Source Type</Label>
                   <RadioGroup 
                     value={videoSourceType} 
                     onValueChange={setVideoSourceType}
@@ -1161,7 +1161,7 @@ export default function CreativeEditor() {
                         id="vast"
                         className="border-[#3B82F6] text-[#3B82F6]"
                       />
-                      <Label htmlFor="vast" className="text-[#F8FAFC] cursor-pointer">VAST Tag</Label>
+                      <Label htmlFor="vast" className="text-slate-900 cursor-pointer">VAST Tag</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem 
@@ -1169,39 +1169,39 @@ export default function CreativeEditor() {
                         id="upload"
                         className="border-[#3B82F6] text-[#3B82F6]"
                       />
-                      <Label htmlFor="upload" className="text-[#F8FAFC] cursor-pointer">RAW Video Upload</Label>
+                      <Label htmlFor="upload" className="text-slate-900 cursor-pointer">RAW Video Upload</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 {/* VAST Tag Options */}
                 {videoSourceType === "vast" && (
-                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-slate-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Film className="w-5 h-5 text-[#3B82F6]" />
-                      <span className="text-sm font-medium text-[#F8FAFC]">VAST Tag Configuration</span>
+                      <span className="text-sm font-medium text-slate-900">VAST Tag Configuration</span>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">VAST Tag URL *</Label>
+                      <Label className="text-slate-600">VAST Tag URL *</Label>
                       <Input
                         value={form.vastUrl}
                         onChange={(e) => updateField("vastUrl", e.target.value)}
                         placeholder="https://ad-server.com/vast.xml"
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">VAST Version</Label>
+                        <Label className="text-slate-600">VAST Version</Label>
                         <Select value={form.vastVersion} onValueChange={(v) => updateField("vastVersion", v)}>
-                          <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                          <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
+                          <SelectContent className="surface-primary border-slate-200">
                             {VAST_VERSIONS.map(v => (
-                              <SelectItem key={v.value} value={v.value} className="text-[#F8FAFC]">
+                              <SelectItem key={v.value} value={v.value} className="text-slate-900">
                                 {v.label}
                               </SelectItem>
                             ))}
@@ -1209,12 +1209,12 @@ export default function CreativeEditor() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Duration (seconds)</Label>
+                        <Label className="text-slate-600">Duration (seconds)</Label>
                         <Input
                           type="number"
                           value={form.videoDuration}
                           onChange={(e) => updateField("videoDuration", parseInt(e.target.value))}
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                     </div>
@@ -1223,10 +1223,10 @@ export default function CreativeEditor() {
 
                 {/* RAW Video Upload Options */}
                 {videoSourceType === "upload" && (
-                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-slate-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Video className="w-5 h-5 text-[#10B981]" />
-                      <span className="text-sm font-medium text-[#F8FAFC]">Video Upload</span>
+                      <span className="text-sm font-medium text-slate-900">Video Upload</span>
                     </div>
                     
                     <input
@@ -1255,8 +1255,8 @@ export default function CreativeEditor() {
                         <div className="flex items-center gap-2">
                           <Video className="w-5 h-5 text-[#10B981]" />
                           <div>
-                            <p className="text-sm text-[#F8FAFC]">{uploadedVideo.name}</p>
-                            <p className="text-xs text-[#64748B]">{(uploadedVideo.size / (1024*1024)).toFixed(2)} MB</p>
+                            <p className="text-sm text-slate-900">{uploadedVideo.name}</p>
+                            <p className="text-xs text-slate-500">{(uploadedVideo.size / (1024*1024)).toFixed(2)} MB</p>
                           </div>
                         </div>
                       </div>
@@ -1264,30 +1264,30 @@ export default function CreativeEditor() {
                     
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Duration (sec)</Label>
+                        <Label className="text-slate-600">Duration (sec)</Label>
                         <Input
                           type="number"
                           value={form.videoDuration}
                           onChange={(e) => updateField("videoDuration", parseInt(e.target.value))}
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Width</Label>
+                        <Label className="text-slate-600">Width</Label>
                         <Input
                           type="number"
                           value={form.videoWidth}
                           onChange={(e) => updateField("videoWidth", parseInt(e.target.value))}
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Height</Label>
+                        <Label className="text-slate-600">Height</Label>
                         <Input
                           type="number"
                           value={form.videoHeight}
                           onChange={(e) => updateField("videoHeight", parseInt(e.target.value))}
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                     </div>
@@ -1301,14 +1301,14 @@ export default function CreativeEditor() {
           {creativeType === "audio" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                   <Music className="w-4 h-4 text-[#EC4899]" />
                   Audio Settings
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">Audio Source Type</Label>
+                  <Label className="text-slate-600">Audio Source Type</Label>
                   <RadioGroup 
                     value={audioSourceType} 
                     onValueChange={setAudioSourceType}
@@ -1320,7 +1320,7 @@ export default function CreativeEditor() {
                         id="audio-vast"
                         className="border-[#EC4899] text-[#EC4899]"
                       />
-                      <Label htmlFor="audio-vast" className="text-[#F8FAFC] cursor-pointer">Audio VAST Tag</Label>
+                      <Label htmlFor="audio-vast" className="text-slate-900 cursor-pointer">Audio VAST Tag</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem 
@@ -1328,56 +1328,56 @@ export default function CreativeEditor() {
                         id="audio-upload"
                         className="border-[#EC4899] text-[#EC4899]"
                       />
-                      <Label htmlFor="audio-upload" className="text-[#F8FAFC] cursor-pointer">Upload Audio</Label>
+                      <Label htmlFor="audio-upload" className="text-slate-900 cursor-pointer">Upload Audio</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 {/* Audio VAST Options */}
                 {audioSourceType === "vast" && (
-                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-slate-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Music className="w-5 h-5 text-[#EC4899]" />
-                      <span className="text-sm font-medium text-[#F8FAFC]">Audio VAST Configuration</span>
+                      <span className="text-sm font-medium text-slate-900">Audio VAST Configuration</span>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Audio VAST URL</Label>
+                      <Label className="text-slate-600">Audio VAST URL</Label>
                       <Input
                         value={form.audioVastUrl}
                         onChange={(e) => updateField("audioVastUrl", e.target.value)}
                         placeholder="https://ad-server.com/audio-vast.xml"
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Or Paste VAST XML</Label>
+                      <Label className="text-slate-600">Or Paste VAST XML</Label>
                       <Textarea
                         value={form.audioVastXml}
                         onChange={(e) => updateField("audioVastXml", e.target.value)}
                         placeholder='<?xml version="1.0"?><VAST version="3.0">...</VAST>'
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono h-24 dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900 font-mono h-24"
                       />
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">Duration (seconds)</Label>
+                        <Label className="text-slate-600">Duration (seconds)</Label>
                         <Input
                           type="number"
                           value={form.audioDuration}
                           onChange={(e) => updateField("audioDuration", parseInt(e.target.value) || 0)}
                           placeholder="30"
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[#94A3B8]">MIME Types</Label>
+                        <Label className="text-slate-600">MIME Types</Label>
                         <Input
                           value={form.audioMimes}
                           onChange={(e) => updateField("audioMimes", e.target.value)}
-                          className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono text-xs dark:bg-[#0F172A] dark:border-[#334155]"
+                          className="surface-primary border-slate-200 text-slate-900 font-mono text-xs"
                         />
                       </div>
                     </div>
@@ -1386,10 +1386,10 @@ export default function CreativeEditor() {
 
                 {/* Audio Upload Options */}
                 {audioSourceType === "upload" && (
-                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                  <div className="space-y-4 p-4 surface-secondary rounded-lg border border-slate-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Music className="w-5 h-5 text-[#EC4899]" />
-                      <span className="text-sm font-medium text-[#F8FAFC]">Audio Upload</span>
+                      <span className="text-sm font-medium text-slate-900">Audio Upload</span>
                     </div>
                     
                     <input
@@ -1418,29 +1418,29 @@ export default function CreativeEditor() {
                         <div className="flex items-center gap-2">
                           <Music className="w-5 h-5 text-[#EC4899]" />
                           <div>
-                            <p className="text-sm text-[#F8FAFC]">{uploadedAudio.name}</p>
-                            <p className="text-xs text-[#64748B]">{(uploadedAudio.size / (1024*1024)).toFixed(2)} MB</p>
+                            <p className="text-sm text-slate-900">{uploadedAudio.name}</p>
+                            <p className="text-xs text-slate-500">{(uploadedAudio.size / (1024*1024)).toFixed(2)} MB</p>
                           </div>
                         </div>
                       </div>
                     )}
                     
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Duration (seconds) <span className="text-xs text-[#64748B]">- Auto-detected on upload</span></Label>
+                      <Label className="text-slate-600">Duration (seconds) <span className="text-xs text-slate-500">- Auto-detected on upload</span></Label>
                       <Input
                         type="number"
                         value={form.audioDuration}
                         onChange={(e) => updateField("audioDuration", parseInt(e.target.value) || 0)}
                         placeholder="30"
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                   </div>
                 )}
 
                 {/* Companion Banner */}
-                <div className="space-y-3 pt-4 border-t border-[#2D3B55]">
-                  <Label className="text-[#94A3B8]">Companion Banner (Optional)</Label>
+                <div className="space-y-3 pt-4 border-t border-slate-200">
+                  <Label className="text-slate-600">Companion Banner (Optional)</Label>
                   
                   {/* Companion Banner Upload */}
                   <input
@@ -1465,49 +1465,49 @@ export default function CreativeEditor() {
                   </Button>
                   
                   <div className="space-y-1">
-                    <Label className="text-xs text-[#64748B]">Or Enter Banner URL</Label>
+                    <Label className="text-xs text-slate-500">Or Enter Banner URL</Label>
                     <div className="flex gap-2">
                       <Input
                         value={form.companionBannerUrl}
                         onChange={(e) => updateField("companionBannerUrl", e.target.value)}
                         placeholder="https://..."
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => detectCompanionDimensions(form.companionBannerUrl)}
                         disabled={!form.companionBannerUrl}
-                        className="border-[#2D3B55] text-[#94A3B8] hover:bg-[#1E293B] shrink-0"
+                        className="border-slate-200 text-slate-600 hover:bg-slate-100 shrink-0"
                       >
                         <RefreshCw className="w-4 h-4" />
                       </Button>
                     </div>
-                    <p className="text-xs text-[#64748B]">Click refresh to auto-detect dimensions from URL</p>
+                    <p className="text-xs text-slate-500">Click refresh to auto-detect dimensions from URL</p>
                   </div>
                   
                   {/* Size Adjustment */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-xs text-[#64748B]">Width (px)</Label>
+                      <Label className="text-xs text-slate-500">Width (px)</Label>
                       <Input
                         type="number"
                         value={form.companionWidth}
                         onChange={(e) => updateField("companionWidth", parseInt(e.target.value) || 300)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-[#64748B]">Height (px)</Label>
+                      <Label className="text-xs text-slate-500">Height (px)</Label>
                       <Input
                         type="number"
                         value={form.companionHeight}
                         onChange={(e) => updateField("companionHeight", parseInt(e.target.value) || 250)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-[#64748B]">Dimensions auto-detected on upload. Adjust as needed.</p>
+                  <p className="text-xs text-slate-500">Dimensions auto-detected on upload. Adjust as needed.</p>
                 </div>
               </CardContent>
             </Card>
@@ -1517,95 +1517,95 @@ export default function CreativeEditor() {
           {creativeType === "js_tag" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                   <Code className="w-5 h-5 text-[#F59E0B]" />
                   Third Party JS Tag Settings
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4 p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                <div className="space-y-4 p-4 surface-secondary rounded-lg border border-slate-200">
                   <div className="flex items-center gap-2 mb-2">
                     <Code className="w-5 h-5 text-[#F59E0B]" />
-                    <span className="text-sm font-medium text-[#F8FAFC]">Tag Configuration</span>
+                    <span className="text-sm font-medium text-slate-900">Tag Configuration</span>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Vendor Name</Label>
+                      <Label className="text-slate-600">Vendor Name</Label>
                       <Input
                         value={form.jsTagVendor}
                         onChange={(e) => updateField("jsTagVendor", e.target.value)}
                         placeholder="e.g., Google, Criteo, TTD"
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Tag Type</Label>
+                      <Label className="text-slate-600">Tag Type</Label>
                       <Select value={form.jsTagType} onValueChange={(v) => updateField("jsTagType", v)}>
-                        <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]">
+                        <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="surface-primary border-[#2D3B55] dark:bg-[#0F172A] dark:border-[#334155]">
-                          <SelectItem value="script" className="text-[#F8FAFC]">Script Tag</SelectItem>
-                          <SelectItem value="iframe" className="text-[#F8FAFC]">iFrame Tag</SelectItem>
-                          <SelectItem value="document.write" className="text-[#F8FAFC]">Document.write</SelectItem>
+                        <SelectContent className="surface-primary border-slate-200">
+                          <SelectItem value="script" className="text-slate-900">Script Tag</SelectItem>
+                          <SelectItem value="iframe" className="text-slate-900">iFrame Tag</SelectItem>
+                          <SelectItem value="document.write" className="text-slate-900">Document.write</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Tag URL (Optional)</Label>
+                    <Label className="text-slate-600">Tag URL (Optional)</Label>
                     <Input
                       value={form.jsTagUrl}
                       onChange={(e) => updateField("jsTagUrl", e.target.value)}
                       placeholder="https://ads.example.com/tag.js"
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-primary border-slate-200 text-slate-900"
                     />
-                    <p className="text-xs text-[#64748B]">External URL to the JavaScript file</p>
+                    <p className="text-xs text-slate-500">External URL to the JavaScript file</p>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-[#94A3B8]">Tag Content / Code *</Label>
+                    <Label className="text-slate-600">Tag Content / Code *</Label>
                     <Textarea
                       value={form.jsTagContent}
                       onChange={(e) => updateField("jsTagContent", e.target.value)}
                       placeholder={'<script src="https://ads.example.com/tag.js"></script>\nor inline JavaScript code...'}
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono text-xs h-40 dark:bg-[#0F172A] dark:border-[#334155]"
+                      className="surface-primary border-slate-200 text-slate-900 font-mono text-xs h-40"
                     />
-                    <p className="text-xs text-[#64748B]">Paste the complete tag code provided by the third party</p>
+                    <p className="text-xs text-slate-500">Paste the complete tag code provided by the third party</p>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#2D3B55]">
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200">
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Container Width (px)</Label>
+                      <Label className="text-slate-600">Container Width (px)</Label>
                       <Input
                         type="number"
                         value={form.jsTagWidth}
                         onChange={(e) => updateField("jsTagWidth", parseInt(e.target.value) || 300)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">Container Height (px)</Label>
+                      <Label className="text-slate-600">Container Height (px)</Label>
                       <Input
                         type="number"
                         value={form.jsTagHeight}
                         onChange={(e) => updateField("jsTagHeight", parseInt(e.target.value) || 250)}
-                        className="surface-primary border-[#2D3B55] text-[#F8FAFC] dark:bg-[#0F172A] dark:border-[#334155]"
+                        className="surface-primary border-slate-200 text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[#94A3B8]">HTTPS Secure</Label>
+                      <Label className="text-slate-600">HTTPS Secure</Label>
                       <div className="flex items-center h-10">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={form.jsTagIsSecure}
                             onChange={(e) => updateField("jsTagIsSecure", e.target.checked)}
-                            className="w-4 h-4 rounded border-[#2D3B55] bg-[#0F172A] text-[#10B981]"
+                            className="w-4 h-4 rounded border-slate-200 bg-slate-100 text-[#10B981]"
                           />
-                          <span className="text-sm text-[#94A3B8]">Tag is HTTPS compatible</span>
+                          <span className="text-sm text-slate-600">Tag is HTTPS compatible</span>
                         </label>
                       </div>
                     </div>
@@ -1618,12 +1618,12 @@ export default function CreativeEditor() {
           {/* Impression Pixels */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-[#F8FAFC]">Impression Pixels</CardTitle>
+              <CardTitle className="text-lg text-slate-900">Impression Pixels</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-[#94A3B8]">Add 1x1 tracking pixels for impression counting</p>
+                  <p className="text-sm text-slate-600">Add 1x1 tracking pixels for impression counting</p>
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -1636,26 +1636,26 @@ export default function CreativeEditor() {
                 </div>
 
                 {impressionPixels.length === 0 ? (
-                  <div className="p-6 surface-secondary rounded-lg border border-dashed border-[#2D3B55] text-center">
-                    <MonitorPlay className="w-8 h-8 mx-auto text-[#64748B] mb-2" />
-                    <p className="text-sm text-[#64748B]">No impression pixels added</p>
-                    <p className="text-xs text-[#475569] mt-1">Click "Add Pixel" to add tracking pixels</p>
+                  <div className="p-6 surface-secondary rounded-lg border border-dashed border-slate-200 text-center">
+                    <MonitorPlay className="w-8 h-8 mx-auto text-slate-500 mb-2" />
+                    <p className="text-sm text-slate-500">No impression pixels added</p>
+                    <p className="text-xs text-slate-400 mt-1">Click "Add Pixel" to add tracking pixels</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {impressionPixels.map((pixel, index) => (
-                      <div key={pixel.id} className="p-4 surface-secondary rounded-lg border border-[#2D3B55]">
+                      <div key={pixel.id} className="p-4 surface-secondary rounded-lg border border-slate-200">
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-xs text-[#64748B]">Pixel #{index + 1}</span>
+                          <span className="text-xs text-slate-500">Pixel #{index + 1}</span>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => updateImpressionPixel(pixel.id, 'enabled', !pixel.enabled)}
-                              className="text-[#94A3B8] hover:text-[#F8FAFC]"
+                              className="text-slate-600 hover:text-slate-900"
                             >
                               {pixel.enabled ? (
                                 <ToggleRight className="w-5 h-5 text-[#10B981]" />
                               ) : (
-                                <ToggleLeft className="w-5 h-5 text-[#64748B]" />
+                                <ToggleLeft className="w-5 h-5 text-slate-500" />
                               )}
                             </button>
                             <button
@@ -1669,45 +1669,45 @@ export default function CreativeEditor() {
 
                         <div className="grid grid-cols-2 gap-3 mb-3">
                           <div className="space-y-1">
-                            <Label className="text-xs text-[#64748B]">Pixel Name *</Label>
+                            <Label className="text-xs text-slate-500">Pixel Name *</Label>
                             <Input
                               value={pixel.name}
                               onChange={(e) => updateImpressionPixel(pixel.id, 'name', e.target.value)}
                               placeholder="e.g., DCM Impression"
-                              className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm"
+                              className="surface-primary border-slate-200 text-slate-900 text-sm"
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-[#64748B]">Fire On Event</Label>
+                            <Label className="text-xs text-slate-500">Fire On Event</Label>
                             <Select 
                               value={pixel.event} 
                               onValueChange={(v) => updateImpressionPixel(pixel.id, 'event', v)}
                             >
-                              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC] text-sm">
+                              <SelectTrigger className="surface-primary border-slate-200 text-slate-900 text-sm">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className="surface-primary border-[#2D3B55]">
-                                <SelectItem value="impression" className="text-[#F8FAFC]">Impression</SelectItem>
-                                <SelectItem value="viewable" className="text-[#F8FAFC]">Viewable</SelectItem>
-                                <SelectItem value="click" className="text-[#F8FAFC]">Click</SelectItem>
-                                <SelectItem value="complete" className="text-[#F8FAFC]">Complete</SelectItem>
-                                <SelectItem value="firstQuartile" className="text-[#F8FAFC]">First Quartile (25%)</SelectItem>
-                                <SelectItem value="midpoint" className="text-[#F8FAFC]">Midpoint (50%)</SelectItem>
-                                <SelectItem value="thirdQuartile" className="text-[#F8FAFC]">Third Quartile (75%)</SelectItem>
+                              <SelectContent className="surface-primary border-slate-200">
+                                <SelectItem value="impression" className="text-slate-900">Impression</SelectItem>
+                                <SelectItem value="viewable" className="text-slate-900">Viewable</SelectItem>
+                                <SelectItem value="click" className="text-slate-900">Click</SelectItem>
+                                <SelectItem value="complete" className="text-slate-900">Complete</SelectItem>
+                                <SelectItem value="firstQuartile" className="text-slate-900">First Quartile (25%)</SelectItem>
+                                <SelectItem value="midpoint" className="text-slate-900">Midpoint (50%)</SelectItem>
+                                <SelectItem value="thirdQuartile" className="text-slate-900">Third Quartile (75%)</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <Label className="text-xs text-[#64748B]">Pixel URL *</Label>
+                          <Label className="text-xs text-slate-500">Pixel URL *</Label>
                           <Input
                             value={pixel.url}
                             onChange={(e) => updateImpressionPixel(pixel.id, 'url', e.target.value)}
                             placeholder="https://tracking.example.com/pixel?id=xxx"
-                            className="surface-primary border-[#2D3B55] text-[#F8FAFC] font-mono text-xs"
+                            className="surface-primary border-slate-200 text-slate-900 font-mono text-xs"
                           />
-                          <p className="text-xs text-[#475569]">1x1 pixel URL that fires on the selected event</p>
+                          <p className="text-xs text-slate-400">1x1 pixel URL that fires on the selected event</p>
                         </div>
                       </div>
                     ))}
@@ -1724,7 +1724,7 @@ export default function CreativeEditor() {
           {creativeType !== "video" && creativeType !== "audio" && creativeType !== "js_tag" && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                   <Upload className="w-4 h-4 text-[#3B82F6]" />
                   Image Upload
                 </CardTitle>
@@ -1752,13 +1752,13 @@ export default function CreativeEditor() {
                 
                 {uploadedImages.length > 0 && (
                   <div className="mt-4 space-y-2">
-                    <p className="text-xs text-[#64748B]">Uploaded Images</p>
+                    <p className="text-xs text-slate-500">Uploaded Images</p>
                     {uploadedImages.map((img, idx) => (
                       <div key={idx} className="flex items-center gap-2 p-2 surface-secondary rounded">
                         <img src={img.url} alt="" className="w-10 h-10 object-cover rounded" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-[#F8FAFC] truncate">{img.filename}</p>
-                          <p className="text-[10px] text-[#64748B]">{(img.size / 1024).toFixed(1)} KB</p>
+                          <p className="text-xs text-slate-900 truncate">{img.filename}</p>
+                          <p className="text-[10px] text-slate-500">{(img.size / 1024).toFixed(1)} KB</p>
                         </div>
                         <Button 
                           variant="ghost" 
@@ -1786,7 +1786,7 @@ export default function CreativeEditor() {
           {/* Live Preview */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                 <Eye className="w-4 h-4 text-[#F59E0B]" />
                 Live Preview
               </CardTitle>
@@ -1796,7 +1796,7 @@ export default function CreativeEditor() {
                 {renderPreview()}
               </div>
               <div className="mt-3 flex items-center justify-between text-xs">
-                <span className="text-[#64748B]">
+                <span className="text-slate-500">
                   {creativeType === "banner" ? `${selectedSize.w}x${selectedSize.h}` : creativeType}
                 </span>
                 <Button 
@@ -1815,7 +1815,7 @@ export default function CreativeEditor() {
           {/* Templates */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                 <Palette className="w-4 h-4 text-[#8B5CF6]" />
                 Templates
               </CardTitle>
@@ -1825,11 +1825,11 @@ export default function CreativeEditor() {
                 {TEMPLATES.filter(t => t.type === creativeType).map(template => (
                   <div 
                     key={template.id}
-                    className="p-2 surface-secondary rounded cursor-pointer hover:bg-[#1E293B] transition-colors"
+                    className="p-2 surface-secondary rounded cursor-pointer hover:bg-slate-100 transition-colors"
                     onClick={() => toast.info(`Template "${template.name}" selected`)}
                   >
-                    <p className="text-sm text-[#F8FAFC]">{template.name}</p>
-                    <p className="text-xs text-[#64748B]">{template.description}</p>
+                    <p className="text-sm text-slate-900">{template.name}</p>
+                    <p className="text-xs text-slate-500">{template.description}</p>
                   </div>
                 ))}
               </div>
@@ -1842,7 +1842,7 @@ export default function CreativeEditor() {
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="surface-primary border-panel max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Creative Preview</DialogTitle>
+            <DialogTitle className="text-slate-900">Creative Preview</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center p-8 surface-secondary rounded">
             {renderPreview()}

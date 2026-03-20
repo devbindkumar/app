@@ -7,9 +7,9 @@ import { getMigrationMatrix } from "../lib/api";
 
 function MigrationRow({ field, data }) {
   return (
-    <tr className="border-b border-[#2D3B55] hover:bg-[#151F32]/50 transition-colors">
+    <tr className="border-b border-slate-200 hover:bg-slate-100/50 transition-colors">
       <td className="py-3 px-4">
-        <span className="text-sm font-medium text-[#F8FAFC]">{field}</span>
+        <span className="text-sm font-medium text-slate-900">{field}</span>
       </td>
       <td className="py-3 px-4">
         <code className="text-xs font-mono bg-[#F59E0B]/10 text-[#F59E0B] px-2 py-1 rounded">
@@ -17,7 +17,7 @@ function MigrationRow({ field, data }) {
         </code>
       </td>
       <td className="py-3 px-4 text-center">
-        <ArrowRight className="w-4 h-4 text-[#64748B] inline" />
+        <ArrowRight className="w-4 h-4 text-slate-500 inline" />
       </td>
       <td className="py-3 px-4">
         <code className="text-xs font-mono bg-[#3B82F6]/10 text-[#3B82F6] px-2 py-1 rounded">
@@ -31,13 +31,13 @@ function MigrationRow({ field, data }) {
               <Badge 
                 key={k} 
                 variant="outline" 
-                className="text-[10px] bg-[#151F32] text-[#94A3B8] border-[#2D3B55]"
+                className="text-[10px] bg-slate-100 text-slate-600 border-slate-200"
               >
                 {k}→{v}
               </Badge>
             ))}
             {Object.entries(data.mapping).length > 3 && (
-              <Badge variant="outline" className="text-[10px] bg-[#151F32] text-[#64748B] border-[#2D3B55]">
+              <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-500 border-slate-200">
                 +{Object.entries(data.mapping).length - 3}
               </Badge>
             )}
@@ -71,8 +71,8 @@ export default function MigrationMatrix() {
     <div className="p-6" data-testid="migration-matrix-page">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#F8FAFC]">OpenRTB Migration Matrix</h1>
-        <p className="text-sm text-[#94A3B8] mt-1">
+        <h1 className="text-3xl font-bold text-slate-900">OpenRTB Migration Matrix</h1>
+        <p className="text-sm text-slate-600 mt-1">
           Field mappings between OpenRTB 2.5 and 2.6 specifications
         </p>
       </div>
@@ -86,8 +86,8 @@ export default function MigrationMatrix() {
                 <span className="text-[#F59E0B] font-bold">2.5</span>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[#F8FAFC]">OpenRTB 2.5</h3>
-                <p className="text-xs text-[#64748B]">Legacy specification with extension-based fields</p>
+                <h3 className="text-sm font-semibold text-slate-900">OpenRTB 2.5</h3>
+                <p className="text-xs text-slate-500">Legacy specification with extension-based fields</p>
               </div>
             </div>
           </CardContent>
@@ -99,8 +99,8 @@ export default function MigrationMatrix() {
                 <span className="text-[#3B82F6] font-bold">2.6</span>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[#F8FAFC]">OpenRTB 2.6</h3>
-                <p className="text-xs text-[#64748B]">Modern spec with native ad pod & privacy support</p>
+                <h3 className="text-sm font-semibold text-slate-900">OpenRTB 2.6</h3>
+                <p className="text-xs text-slate-500">Modern spec with native ad pod & privacy support</p>
               </div>
             </div>
           </CardContent>
@@ -109,22 +109,22 @@ export default function MigrationMatrix() {
 
       {/* Migration Table */}
       <Card className="surface-primary border-panel">
-        <CardHeader className="border-b border-[#2D3B55]">
+        <CardHeader className="border-b border-slate-200">
           <div className="flex items-center gap-2">
             <ArrowLeftRight className="w-5 h-5 text-[#3B82F6]" />
-            <CardTitle className="text-lg text-[#F8FAFC]">Field Migration Reference</CardTitle>
+            <CardTitle className="text-lg text-slate-900">Field Migration Reference</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="text-[#64748B]">Loading migration matrix...</div>
+              <div className="text-slate-500">Loading migration matrix...</div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full data-table">
                 <thead>
-                  <tr className="border-b border-[#2D3B55]">
+                  <tr className="border-b border-slate-200">
                     <th className="text-left">Field</th>
                     <th className="text-left">
                       <Badge variant="outline" className="version-badge version-2-5">v2.5</Badge>
@@ -151,8 +151,8 @@ export default function MigrationMatrix() {
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="surface-primary border-panel">
           <CardContent className="p-4">
-            <h4 className="text-sm font-semibold text-[#F8FAFC] mb-2">Video Placement</h4>
-            <p className="text-xs text-[#94A3B8]">
+            <h4 className="text-sm font-semibold text-slate-900 mb-2">Video Placement</h4>
+            <p className="text-xs text-slate-600">
               <code className="text-[#F59E0B]">video.placement</code> (2.5) replaced by 
               <code className="text-[#3B82F6]"> video.plcmt</code> (2.6) with simplified values: 
               Instream, Accompanying, Interstitial, No-Content.
@@ -161,8 +161,8 @@ export default function MigrationMatrix() {
         </Card>
         <Card className="surface-primary border-panel">
           <CardContent className="p-4">
-            <h4 className="text-sm font-semibold text-[#F8FAFC] mb-2">Privacy Fields</h4>
-            <p className="text-xs text-[#94A3B8]">
+            <h4 className="text-sm font-semibold text-slate-900 mb-2">Privacy Fields</h4>
+            <p className="text-xs text-slate-600">
               GDPR, US Privacy, and consent strings moved from <code className="text-[#F59E0B]">*.ext</code> to 
               root-level fields in 2.6 for standardization.
             </p>
@@ -170,8 +170,8 @@ export default function MigrationMatrix() {
         </Card>
         <Card className="surface-primary border-panel">
           <CardContent className="p-4">
-            <h4 className="text-sm font-semibold text-[#F8FAFC] mb-2">Ad Pod Support</h4>
-            <p className="text-xs text-[#94A3B8]">
+            <h4 className="text-sm font-semibold text-slate-900 mb-2">Ad Pod Support</h4>
+            <p className="text-xs text-slate-600">
               2.6 introduces <code className="text-[#3B82F6]">podid</code>, 
               <code className="text-[#3B82F6]"> podseq</code>, 
               <code className="text-[#3B82F6]"> slotinpod</code> for CTV ad pod targeting.

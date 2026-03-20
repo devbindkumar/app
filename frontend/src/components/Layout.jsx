@@ -96,7 +96,7 @@ export default function Layout() {
       case "super_admin": return "bg-[#F59E0B]/20 text-[#F59E0B]";
       case "admin": return "bg-[#10B981]/20 text-[#10B981]";
       case "advertiser": return "bg-[#3B82F6]/20 text-[#3B82F6]";
-      default: return "bg-[#64748B]/20 text-[#64748B]";
+      default: return "bg-[#64748B]/20 text-slate-500";
     }
   };
 

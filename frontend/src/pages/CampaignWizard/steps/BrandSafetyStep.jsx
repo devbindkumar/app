@@ -9,8 +9,8 @@ export function BrandSafetyStep({ form, updateField }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Brand Safety</h2>
-        <p className="text-sm text-[#64748B]">Configure brand safety controls and content exclusions</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Brand Safety</h2>
+        <p className="text-sm text-slate-500">Configure brand safety controls and content exclusions</p>
       </div>
 
       {/* Safety Level */}
@@ -27,11 +27,11 @@ export function BrandSafetyStep({ form, updateField }) {
                 className={`p-4 rounded-lg cursor-pointer border transition-all ${
                   form.brand_safety_level === level.value
                     ? "bg-[#3B82F6]/20 border-[#3B82F6]"
-                    : "surface-primary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                    : "surface-primary border-slate-200 hover:border-[#3B82F6]/50"
                 }`}
               >
-                <p className="text-sm font-medium text-[#F8FAFC]">{level.label}</p>
-                <p className="text-xs text-[#64748B] mt-1">{level.desc}</p>
+                <p className="text-sm font-medium text-slate-900">{level.label}</p>
+                <p className="text-xs text-slate-500 mt-1">{level.desc}</p>
               </div>
             ))}
           </div>
@@ -42,7 +42,7 @@ export function BrandSafetyStep({ form, updateField }) {
       <Card className="surface-secondary border-[#EF4444]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#EF4444]">Blocked Content Categories</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Select categories to exclude from ad placements
           </CardDescription>
         </CardHeader>
@@ -55,7 +55,7 @@ export function BrandSafetyStep({ form, updateField }) {
                 className={`cursor-pointer ${
                   form.blocked_categories.includes(cat)
                     ? "bg-[#EF4444]/20 text-[#EF4444]"
-                    : "bg-[#1E293B] text-[#64748B] hover:bg-[#EF4444]/10"
+                    : "bg-slate-100 text-slate-500 hover:bg-[#EF4444]/10"
                 }`}
                 onClick={() => {
                   const cats = form.blocked_categories.includes(cat)
@@ -75,14 +75,14 @@ export function BrandSafetyStep({ form, updateField }) {
       <Card className="surface-secondary border-[#F59E0B]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#F59E0B]">Blocked Keywords</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Ads will not appear on pages containing these keywords
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Input
             placeholder="Enter keyword and press Enter"
-            className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+            className="surface-primary border-slate-200 text-slate-900"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.target.value.trim()) {
                 const keyword = e.target.value.trim().toLowerCase();
@@ -110,14 +110,14 @@ export function BrandSafetyStep({ form, updateField }) {
       <Card className="surface-secondary border-[#8B5CF6]/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-[#8B5CF6]">Blocked Domains</CardTitle>
-          <CardDescription className="text-xs text-[#64748B]">
+          <CardDescription className="text-xs text-slate-500">
             Ads will not appear on these domains
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Input
             placeholder="Enter domain and press Enter (e.g., example.com)"
-            className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+            className="surface-primary border-slate-200 text-slate-900"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.target.value.trim()) {
                 const domain = e.target.value.trim().toLowerCase();
@@ -142,15 +142,15 @@ export function BrandSafetyStep({ form, updateField }) {
       </Card>
 
       {/* Additional Controls */}
-      <Card className="surface-secondary border-[#2D3B55]">
+      <Card className="surface-secondary border-slate-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-[#F8FAFC]">Additional Controls</CardTitle>
+          <CardTitle className="text-sm text-slate-900">Additional Controls</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[#F8FAFC]">Exclude User-Generated Content</p>
-              <p className="text-xs text-[#64748B]">Avoid placements on UGC platforms like forums, comments</p>
+              <p className="text-sm text-slate-900">Exclude User-Generated Content</p>
+              <p className="text-xs text-slate-500">Avoid placements on UGC platforms like forums, comments</p>
             </div>
             <Switch
               checked={form.exclude_ugc}
@@ -159,8 +159,8 @@ export function BrandSafetyStep({ form, updateField }) {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[#F8FAFC]">Exclude Live Streaming Content</p>
-              <p className="text-xs text-[#64748B]">Avoid placements in live streams and live events</p>
+              <p className="text-sm text-slate-900">Exclude Live Streaming Content</p>
+              <p className="text-xs text-slate-500">Avoid placements in live streams and live events</p>
             </div>
             <Switch
               checked={form.exclude_live_streaming}

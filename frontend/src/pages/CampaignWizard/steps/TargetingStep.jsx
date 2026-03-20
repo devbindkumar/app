@@ -43,7 +43,7 @@ function BulkInputSection({ title, items, onAdd, onRemove, placeholder, type = "
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-[#94A3B8]">{title}</Label>
+        <Label className="text-slate-600">{title}</Label>
         <Button
           variant="ghost"
           size="sm"
@@ -61,7 +61,7 @@ function BulkInputSection({ title, items, onAdd, onRemove, placeholder, type = "
             value={bulkInput}
             onChange={(e) => setBulkInput(e.target.value)}
             placeholder={`Paste ${placeholder} (comma or newline separated)`}
-            className="w-full h-24 p-2 rounded surface-primary border border-[#2D3B55] text-[#F8FAFC] text-sm"
+            className="w-full h-24 p-2 rounded surface-primary border border-slate-200 text-slate-900 text-sm"
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={handleBulkAdd} className={`bg-[#${colorClass}]`}>
@@ -75,7 +75,7 @@ function BulkInputSection({ title, items, onAdd, onRemove, placeholder, type = "
       ) : (
         <Input
           placeholder={`Enter ${placeholder} and press Enter`}
-          className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+          className="surface-primary border-slate-200 text-slate-900"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && e.target.value.trim()) {
               const val = e.target.value.trim();
@@ -155,7 +155,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
     <div className="space-y-4">
       {/* Countries */}
       <div className="space-y-2">
-        <Label className="text-[#94A3B8]">Countries</Label>
+        <Label className="text-slate-600">Countries</Label>
         <Select 
           onValueChange={(v) => {
             if (v && !countries.includes(v)) {
@@ -167,12 +167,12 @@ function GeoSelector({ form, updateField, type = "include" }) {
             }
           }}
         >
-          <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+          <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
             <SelectValue placeholder={`Select country to ${type}`} />
           </SelectTrigger>
-          <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+          <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
             {COUNTRIES.map((country) => (
-              <SelectItem key={country.code} value={country.code} className="text-[#F8FAFC]">
+              <SelectItem key={country.code} value={country.code} className="text-slate-900">
                 {country.name}
               </SelectItem>
             ))}
@@ -193,7 +193,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
       {/* States */}
       {availableStates.length > 0 && (
         <div className="space-y-2">
-          <Label className="text-[#94A3B8]">States / Regions</Label>
+          <Label className="text-slate-600">States / Regions</Label>
           <Select onValueChange={(v) => {
             if (v && !states.includes(v)) {
               updateField(statesField, [...states, v]);
@@ -203,12 +203,12 @@ function GeoSelector({ form, updateField, type = "include" }) {
               }
             }
           }}>
-            <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+            <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
               <SelectValue placeholder="Select state/region" />
             </SelectTrigger>
-            <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+            <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
               {availableStates.map((state) => (
-                <SelectItem key={state} value={state} className="text-[#F8FAFC]">{state}</SelectItem>
+                <SelectItem key={state} value={state} className="text-slate-900">{state}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -228,7 +228,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
       {/* Cities - With Tier Classification for India */}
       {hasAvailableCities && (
         <div className="space-y-2">
-          <Label className="text-[#94A3B8]">
+          <Label className="text-slate-600">
             Cities {countries[0] === "IND" && states.length > 0 && `(${states.join(", ")})`}
           </Label>
           
@@ -245,7 +245,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
                     }`}>
                       {tierGroup.tier}
                     </span>
-                    {tierGroup.state && <span className="text-xs text-[#64748B]">({tierGroup.state})</span>}
+                    {tierGroup.state && <span className="text-xs text-slate-500">({tierGroup.state})</span>}
                     <Button 
                       size="sm" 
                       variant="ghost" 
@@ -265,7 +265,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
                         <Badge 
                           key={city} 
                           variant="secondary" 
-                          className={`cursor-pointer ${isSelected ? `bg-[#${colorClass}]/20 text-[#${colorClass}]` : "bg-[#1E293B] text-[#94A3B8] hover:bg-[#2D3B55]"}`}
+                          className={`cursor-pointer ${isSelected ? `bg-[#${colorClass}]/20 text-[#${colorClass}]` : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
                           onClick={() => {
                             if (isSelected) {
                               updateField(citiesField, cities.filter(c => c !== city));
@@ -290,12 +290,12 @@ function GeoSelector({ form, updateField, type = "include" }) {
                 updateField(citiesField, [...cities, v]);
               }
             }}>
-              <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+              <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                 <SelectValue placeholder="Select city" />
               </SelectTrigger>
-              <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+              <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
                 {availableCitiesByTier[0]?.cities.map((city) => (
-                  <SelectItem key={city} value={city} className="text-[#F8FAFC]">{city}</SelectItem>
+                  <SelectItem key={city} value={city} className="text-slate-900">{city}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -303,7 +303,7 @@ function GeoSelector({ form, updateField, type = "include" }) {
           
           {cities.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              <span className="text-xs text-[#64748B]">Selected ({cities.length}):</span>
+              <span className="text-xs text-slate-500">Selected ({cities.length}):</span>
               {cities.map((city) => (
                 <Badge key={city} variant="secondary" className={`bg-[#${colorClass}]/20 text-[#${colorClass}]`}>
                   {city}
@@ -355,12 +355,12 @@ export function TargetingStep({ form, updateField }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Targeting</h2>
-        <p className="text-sm text-[#64748B]">Define geographic, device, inventory, and technical targeting</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Targeting</h2>
+        <p className="text-sm text-slate-500">Define geographic, device, inventory, and technical targeting</p>
       </div>
 
       <Tabs defaultValue="geo" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 bg-[#0A0F1C]">
+        <TabsList className="grid w-full grid-cols-6 bg-slate-50">
           <TabsTrigger value="geo" className="data-[state=active]:bg-[#3B82F6] text-xs">Geography</TabsTrigger>
           <TabsTrigger value="device" className="data-[state=active]:bg-[#3B82F6] text-xs">Device</TabsTrigger>
           <TabsTrigger value="inventory" className="data-[state=active]:bg-[#3B82F6] text-xs">Inventory</TabsTrigger>
@@ -408,7 +408,7 @@ export function TargetingStep({ form, updateField }) {
                       className={`cursor-pointer ${
                         form.telecom_operators.includes(op)
                           ? "bg-[#8B5CF6]/20 text-[#8B5CF6]"
-                          : "bg-[#1E293B] text-[#64748B] hover:bg-[#8B5CF6]/10"
+                          : "bg-slate-100 text-slate-500 hover:bg-[#8B5CF6]/10"
                       }`}
                       onClick={() => {
                         const ops = form.telecom_operators.includes(op)
@@ -442,41 +442,41 @@ export function TargetingStep({ form, updateField }) {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-4 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-[#94A3B8] text-xs">Latitude</Label>
+                    <Label className="text-slate-600 text-xs">Latitude</Label>
                     <NumberInput
                       step="0.0001"
                       value={form.geo_latitude}
                       onChange={(e) => updateField("geo_latitude", e.target.value)}
                       placeholder="e.g. 40.7128"
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      className="surface-primary border-slate-200 text-slate-900"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[#94A3B8] text-xs">Longitude</Label>
+                    <Label className="text-slate-600 text-xs">Longitude</Label>
                     <NumberInput
                       step="0.0001"
                       value={form.geo_longitude}
                       onChange={(e) => updateField("geo_longitude", e.target.value)}
                       placeholder="e.g. -74.0060"
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      className="surface-primary border-slate-200 text-slate-900"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[#94A3B8] text-xs">Radius (km)</Label>
+                    <Label className="text-slate-600 text-xs">Radius (km)</Label>
                     <NumberInput
                       value={form.radius_km}
                       onChange={(e) => updateField("radius_km", parseInt(e.target.value) || 10)}
-                      className="surface-primary border-[#2D3B55] text-[#F8FAFC]"
+                      className="surface-primary border-slate-200 text-slate-900"
                       min={1}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[#94A3B8] text-xs">Type</Label>
+                    <Label className="text-slate-600 text-xs">Type</Label>
                     <Select value={form.lat_long_type} onValueChange={(v) => updateField("lat_long_type", v)}>
-                      <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                      <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="surface-primary border-[#2D3B55]">
+                      <SelectContent className="surface-primary border-slate-200">
                         <SelectItem value="include">Include</SelectItem>
                         <SelectItem value="exclude">Exclude</SelectItem>
                       </SelectContent>
@@ -497,7 +497,7 @@ export function TargetingStep({ form, updateField }) {
                       <div key={point.id} className={`flex items-center justify-between p-2 rounded ${
                         point.type === "include" ? "bg-[#10B981]/10" : "bg-[#EF4444]/10"
                       }`}>
-                        <span className="text-sm text-[#F8FAFC]">
+                        <span className="text-sm text-slate-900">
                           {point.lat.toFixed(4)}, {point.lon.toFixed(4)} ({point.radius_km}km) - {point.type}
                         </span>
                         <Button
@@ -539,11 +539,11 @@ export function TargetingStep({ form, updateField }) {
                       className={`p-4 rounded-lg cursor-pointer border text-center ${
                         isSelected
                           ? "bg-[#3B82F6]/20 border-[#3B82F6]"
-                          : "surface-primary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                          : "surface-primary border-slate-200 hover:border-[#3B82F6]/50"
                       }`}
                     >
-                      <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? "text-[#3B82F6]" : "text-[#64748B]"}`} />
-                      <p className="text-sm text-[#F8FAFC]">{device.label}</p>
+                      <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? "text-[#3B82F6]" : "text-slate-500"}`} />
+                      <p className="text-sm text-slate-900">{device.label}</p>
                     </div>
                   );
                 })}
@@ -564,7 +564,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.os_list.includes(os.value)
                         ? "bg-[#10B981]/20 text-[#10B981]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#10B981]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#10B981]/10"
                     }`}
                     onClick={() => {
                       const list = form.os_list.includes(os.value)
@@ -581,7 +581,7 @@ export function TargetingStep({ form, updateField }) {
               {/* OS Versions */}
               {availableOSVersions.length > 0 && (
                 <div className="space-y-2">
-                  <Label className="text-[#94A3B8]">OS Versions</Label>
+                  <Label className="text-slate-600">OS Versions</Label>
                   <div className="flex flex-wrap gap-2">
                     {availableOSVersions.map((version) => (
                       <Badge
@@ -590,7 +590,7 @@ export function TargetingStep({ form, updateField }) {
                         className={`cursor-pointer ${
                           form.os_versions.includes(version)
                             ? "bg-[#10B981]/20 text-[#10B981]"
-                            : "bg-[#1E293B] text-[#64748B] hover:bg-[#10B981]/10"
+                            : "bg-slate-100 text-slate-500 hover:bg-[#10B981]/10"
                         }`}
                         onClick={() => {
                           const versions = form.os_versions.includes(version)
@@ -622,7 +622,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.connection_types.includes(speed.value)
                         ? "bg-[#8B5CF6]/20 text-[#8B5CF6]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#8B5CF6]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#8B5CF6]/10"
                     }`}
                     onClick={() => {
                       const types = form.connection_types.includes(speed.value)
@@ -644,7 +644,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#10B981]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#10B981]">Domain/URL Allowlist</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Only bid on these domains</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Only bid on these domains</CardDescription>
             </CardHeader>
             <CardContent>
               <BulkInputSection
@@ -661,7 +661,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#EF4444]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#EF4444]">Domain/URL Blocklist</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Never bid on these domains</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Never bid on these domains</CardDescription>
             </CardHeader>
             <CardContent>
               <BulkInputSection
@@ -678,7 +678,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#10B981]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#10B981]">App Allowlist</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Only bid on these app bundle IDs</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Only bid on these app bundle IDs</CardDescription>
             </CardHeader>
             <CardContent>
               <BulkInputSection
@@ -695,7 +695,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#EF4444]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#EF4444]">App Blocklist</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Never bid on these apps</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Never bid on these apps</CardDescription>
             </CardHeader>
             <CardContent>
               <BulkInputSection
@@ -717,7 +717,7 @@ export function TargetingStep({ form, updateField }) {
             <CardContent className="space-y-4">
               {/* Display Placements */}
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Display Placements (Include)</Label>
+                <Label className="text-slate-600">Display Placements (Include)</Label>
                 <div className="flex flex-wrap gap-2">
                   {AD_PLACEMENTS_DISPLAY.map((p) => (
                     <Badge
@@ -726,7 +726,7 @@ export function TargetingStep({ form, updateField }) {
                       className={`cursor-pointer ${
                         form.ad_placements_display_include.includes(p.value)
                           ? "bg-[#10B981]/20 text-[#10B981]"
-                          : "bg-[#1E293B] text-[#64748B]"
+                          : "bg-slate-100 text-slate-500"
                       }`}
                       onClick={() => {
                         const list = form.ad_placements_display_include.includes(p.value)
@@ -743,7 +743,7 @@ export function TargetingStep({ form, updateField }) {
 
               {/* Native Placements */}
               <div className="space-y-2">
-                <Label className="text-[#94A3B8]">Native Placements (Include)</Label>
+                <Label className="text-slate-600">Native Placements (Include)</Label>
                 <div className="flex flex-wrap gap-2">
                   {AD_PLACEMENTS_NATIVE.map((p) => (
                     <Badge
@@ -752,7 +752,7 @@ export function TargetingStep({ form, updateField }) {
                       className={`cursor-pointer ${
                         form.ad_placements_native_include.includes(p.value)
                           ? "bg-[#10B981]/20 text-[#10B981]"
-                          : "bg-[#1E293B] text-[#64748B]"
+                          : "bg-slate-100 text-slate-500"
                       }`}
                       onClick={() => {
                         const list = form.ad_placements_native_include.includes(p.value)
@@ -775,7 +775,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#10B981]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#10B981]">Include SSPs/Exchanges</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Only bid through these supply sources</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Only bid through these supply sources</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -786,7 +786,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.supply_sources_include.includes(ssp)
                         ? "bg-[#10B981]/20 text-[#10B981]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#10B981]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#10B981]/10"
                     }`}
                     onClick={() => {
                       const list = form.supply_sources_include.includes(ssp)
@@ -805,7 +805,7 @@ export function TargetingStep({ form, updateField }) {
           <Card className="surface-secondary border-[#EF4444]/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-[#EF4444]">Exclude SSPs/Exchanges</CardTitle>
-              <CardDescription className="text-xs text-[#64748B]">Never bid through these supply sources</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Never bid through these supply sources</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -816,7 +816,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.supply_sources_exclude.includes(ssp)
                         ? "bg-[#EF4444]/20 text-[#EF4444]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#EF4444]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#EF4444]/10"
                     }`}
                     onClick={() => {
                       const list = form.supply_sources_exclude.includes(ssp)
@@ -849,12 +849,12 @@ export function TargetingStep({ form, updateField }) {
                 type="include"
               />
               <div className="mt-4 space-y-2">
-                <Label className="text-[#94A3B8]">Keyword Match Type</Label>
+                <Label className="text-slate-600">Keyword Match Type</Label>
                 <Select value={form.keyword_match_type} onValueChange={(v) => updateField("keyword_match_type", v)}>
-                  <SelectTrigger className="surface-primary border-[#2D3B55] text-[#F8FAFC]">
+                  <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="surface-primary border-[#2D3B55]">
+                  <SelectContent className="surface-primary border-slate-200">
                     <SelectItem value="broad">Broad Match</SelectItem>
                     <SelectItem value="phrase">Phrase Match</SelectItem>
                     <SelectItem value="exact">Exact Match</SelectItem>
@@ -880,7 +880,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.browsers_include.includes(browser)
                         ? "bg-[#10B981]/20 text-[#10B981]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#10B981]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#10B981]/10"
                     }`}
                     onClick={() => {
                       const list = form.browsers_include.includes(browser)
@@ -909,7 +909,7 @@ export function TargetingStep({ form, updateField }) {
                     className={`cursor-pointer ${
                       form.browsers_exclude.includes(browser)
                         ? "bg-[#EF4444]/20 text-[#EF4444]"
-                        : "bg-[#1E293B] text-[#64748B] hover:bg-[#EF4444]/10"
+                        : "bg-slate-100 text-slate-500 hover:bg-[#EF4444]/10"
                     }`}
                     onClick={() => {
                       const list = form.browsers_exclude.includes(browser)

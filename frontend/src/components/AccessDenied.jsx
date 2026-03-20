@@ -21,13 +21,13 @@ export function AccessDenied({
             <ShieldX className="w-8 h-8 text-[#EF4444]" />
           </div>
           
-          <h2 className="text-xl font-bold text-[#F8FAFC] mb-2">{title}</h2>
-          <p className="text-sm text-[#64748B] mb-6">{message}</p>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">{title}</h2>
+          <p className="text-sm text-slate-500 mb-6">{message}</p>
           
           {user && (
-            <div className="p-3 rounded-lg bg-[#0B1221] border border-[#2D3B55] mb-6">
-              <p className="text-xs text-[#64748B]">Current Role</p>
-              <p className="text-sm text-[#F8FAFC] font-medium capitalize">
+            <div className="p-3 rounded-lg bg-white border border-slate-200 mb-6">
+              <p className="text-xs text-slate-500">Current Role</p>
+              <p className="text-sm text-slate-900 font-medium capitalize">
                 {user.role?.replace("_", " ")}
               </p>
             </div>
@@ -38,7 +38,7 @@ export function AccessDenied({
               <Button
                 variant="outline"
                 onClick={() => navigate(-1)}
-                className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+                className="border-slate-200 text-slate-600 hover:text-slate-900"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Back

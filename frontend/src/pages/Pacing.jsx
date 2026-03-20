@@ -59,8 +59,8 @@ function CampaignPacingCard({ campaign, onReset }) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-[#F8FAFC]">{campaign.campaign_name}</h3>
-            <p className="text-xs text-[#64748B] font-mono mt-1">
+            <h3 className="text-sm font-semibold text-slate-900">{campaign.campaign_name}</h3>
+            <p className="text-xs text-slate-500 font-mono mt-1">
               {campaign.hours_remaining}h remaining today
             </p>
           </div>
@@ -70,40 +70,40 @@ function CampaignPacingCard({ campaign, onReset }) {
         {/* Budget Progress */}
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-xs">
-            <span className="text-[#64748B]">Daily Budget Progress</span>
-            <span className="text-[#F8FAFC] font-mono">
+            <span className="text-slate-500">Daily Budget Progress</span>
+            <span className="text-slate-900 font-mono">
               ${campaign.daily_spend?.toFixed(2)} / ${campaign.daily_budget?.toFixed(2)}
             </span>
           </div>
-          <div className="h-2 bg-[#151F32] rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div 
               className={`h-full ${progressColor} transition-all duration-300`}
               style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>
-          <div className="flex justify-between text-[10px] text-[#64748B]">
+          <div className="flex justify-between text-[10px] text-slate-500">
             <span>Actual: {campaign.pacing_percentage?.toFixed(1)}%</span>
             <span>Ideal: {campaign.ideal_percentage?.toFixed(1)}%</span>
           </div>
         </div>
         
         {/* Bid Shading Info */}
-        <div className="pt-3 border-t border-[#2D3B55] flex items-center justify-between">
+        <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
           <div>
-            <p className="text-[10px] text-[#64748B] uppercase">Bid Shading</p>
+            <p className="text-[10px] text-slate-500 uppercase">Bid Shading</p>
             {campaign.bid_shading_enabled ? (
               <p className="text-sm font-mono text-[#3B82F6]">
                 {(campaign.current_shade_factor * 100).toFixed(0)}% of bid
               </p>
             ) : (
-              <p className="text-sm text-[#64748B]">Disabled</p>
+              <p className="text-sm text-slate-500">Disabled</p>
             )}
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onReset(campaign.campaign_id)}
-            className="text-[#64748B] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+            className="text-slate-500 hover:text-slate-900 hover:bg-slate-100"
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -168,11 +168,11 @@ export default function Pacing() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Budget Pacing</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Budget Pacing</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Monitor and control campaign spend distribution
             {pacingData && (
-              <span className="ml-2 text-[#64748B]">
+              <span className="ml-2 text-slate-500">
                 Current hour: {pacingData.current_hour}:00 UTC
               </span>
             )}
@@ -182,7 +182,7 @@ export default function Pacing() {
           <Button 
             variant="outline"
             onClick={fetchData}
-            className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+            className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
@@ -200,14 +200,14 @@ export default function Pacing() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading pacing status...</div>
+          <div className="text-slate-500">Loading pacing status...</div>
         </div>
       ) : campaigns.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="empty-state py-16">
             <Gauge className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No active campaigns</h3>
-            <p className="text-sm text-[#94A3B8]">Activate campaigns to monitor their pacing</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No active campaigns</h3>
+            <p className="text-sm text-slate-600">Activate campaigns to monitor their pacing</p>
           </CardContent>
         </Card>
       ) : (
@@ -222,7 +222,7 @@ export default function Pacing() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-[#10B981]">{onTrack.length}</p>
-                    <p className="text-xs text-[#64748B]">On Track / Unlimited</p>
+                    <p className="text-xs text-slate-500">On Track / Unlimited</p>
                   </div>
                 </div>
               </CardContent>
@@ -236,7 +236,7 @@ export default function Pacing() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-[#EF4444]">{overpacing.length}</p>
-                    <p className="text-xs text-[#64748B]">Overpacing</p>
+                    <p className="text-xs text-slate-500">Overpacing</p>
                   </div>
                 </div>
               </CardContent>
@@ -250,7 +250,7 @@ export default function Pacing() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-[#F59E0B]">{underpacing.length}</p>
-                    <p className="text-xs text-[#64748B]">Underpacing</p>
+                    <p className="text-xs text-slate-500">Underpacing</p>
                   </div>
                 </div>
               </CardContent>
@@ -265,7 +265,7 @@ export default function Pacing() {
                   <AlertTriangle className="w-5 h-5 text-[#EF4444] mt-0.5" />
                   <div>
                     <h4 className="text-sm font-semibold text-[#EF4444]">Overpacing Alert</h4>
-                    <p className="text-xs text-[#94A3B8] mt-1">
+                    <p className="text-xs text-slate-600 mt-1">
                       {overpacing.length} campaign(s) are spending faster than the daily budget allows. 
                       Consider pausing or reducing bid prices.
                     </p>
@@ -299,13 +299,13 @@ export default function Pacing() {
       <AlertDialog open={showResetAll} onOpenChange={setShowResetAll}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Reset All Daily Spend</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Reset All Daily Spend</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               This will reset the daily spend counter for all campaigns. Use this at the start of a new day or for testing.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]">
+            <AlertDialogCancel className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 

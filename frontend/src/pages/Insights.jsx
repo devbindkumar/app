@@ -86,7 +86,7 @@ export default function Insights() {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Analyzing campaigns...</div>
+        <div className="text-slate-500">Analyzing campaigns...</div>
       </div>
     );
   }
@@ -96,8 +96,8 @@ export default function Insights() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Campaign Insights</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Campaign Insights</h1>
+          <p className="text-sm text-slate-600 mt-1">
             AI-powered analysis and recommendations for your campaigns
           </p>
         </div>
@@ -119,8 +119,8 @@ export default function Insights() {
               <Target className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Campaigns</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{insights?.total_campaigns || 0}</p>
+              <p className="text-xs text-slate-500">Total Campaigns</p>
+              <p className="text-xl font-bold text-slate-900">{insights?.total_campaigns || 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -130,7 +130,7 @@ export default function Insights() {
               <CheckCircle className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Healthy</p>
+              <p className="text-xs text-slate-500">Healthy</p>
               <p className="text-xl font-bold text-[#10B981]">{insights?.overall_health?.healthy || 0}</p>
             </div>
           </CardContent>
@@ -141,7 +141,7 @@ export default function Insights() {
               <AlertTriangle className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Warning</p>
+              <p className="text-xs text-slate-500">Warning</p>
               <p className="text-xl font-bold text-[#F59E0B]">{insights?.overall_health?.warning || 0}</p>
             </div>
           </CardContent>
@@ -152,7 +152,7 @@ export default function Insights() {
               <AlertCircle className="w-5 h-5 text-[#EF4444]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Critical</p>
+              <p className="text-xs text-slate-500">Critical</p>
               <p className="text-xl font-bold text-[#EF4444]">{insights?.overall_health?.critical || 0}</p>
             </div>
           </CardContent>
@@ -171,23 +171,23 @@ export default function Insights() {
                 <div className="flex items-center gap-3">
                   {getHealthIcon(insight.health_status)}
                   <div>
-                    <CardTitle className="text-lg text-[#F8FAFC]">{insight.campaign_name}</CardTitle>
+                    <CardTitle className="text-lg text-slate-900">{insight.campaign_name}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="outline" className={getHealthColor(insight.health_status)}>
                         {insight.health_status.toUpperCase()}
                       </Badge>
-                      <Badge variant="outline" className="text-[#64748B] border-[#2D3B55]">
+                      <Badge variant="outline" className="text-slate-500 border-slate-200">
                         Score: {insight.health_score}/100
                       </Badge>
-                      <Badge variant="outline" className="text-[#64748B] border-[#2D3B55]">
+                      <Badge variant="outline" className="text-slate-500 border-slate-200">
                         {insight.status}
                       </Badge>
                     </div>
                   </div>
                 </div>
                 <div className="text-right text-sm">
-                  <p className="text-[#F8FAFC] font-mono">{insight.metrics.win_rate}% win rate</p>
-                  <p className="text-[#64748B]">{insight.metrics.bids} bids / {insight.metrics.wins} wins</p>
+                  <p className="text-slate-900 font-mono">{insight.metrics.win_rate}% win rate</p>
+                  <p className="text-slate-500">{insight.metrics.bids} bids / {insight.metrics.wins} wins</p>
                 </div>
               </div>
             </CardHeader>
@@ -195,31 +195,31 @@ export default function Insights() {
               {/* Metrics Row */}
               <div className="grid grid-cols-5 gap-3">
                 <div className="surface-secondary p-3 rounded">
-                  <p className="text-xs text-[#64748B]">Impressions</p>
-                  <p className="text-lg font-mono text-[#F8FAFC]">{insight.metrics.impressions.toLocaleString()}</p>
+                  <p className="text-xs text-slate-500">Impressions</p>
+                  <p className="text-lg font-mono text-slate-900">{insight.metrics.impressions.toLocaleString()}</p>
                 </div>
                 <div className="surface-secondary p-3 rounded">
-                  <p className="text-xs text-[#64748B]">Clicks</p>
-                  <p className="text-lg font-mono text-[#F8FAFC]">{insight.metrics.clicks.toLocaleString()}</p>
+                  <p className="text-xs text-slate-500">Clicks</p>
+                  <p className="text-lg font-mono text-slate-900">{insight.metrics.clicks.toLocaleString()}</p>
                 </div>
                 <div className="surface-secondary p-3 rounded">
-                  <p className="text-xs text-[#64748B]">CTR</p>
-                  <p className="text-lg font-mono text-[#F8FAFC]">{insight.metrics.ctr}%</p>
+                  <p className="text-xs text-slate-500">CTR</p>
+                  <p className="text-lg font-mono text-slate-900">{insight.metrics.ctr}%</p>
                 </div>
                 <div className="surface-secondary p-3 rounded">
-                  <p className="text-xs text-[#64748B]">Daily Spend</p>
+                  <p className="text-xs text-slate-500">Daily Spend</p>
                   <p className="text-lg font-mono text-[#10B981]">${insight.metrics.daily_spend.toFixed(2)}</p>
                 </div>
                 <div className="surface-secondary p-3 rounded">
-                  <p className="text-xs text-[#64748B]">Budget Used</p>
-                  <p className="text-lg font-mono text-[#F8FAFC]">{insight.metrics.budget_utilization}%</p>
+                  <p className="text-xs text-slate-500">Budget Used</p>
+                  <p className="text-lg font-mono text-slate-900">{insight.metrics.budget_utilization}%</p>
                 </div>
               </div>
 
               {/* Issues */}
               {insight.issues.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#F8FAFC]">Issues Detected</p>
+                  <p className="text-sm font-medium text-slate-900">Issues Detected</p>
                   <div className="space-y-1">
                     {insight.issues.map((issue, idx) => (
                       <div 
@@ -246,7 +246,7 @@ export default function Insights() {
               {/* Recommendations */}
               {insight.recommendations.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#F8FAFC]">Recommendations</p>
+                  <p className="text-sm font-medium text-slate-900">Recommendations</p>
                   <div className="flex flex-wrap gap-2">
                     {insight.recommendations.map((rec, idx) => (
                       <Button
@@ -255,10 +255,10 @@ export default function Insights() {
                         size="sm"
                         onClick={() => handleApplyRecommendation(insight.campaign_id, rec.action)}
                         disabled={applying[`${insight.campaign_id}-${rec.action}`]}
-                        className={`border-[#2D3B55] hover:bg-[#151F32] ${
+                        className={`border-slate-200 hover:bg-slate-100 ${
                           rec.priority === "high" ? "text-[#EF4444] hover:text-[#EF4444]" :
                           rec.priority === "medium" ? "text-[#F59E0B] hover:text-[#F59E0B]" :
-                          "text-[#94A3B8]"
+                          "text-slate-600"
                         }`}
                         data-testid={`apply-${rec.action}-btn`}
                       >
@@ -275,7 +275,7 @@ export default function Insights() {
                 <div className="p-4 surface-secondary rounded text-center">
                   <CheckCircle className="w-8 h-8 text-[#10B981] mx-auto mb-2" />
                   <p className="text-[#10B981] font-medium">Campaign is performing well!</p>
-                  <p className="text-sm text-[#64748B]">No issues or recommendations at this time.</p>
+                  <p className="text-sm text-slate-500">No issues or recommendations at this time.</p>
                 </div>
               )}
             </CardContent>
@@ -285,9 +285,9 @@ export default function Insights() {
         {insights?.insights?.length === 0 && (
           <Card className="surface-primary border-panel">
             <CardContent className="p-8 text-center">
-              <Target className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
-              <p className="text-[#F8FAFC] font-medium">No campaigns to analyze</p>
-              <p className="text-sm text-[#64748B]">Create some campaigns to see insights and recommendations.</p>
+              <Target className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+              <p className="text-slate-900 font-medium">No campaigns to analyze</p>
+              <p className="text-sm text-slate-500">Create some campaigns to see insights and recommendations.</p>
             </CardContent>
           </Card>
         )}

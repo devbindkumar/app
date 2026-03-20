@@ -35,9 +35,9 @@ const getNotificationIcon = (type) => {
     case 'budget_alert':
       return <DollarSign className="w-4 h-4 text-[#F59E0B]" />;
     case 'system_message':
-      return <MessageSquare className="w-4 h-4 text-[#64748B]" />;
+      return <MessageSquare className="w-4 h-4 text-slate-500" />;
     default:
-      return <Bell className="w-4 h-4 text-[#64748B]" />;
+      return <Bell className="w-4 h-4 text-slate-500" />;
   }
 };
 
@@ -92,7 +92,7 @@ export default function NotificationBell() {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="relative text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+          className="relative text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           data-testid="notification-bell"
         >
           <Bell className="w-5 h-5" />
@@ -109,16 +109,16 @@ export default function NotificationBell() {
         data-testid="notification-panel"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b border-[#2D3B55]">
+        <div className="flex items-center justify-between p-3 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-[#F8FAFC]">Notifications</h3>
+            <h3 className="font-semibold text-slate-900">Notifications</h3>
             <div className="flex items-center gap-1">
               {isConnected ? (
                 <Wifi className="w-3 h-3 text-[#10B981]" />
               ) : (
                 <WifiOff className="w-3 h-3 text-[#EF4444]" />
               )}
-              <span className="text-xs text-[#64748B]">
+              <span className="text-xs text-slate-500">
                 {isConnected ? 'Live' : 'Offline'}
               </span>
             </div>
@@ -140,7 +140,7 @@ export default function NotificationBell() {
                 variant="ghost"
                 size="sm"
                 onClick={clearNotifications}
-                className="h-7 text-xs text-[#64748B] hover:text-[#EF4444] hover:bg-[#EF4444]/10"
+                className="h-7 text-xs text-slate-500 hover:text-[#EF4444] hover:bg-[#EF4444]/10"
                 title="Clear all"
               >
                 <Trash2 className="w-3 h-3" />
@@ -153,34 +153,34 @@ export default function NotificationBell() {
         <ScrollArea className="max-h-[350px]">
           {notifications.length === 0 ? (
             <div className="p-6 text-center">
-              <Bell className="w-8 h-8 text-[#2D3B55] mx-auto mb-2" />
-              <p className="text-sm text-[#64748B]">No notifications yet</p>
+              <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500">No notifications yet</p>
               <p className="text-xs text-[#4B5563] mt-1">
                 {isConnected ? 'You\'ll see updates here' : 'Connect to receive updates'}
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#2D3B55]">
+            <div className="divide-y divide-slate-200">
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
                   className={`p-3 cursor-pointer transition-colors ${
                     notification.read 
-                      ? 'bg-transparent hover:bg-[#0B1221]' 
+                      ? 'bg-transparent hover:bg-white' 
                       : 'bg-[#3B82F6]/5 hover:bg-[#3B82F6]/10'
                   }`}
                   onClick={() => markAsRead(notification.id)}
                 >
                   <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0B1221] flex items-center justify-center">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white flex items-center justify-center">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${notification.read ? 'text-[#94A3B8]' : 'text-[#F8FAFC]'}`}>
+                      <p className={`text-sm truncate ${notification.read ? 'text-slate-600' : 'text-slate-900'}`}>
                         {getNotificationTitle(notification)}
                       </p>
                       {notification.data?.target && (
-                        <p className="text-xs text-[#64748B] truncate">{notification.data.target}</p>
+                        <p className="text-xs text-slate-500 truncate">{notification.data.target}</p>
                       )}
                       <p className="text-xs text-[#4B5563] mt-1">
                         {formatTime(notification.receivedAt)}
@@ -198,8 +198,8 @@ export default function NotificationBell() {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="p-2 border-t border-[#2D3B55] text-center">
-            <span className="text-xs text-[#64748B]">
+          <div className="p-2 border-t border-slate-200 text-center">
+            <span className="text-xs text-slate-500">
               {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
             </span>
           </div>

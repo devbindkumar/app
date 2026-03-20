@@ -71,7 +71,7 @@ export default function MLModels() {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Loading ML models...</div>
+        <div className="text-slate-500">Loading ML models...</div>
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function MLModels() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">ML Model Management</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">ML Model Management</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Train and monitor machine learning models for bid optimization
           </p>
         </div>
@@ -103,8 +103,8 @@ export default function MLModels() {
               <Brain className="w-5 h-5 text-[#8B5CF6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">ML-Enabled Campaigns</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">{models.length}</p>
+              <p className="text-xs text-slate-500">ML-Enabled Campaigns</p>
+              <p className="text-xl font-bold text-slate-900">{models.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -114,7 +114,7 @@ export default function MLModels() {
               <Cpu className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Trained Models</p>
+              <p className="text-xs text-slate-500">Trained Models</p>
               <p className="text-xl font-bold text-[#10B981]">
                 {models.filter(m => m.status === "trained").length}
               </p>
@@ -127,8 +127,8 @@ export default function MLModels() {
               <Database className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Data Points</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">
+              <p className="text-xs text-slate-500">Total Data Points</p>
+              <p className="text-xl font-bold text-slate-900">
                 {models.reduce((sum, m) => sum + m.total_data_points, 0).toLocaleString()}
               </p>
             </div>
@@ -140,8 +140,8 @@ export default function MLModels() {
               <Layers className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-xs text-[#64748B]">Total Features</p>
-              <p className="text-xl font-bold text-[#F8FAFC]">
+              <p className="text-xs text-slate-500">Total Features</p>
+              <p className="text-xl font-bold text-slate-900">
                 {models.reduce((sum, m) => sum + m.features_count, 0)}
               </p>
             </div>
@@ -154,18 +154,18 @@ export default function MLModels() {
         {models.map((model) => (
           <Card key={model.campaign_id} className="surface-primary border-panel overflow-hidden">
             <CardHeader 
-              className="pb-2 cursor-pointer hover:bg-[#151F32]/50 transition-colors"
+              className="pb-2 cursor-pointer hover:bg-slate-100/50 transition-colors"
               onClick={() => toggleExpand(model.campaign_id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {expandedModel === model.campaign_id ? 
-                    <ChevronDown className="w-5 h-5 text-[#64748B]" /> : 
-                    <ChevronRight className="w-5 h-5 text-[#64748B]" />
+                    <ChevronDown className="w-5 h-5 text-slate-500" /> : 
+                    <ChevronRight className="w-5 h-5 text-slate-500" />
                   }
-                  <Brain className={`w-5 h-5 ${model.ml_enabled ? "text-[#8B5CF6]" : "text-[#64748B]"}`} />
+                  <Brain className={`w-5 h-5 ${model.ml_enabled ? "text-[#8B5CF6]" : "text-slate-500"}`} />
                   <div>
-                    <CardTitle className="text-lg text-[#F8FAFC]">{model.campaign_name}</CardTitle>
+                    <CardTitle className="text-lg text-slate-900">{model.campaign_name}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge 
                         variant="outline" 
@@ -176,7 +176,7 @@ export default function MLModels() {
                       >
                         {model.status === "trained" ? "TRAINED" : "NEEDS DATA"}
                       </Badge>
-                      <span className="text-xs text-[#64748B]">
+                      <span className="text-xs text-slate-500">
                         {model.features_count} features • {model.total_data_points} data points
                       </span>
                     </div>
@@ -184,11 +184,11 @@ export default function MLModels() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm text-[#64748B]">Prediction Weight</p>
-                    <p className="text-lg font-mono text-[#F8FAFC]">{(model.prediction_weight * 100).toFixed(0)}%</p>
+                    <p className="text-sm text-slate-500">Prediction Weight</p>
+                    <p className="text-lg font-mono text-slate-900">{(model.prediction_weight * 100).toFixed(0)}%</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-[#64748B]">Avg Win Rate</p>
+                    <p className="text-sm text-slate-500">Avg Win Rate</p>
                     <p className="text-lg font-mono text-[#10B981]">{model.avg_win_rate}%</p>
                   </div>
                   <Button
@@ -213,13 +213,13 @@ export default function MLModels() {
 
             {/* Expanded Details */}
             {expandedModel === model.campaign_id && modelDetails[model.campaign_id] && (
-              <CardContent className="border-t border-[#2D3B55] pt-4">
+              <CardContent className="border-t border-slate-200 pt-4">
                 <div className="space-y-4">
                   {/* Training Progress */}
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-[#94A3B8]">Training Data</span>
-                      <span className="text-[#F8FAFC]">
+                      <span className="text-slate-600">Training Data</span>
+                      <span className="text-slate-900">
                         {modelDetails[model.campaign_id].total_data_points} / 100 required
                       </span>
                     </div>
@@ -233,18 +233,18 @@ export default function MLModels() {
                   <div className="grid grid-cols-3 gap-4">
                     {Object.entries(modelDetails[model.campaign_id].feature_groups || {}).map(([group, features]) => (
                       <div key={group} className="surface-secondary rounded p-3">
-                        <h4 className="text-sm font-medium text-[#F8FAFC] mb-2 capitalize">
+                        <h4 className="text-sm font-medium text-slate-900 mb-2 capitalize">
                           {group.replace("_", " ")}
                         </h4>
                         <div className="space-y-1">
                           {features.slice(0, 5).map((f, idx) => (
                             <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-[#94A3B8] truncate max-w-[100px]">{f.value}</span>
+                              <span className="text-slate-600 truncate max-w-[100px]">{f.value}</span>
                               <span className="text-[#10B981] font-mono">{f.win_rate}%</span>
                             </div>
                           ))}
                           {features.length > 5 && (
-                            <p className="text-xs text-[#64748B]">+{features.length - 5} more</p>
+                            <p className="text-xs text-slate-500">+{features.length - 5} more</p>
                           )}
                         </div>
                       </div>
@@ -262,7 +262,7 @@ export default function MLModels() {
                         <div className="space-y-1">
                           {modelDetails[model.campaign_id].performance_summary.best_performing?.slice(0, 3).map((f, idx) => (
                             <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-[#94A3B8]">{f.feature_key}</span>
+                              <span className="text-slate-600">{f.feature_key}</span>
                               <span className="text-[#10B981] font-mono">{(f.win_rate * 100).toFixed(1)}%</span>
                             </div>
                           ))}
@@ -276,7 +276,7 @@ export default function MLModels() {
                         <div className="space-y-1">
                           {modelDetails[model.campaign_id].performance_summary.worst_performing?.slice(0, 3).map((f, idx) => (
                             <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-[#94A3B8]">{f.feature_key}</span>
+                              <span className="text-slate-600">{f.feature_key}</span>
                               <span className="text-[#EF4444] font-mono">{(f.win_rate * 100).toFixed(1)}%</span>
                             </div>
                           ))}
@@ -290,7 +290,7 @@ export default function MLModels() {
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`/campaigns/${model.campaign_id}/edit`)}
-                      className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC]"
+                      className="border-slate-200 text-slate-600 hover:text-slate-900"
                     >
                       Edit Campaign Settings
                       <ChevronRight className="w-4 h-4 ml-1" />
@@ -305,9 +305,9 @@ export default function MLModels() {
         {models.length === 0 && (
           <Card className="surface-primary border-panel">
             <CardContent className="p-8 text-center">
-              <Brain className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
-              <p className="text-[#F8FAFC] font-medium">No ML Models</p>
-              <p className="text-sm text-[#64748B] mb-4">
+              <Brain className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+              <p className="text-slate-900 font-medium">No ML Models</p>
+              <p className="text-sm text-slate-500 mb-4">
                 Enable ML prediction on campaigns to start training models.
               </p>
               <Button

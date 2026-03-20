@@ -114,8 +114,8 @@ export default function SSPEndpoints() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">SSP Endpoints</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">Manage Supply-Side Platform integrations and bid endpoints</p>
+          <h1 className="text-3xl font-bold text-slate-900">SSP Endpoints</h1>
+          <p className="text-sm text-slate-600 mt-1">Manage Supply-Side Platform integrations and bid endpoints</p>
         </div>
         <Button 
           onClick={() => setShowCreate(true)}
@@ -135,10 +135,10 @@ export default function SSPEndpoints() {
               <Server className="w-5 h-5 text-[#3B82F6]" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-[#F8FAFC] mb-1">Bid Request Endpoint</h3>
-              <p className="text-xs text-[#94A3B8] mb-2">Send OpenRTB 2.5/2.6 bid requests to:</p>
+              <h3 className="text-sm font-semibold text-slate-900 mb-1">Bid Request Endpoint</h3>
+              <p className="text-xs text-slate-600 mb-2">Send OpenRTB 2.5/2.6 bid requests to:</p>
               <div className="flex items-center gap-2">
-                <code className="text-xs font-mono bg-[#020408] px-3 py-1.5 rounded text-[#3B82F6]">
+                <code className="text-xs font-mono bg-slate-50 px-3 py-1.5 rounded text-[#3B82F6]">
                   POST {BACKEND_URL}/api/bid
                 </code>
                 <Button 
@@ -148,12 +148,12 @@ export default function SSPEndpoints() {
                     navigator.clipboard.writeText(`${BACKEND_URL}/api/bid`);
                     toast.success("Endpoint URL copied");
                   }}
-                  className="text-[#64748B] hover:text-[#F8FAFC] p-1 h-auto"
+                  className="text-slate-500 hover:text-slate-900 p-1 h-auto"
                 >
                   <Copy className="w-3 h-3" />
                 </Button>
               </div>
-              <p className="text-xs text-[#64748B] mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 <span className="text-[#10B981] font-semibold">No authentication required.</span> Optionally include <code className="text-[#10B981]">X-OpenRTB-Version: 2.6</code> for explicit version handling.
               </p>
             </div>
@@ -164,14 +164,14 @@ export default function SSPEndpoints() {
       {/* Endpoints List */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-[#64748B]">Loading endpoints...</div>
+          <div className="text-slate-500">Loading endpoints...</div>
         </div>
       ) : endpoints.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="empty-state py-16">
             <Server className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-[#F8FAFC] mb-2">No SSP endpoints</h3>
-            <p className="text-sm text-[#94A3B8] mb-4">Create an endpoint to start tracking SSP traffic</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No SSP endpoints</h3>
+            <p className="text-sm text-slate-600 mb-4">Create an endpoint to start tracking SSP traffic</p>
             <Button 
               onClick={() => setShowCreate(true)}
               className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white"
@@ -193,12 +193,12 @@ export default function SSPEndpoints() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-base font-semibold text-[#F8FAFC]">{endpoint.name}</h3>
+                      <h3 className="text-base font-semibold text-slate-900">{endpoint.name}</h3>
                       <Badge 
                         variant="outline"
                         className={endpoint.status === "active" 
                           ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30" 
-                          : "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30"
+                          : "bg-[#64748B]/20 text-slate-500 border-[#64748B]/30"
                         }
                       >
                         <span className={`status-dot ${endpoint.status === "active" ? 'status-active' : 'status-draft'} mr-1.5`}></span>
@@ -213,11 +213,11 @@ export default function SSPEndpoints() {
                     </div>
                     
                     {endpoint.description && (
-                      <p className="text-xs text-[#64748B] mb-3">{endpoint.description}</p>
+                      <p className="text-xs text-slate-500 mb-3">{endpoint.description}</p>
                     )}
                     
                     {/* Unique Endpoint URL with Token */}
-                    <div className="flex items-center gap-2 mb-3 p-2 bg-[#020408] rounded">
+                    <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded">
                       <code className="text-xs font-mono text-[#10B981] flex-1">
                         POST {BACKEND_URL}/api/bid/{endpoint.endpoint_token || endpoint.id.substring(0, 16)}
                       </code>
@@ -228,32 +228,32 @@ export default function SSPEndpoints() {
                           navigator.clipboard.writeText(`${BACKEND_URL}/api/bid/${endpoint.endpoint_token || endpoint.id.substring(0, 16)}`);
                           toast.success("Endpoint URL copied");
                         }}
-                        className="text-[#64748B] hover:text-[#F8FAFC] p-1 h-auto"
+                        className="text-slate-500 hover:text-slate-900 p-1 h-auto"
                       >
                         <Copy className="w-3 h-3" />
                       </Button>
                     </div>
                     
-                    <div className="grid grid-cols-5 gap-4 mt-2 pt-2 border-t border-[#2D3B55]">
+                    <div className="grid grid-cols-5 gap-4 mt-2 pt-2 border-t border-slate-200">
                       <div>
-                        <p className="text-[10px] text-[#64748B] uppercase">Requests</p>
-                        <p className="text-sm font-mono text-[#F8FAFC]">{formatNumber(endpoint.total_requests)}</p>
+                        <p className="text-[10px] text-slate-500 uppercase">Requests</p>
+                        <p className="text-sm font-mono text-slate-900">{formatNumber(endpoint.total_requests)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#64748B] uppercase">Bids</p>
+                        <p className="text-[10px] text-slate-500 uppercase">Bids</p>
                         <p className="text-sm font-mono text-[#3B82F6]">{formatNumber(endpoint.total_bids)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#64748B] uppercase">Wins</p>
+                        <p className="text-[10px] text-slate-500 uppercase">Wins</p>
                         <p className="text-sm font-mono text-[#10B981]">{formatNumber(endpoint.total_wins)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#64748B] uppercase">Impressions</p>
+                        <p className="text-[10px] text-slate-500 uppercase">Impressions</p>
                         <p className="text-sm font-mono text-[#8B5CF6]">{formatNumber(endpoint.total_impressions || 0)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#64748B] uppercase">Spend</p>
-                        <p className="text-sm font-mono text-[#F8FAFC]">${endpoint.total_spend?.toFixed(2) || '0.00'}</p>
+                        <p className="text-[10px] text-slate-500 uppercase">Spend</p>
+                        <p className="text-sm font-mono text-slate-900">${endpoint.total_spend?.toFixed(2) || '0.00'}</p>
                       </div>
                     </div>
                   </div>
@@ -290,30 +290,30 @@ export default function SSPEndpoints() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="surface-primary border-panel">
           <DialogHeader>
-            <DialogTitle className="text-[#F8FAFC]">Add SSP Endpoint</DialogTitle>
+            <DialogTitle className="text-slate-900">Add SSP Endpoint</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Name *</Label>
+              <Label className="text-slate-600">Name *</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="SSP Partner Name"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC] input-glow"
+                className="surface-secondary border-slate-200 text-slate-900 input-glow"
                 data-testid="ssp-name-input"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Description</Label>
+              <Label className="text-slate-600">Description</Label>
               <Input
                 value={form.description}
                 onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Optional description"
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC] input-glow"
+                className="surface-secondary border-slate-200 text-slate-900 input-glow"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">OpenRTB Version</Label>
+              <Label className="text-slate-600">OpenRTB Version</Label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -324,7 +324,7 @@ export default function SSPEndpoints() {
                     onChange={(e) => setForm(prev => ({ ...prev, ortb_version: e.target.value }))}
                     className="accent-[#3B82F6]"
                   />
-                  <span className="text-[#F8FAFC]">OpenRTB 2.5</span>
+                  <span className="text-slate-900">OpenRTB 2.5</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -335,17 +335,17 @@ export default function SSPEndpoints() {
                     onChange={(e) => setForm(prev => ({ ...prev, ortb_version: e.target.value }))}
                     className="accent-[#3B82F6]"
                   />
-                  <span className="text-[#F8FAFC]">OpenRTB 2.6</span>
+                  <span className="text-slate-900">OpenRTB 2.6</span>
                 </label>
               </div>
-              <p className="text-xs text-[#64748B]">Select the protocol version the SSP will use</p>
+              <p className="text-xs text-slate-500">Select the protocol version the SSP will use</p>
             </div>
           </div>
           <DialogFooter>
             <Button 
               variant="outline"
               onClick={() => setShowCreate(false)}
-              className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]"
+              className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             >
               Cancel
             </Button>
@@ -364,13 +364,13 @@ export default function SSPEndpoints() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="surface-primary border-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[#F8FAFC]">Delete SSP Endpoint</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#94A3B8]">
+            <AlertDialogTitle className="text-slate-900">Delete SSP Endpoint</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600">
               Are you sure? This will remove this SSP endpoint and all its tracking data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#2D3B55] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#151F32]">
+            <AlertDialogCancel className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 

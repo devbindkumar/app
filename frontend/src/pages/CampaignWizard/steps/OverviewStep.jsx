@@ -15,25 +15,25 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[#F8FAFC] mb-1">Campaign Overview</h2>
-        <p className="text-sm text-[#64748B]">Define your campaign goals and target audience</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Campaign Overview</h2>
+        <p className="text-sm text-slate-500">Define your campaign goals and target audience</p>
       </div>
 
       {/* Campaign Name */}
       <div className="space-y-2">
-        <Label className="text-[#94A3B8]">Campaign Name *</Label>
+        <Label className="text-slate-600">Campaign Name *</Label>
         <Input
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
           placeholder="Enter campaign name"
-          className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+          className="surface-secondary border-slate-200 text-slate-900"
           data-testid="campaign-name-input"
         />
       </div>
 
       {/* IAB Categories */}
       <div className="space-y-2">
-        <Label className="text-[#94A3B8]">IAB Categories *</Label>
+        <Label className="text-slate-600">IAB Categories *</Label>
         <Select 
           value={form.iab_categories[0] || ""} 
           onValueChange={(v) => {
@@ -42,12 +42,12 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
             }
           }}
         >
-          <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+          <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
             <SelectValue placeholder="Select IAB category" />
           </SelectTrigger>
-          <SelectContent className="surface-primary border-[#2D3B55] max-h-[300px]">
+          <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
             {IAB_CATEGORIES.map((cat) => (
-              <SelectItem key={cat.code} value={cat.code} className="text-[#F8FAFC]">
+              <SelectItem key={cat.code} value={cat.code} className="text-slate-900">
                 {cat.code} - {cat.name}
               </SelectItem>
             ))}
@@ -72,7 +72,7 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
 
       {/* Primary Goal */}
       <div className="space-y-2">
-        <Label className="text-[#94A3B8]">Primary Goal *</Label>
+        <Label className="text-slate-600">Primary Goal *</Label>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {CAMPAIGN_GOALS.map((goal) => (
             <div
@@ -81,12 +81,12 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
               className={`p-4 rounded-lg cursor-pointer border transition-all ${
                 form.primary_goal === goal.value
                   ? "bg-[#3B82F6]/20 border-[#3B82F6]"
-                  : "surface-secondary border-[#2D3B55] hover:border-[#3B82F6]/50"
+                  : "surface-secondary border-slate-200 hover:border-[#3B82F6]/50"
               }`}
               data-testid={`goal-${goal.value}`}
             >
-              <p className="text-sm font-medium text-[#F8FAFC]">{goal.label}</p>
-              <p className="text-xs text-[#64748B] mt-1">{goal.desc}</p>
+              <p className="text-sm font-medium text-slate-900">{goal.label}</p>
+              <p className="text-xs text-slate-500 mt-1">{goal.desc}</p>
             </div>
           ))}
         </div>
@@ -95,19 +95,19 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
       {/* KPI Settings */}
       <Card className="surface-primary border-panel">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-[#F8FAFC]">Key Performance Indicator</CardTitle>
+          <CardTitle className="text-base text-slate-900">Key Performance Indicator</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">KPI Type</Label>
+              <Label className="text-slate-600">KPI Type</Label>
               <Select value={form.kpi_type} onValueChange={(v) => updateField("kpi_type", v)}>
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
+                <SelectContent className="surface-primary border-slate-200">
                   {KPI_TYPES.map((kpi) => (
-                    <SelectItem key={kpi.value} value={kpi.value} className="text-[#F8FAFC]">
+                    <SelectItem key={kpi.value} value={kpi.value} className="text-slate-900">
                       {kpi.label} - {kpi.desc}
                     </SelectItem>
                   ))}
@@ -115,14 +115,14 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Target {form.kpi_type.toUpperCase()}</Label>
+              <Label className="text-slate-600">Target {form.kpi_type.toUpperCase()}</Label>
               <NumberInput
                 value={form.kpi_target}
                 onChange={(e) => {
                   const val = e.target.value;
                   updateField("kpi_target", val === "" ? 0 : (typeof val === 'number' ? val : parseFloat(val) || 0));
                 }}
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
                 min={0}
                 data-testid="kpi-target-input"
               />
@@ -133,12 +133,12 @@ export function OverviewStep({ form, updateField, onGetRecommendations }) {
 
       {/* Campaign Description */}
       <div className="space-y-2">
-        <Label className="text-[#94A3B8]">Campaign Description</Label>
+        <Label className="text-slate-600">Campaign Description</Label>
         <Textarea
           value={form.description}
           onChange={(e) => updateField("description", e.target.value)}
           placeholder="Internal notes about this campaign"
-          className="surface-secondary border-[#2D3B55] text-[#F8FAFC] min-h-[100px]"
+          className="surface-secondary border-slate-200 text-slate-900 min-h-[100px]"
         />
       </div>
 

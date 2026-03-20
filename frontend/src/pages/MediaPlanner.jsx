@@ -193,8 +193,8 @@ export default function MediaPlanner() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Media Planner</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Media Planner</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Forecast campaign performance and get strategic recommendations
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function MediaPlanner() {
       {/* Configuration Panel */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+          <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
             <Target className="w-5 h-5 text-[#3B82F6]" />
             Campaign Planning Parameters
           </CardTitle>
@@ -221,35 +221,35 @@ export default function MediaPlanner() {
         <CardContent>
           <div className="grid grid-cols-5 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Budget ($)</Label>
+              <Label className="text-slate-600">Budget ($)</Label>
               <Input
                 type="number"
                 value={planConfig.budget}
                 onChange={(e) => setPlanConfig(prev => ({ ...prev, budget: parseFloat(e.target.value) || 0 }))}
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Duration (days)</Label>
+              <Label className="text-slate-600">Duration (days)</Label>
               <Input
                 type="number"
                 value={planConfig.duration_days}
                 onChange={(e) => setPlanConfig(prev => ({ ...prev, duration_days: parseInt(e.target.value) || 30 }))}
-                className="surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                className="surface-secondary border-slate-200 text-slate-900"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Goal</Label>
+              <Label className="text-slate-600">Goal</Label>
               <Select 
                 value={planConfig.goal} 
                 onValueChange={(v) => setPlanConfig(prev => ({ ...prev, goal: v }))}
               >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
+                <SelectContent className="surface-primary border-slate-200">
                   {CAMPAIGN_GOALS.map((goal) => (
-                    <SelectItem key={goal.value} value={goal.value} className="text-[#F8FAFC]">
+                    <SelectItem key={goal.value} value={goal.value} className="text-slate-900">
                       {goal.label}
                     </SelectItem>
                   ))}
@@ -257,17 +257,17 @@ export default function MediaPlanner() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#94A3B8]">Creative Type</Label>
+              <Label className="text-slate-600">Creative Type</Label>
               <Select 
                 value={planConfig.creative_type} 
                 onValueChange={(v) => setPlanConfig(prev => ({ ...prev, creative_type: v }))}
               >
-                <SelectTrigger className="surface-secondary border-[#2D3B55] text-[#F8FAFC]">
+                <SelectTrigger className="surface-secondary border-slate-200 text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="surface-primary border-[#2D3B55]">
+                <SelectContent className="surface-primary border-slate-200">
                   {CREATIVE_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value} className="text-[#F8FAFC]">
+                    <SelectItem key={type.value} value={type.value} className="text-slate-900">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -297,54 +297,54 @@ export default function MediaPlanner() {
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <BarChart3 className="w-4 h-4 text-[#3B82F6]" />
-                  <span className="text-xs text-[#64748B]">Impressions</span>
+                  <span className="text-xs text-slate-500">Impressions</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{formatNumber(forecast.estimated_impressions)}</p>
+                <p className="text-2xl font-bold text-slate-900">{formatNumber(forecast.estimated_impressions)}</p>
               </CardContent>
             </Card>
             <Card className="surface-primary border-panel">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#10B981]" />
-                  <span className="text-xs text-[#64748B]">Reach</span>
+                  <span className="text-xs text-slate-500">Reach</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{formatNumber(forecast.estimated_reach)}</p>
+                <p className="text-2xl font-bold text-slate-900">{formatNumber(forecast.estimated_reach)}</p>
               </CardContent>
             </Card>
             <Card className="surface-primary border-panel">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-[#F59E0B]" />
-                  <span className="text-xs text-[#64748B]">Clicks</span>
+                  <span className="text-xs text-slate-500">Clicks</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{formatNumber(forecast.estimated_clicks)}</p>
+                <p className="text-2xl font-bold text-slate-900">{formatNumber(forecast.estimated_clicks)}</p>
               </CardContent>
             </Card>
             <Card className="surface-primary border-panel">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Target className="w-4 h-4 text-[#8B5CF6]" />
-                  <span className="text-xs text-[#64748B]">Conversions</span>
+                  <span className="text-xs text-slate-500">Conversions</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{formatNumber(forecast.estimated_conversions)}</p>
+                <p className="text-2xl font-bold text-slate-900">{formatNumber(forecast.estimated_conversions)}</p>
               </CardContent>
             </Card>
             <Card className="surface-primary border-panel">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <DollarSign className="w-4 h-4 text-[#EC4899]" />
-                  <span className="text-xs text-[#64748B]">Est. CPM</span>
+                  <span className="text-xs text-slate-500">Est. CPM</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">${forecast.estimated_cpm?.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-slate-900">${forecast.estimated_cpm?.toFixed(2)}</p>
               </CardContent>
             </Card>
             <Card className="surface-primary border-panel">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Lightbulb className="w-4 h-4 text-[#EF4444]" />
-                  <span className="text-xs text-[#64748B]">Confidence</span>
+                  <span className="text-xs text-slate-500">Confidence</span>
                 </div>
-                <p className="text-2xl font-bold text-[#F8FAFC]">{forecast.confidence_level}%</p>
+                <p className="text-2xl font-bold text-slate-900">{forecast.confidence_level}%</p>
                 <Progress value={forecast.confidence_level} className="h-1 mt-2" />
               </CardContent>
             </Card>
@@ -354,7 +354,7 @@ export default function MediaPlanner() {
             {/* Budget Allocation Pie Chart */}
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-0">
-                <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                   <PieChart className="w-4 h-4 text-[#F59E0B]" />
                   Recommended Budget Allocation
                 </CardTitle>
@@ -380,8 +380,8 @@ export default function MediaPlanner() {
                       </Pie>
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#0A0F1C', 
-                          border: '1px solid #2D3B55',
+                          backgroundColor: '#F8FAFC', 
+                          border: '1px solid #E2E8F0',
                           borderRadius: '8px',
                           color: '#F8FAFC'
                         }}
@@ -396,7 +396,7 @@ export default function MediaPlanner() {
             {/* Strategy Recommendations */}
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-0">
-                <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-[#3B82F6]" />
                   Strategy Recommendations
                 </CardTitle>
@@ -405,25 +405,25 @@ export default function MediaPlanner() {
                 {strategy && (
                   <>
                     <div className="p-3 surface-secondary rounded-lg">
-                      <p className="text-xs text-[#64748B]">Bidding Strategy</p>
-                      <p className="text-sm font-medium text-[#F8FAFC] capitalize">
+                      <p className="text-xs text-slate-500">Bidding Strategy</p>
+                      <p className="text-sm font-medium text-slate-900 capitalize">
                         {strategy.strategy?.bidding_strategy?.replace(/_/g, ' ')}
                       </p>
                     </div>
                     <div className="p-3 surface-secondary rounded-lg">
-                      <p className="text-xs text-[#64748B]">Frequency Cap</p>
-                      <p className="text-sm font-medium text-[#F8FAFC]">
+                      <p className="text-xs text-slate-500">Frequency Cap</p>
+                      <p className="text-sm font-medium text-slate-900">
                         {strategy.strategy?.frequency_cap} per {strategy.strategy?.frequency_period}
                       </p>
                     </div>
                     <div className="p-3 surface-secondary rounded-lg">
-                      <p className="text-xs text-[#64748B]">Pacing</p>
-                      <p className="text-sm font-medium text-[#F8FAFC] capitalize">
+                      <p className="text-xs text-slate-500">Pacing</p>
+                      <p className="text-sm font-medium text-slate-900 capitalize">
                         {strategy.strategy?.pacing}
                       </p>
                     </div>
                     <div className="p-3 surface-secondary rounded-lg">
-                      <p className="text-xs text-[#64748B]">Priority Inventory</p>
+                      <p className="text-xs text-slate-500">Priority Inventory</p>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {strategy.strategy?.priority_inventory?.slice(0, 3).map((inv) => (
                           <Badge key={inv} className="bg-[#3B82F6]/20 text-[#3B82F6] text-xs">
@@ -440,7 +440,7 @@ export default function MediaPlanner() {
             {/* Performance Projections */}
             <Card className="surface-primary border-panel">
               <CardHeader className="pb-0">
-                <CardTitle className="text-base text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-base text-slate-900 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-[#10B981]" />
                   Expected Performance Ranges
                 </CardTitle>
@@ -450,8 +450,8 @@ export default function MediaPlanner() {
                   <>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-[#64748B]">CPM Range</span>
-                        <span className="text-[#F8FAFC]">
+                        <span className="text-slate-500">CPM Range</span>
+                        <span className="text-slate-900">
                           ${projections.expected_cpm_range?.[0]?.toFixed(2)} - ${projections.expected_cpm_range?.[1]?.toFixed(2)}
                         </span>
                       </div>
@@ -459,8 +459,8 @@ export default function MediaPlanner() {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-[#64748B]">CPC Range</span>
-                        <span className="text-[#F8FAFC]">
+                        <span className="text-slate-500">CPC Range</span>
+                        <span className="text-slate-900">
                           ${projections.expected_cpc_range?.[0]?.toFixed(2)} - ${projections.expected_cpc_range?.[1]?.toFixed(2)}
                         </span>
                       </div>
@@ -468,20 +468,20 @@ export default function MediaPlanner() {
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-[#64748B]">CPA Range</span>
-                        <span className="text-[#F8FAFC]">
+                        <span className="text-slate-500">CPA Range</span>
+                        <span className="text-slate-900">
                           ${projections.expected_cpa_range?.[0]?.toFixed(2)} - ${projections.expected_cpa_range?.[1]?.toFixed(2)}
                         </span>
                       </div>
                       <Progress value={50} className="h-2" />
                     </div>
-                    <div className="pt-2 border-t border-[#2D3B55]">
+                    <div className="pt-2 border-t border-slate-200">
                       <div className="flex justify-between text-sm">
-                        <span className="text-[#64748B]">Industry Avg CTR</span>
+                        <span className="text-slate-500">Industry Avg CTR</span>
                         <span className="text-[#10B981]">{projections.industry_avg_ctr}%</span>
                       </div>
                       <div className="flex justify-between text-sm mt-1">
-                        <span className="text-[#64748B]">Industry Avg CVR</span>
+                        <span className="text-slate-500">Industry Avg CVR</span>
                         <span className="text-[#10B981]">{projections.industry_avg_cvr}%</span>
                       </div>
                     </div>
@@ -495,8 +495,8 @@ export default function MediaPlanner() {
           {lineItemRecs && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC]">Recommended Line Items</CardTitle>
-                <CardDescription className="text-[#64748B]">
+                <CardTitle className="text-lg text-slate-900">Recommended Line Items</CardTitle>
+                <CardDescription className="text-slate-500">
                   Suggested line item structure for optimal performance
                 </CardDescription>
               </CardHeader>
@@ -506,22 +506,22 @@ export default function MediaPlanner() {
                     <div key={idx} className="p-4 surface-secondary rounded-lg border-l-4" style={{ borderLeftColor: COLORS[idx % COLORS.length] }}>
                       <div className="flex items-center justify-between mb-2">
                         <Badge className="bg-[#3B82F6]/20 text-[#3B82F6] capitalize">{rec.type}</Badge>
-                        <span className="text-xs text-[#64748B]">{rec.budget_allocation * 100}%</span>
+                        <span className="text-xs text-slate-500">{rec.budget_allocation * 100}%</span>
                       </div>
-                      <p className="text-sm font-medium text-[#F8FAFC]">{rec.name}</p>
-                      <p className="text-xs text-[#64748B] mt-1">{rec.description}</p>
-                      <div className="mt-3 pt-2 border-t border-[#2D3B55]">
+                      <p className="text-sm font-medium text-slate-900">{rec.name}</p>
+                      <p className="text-xs text-slate-500 mt-1">{rec.description}</p>
+                      <div className="mt-3 pt-2 border-t border-slate-200">
                         <div className="flex justify-between text-xs">
-                          <span className="text-[#64748B]">Budget</span>
-                          <span className="text-[#F8FAFC]">${rec.budget?.toLocaleString()}</span>
+                          <span className="text-slate-500">Budget</span>
+                          <span className="text-slate-900">${rec.budget?.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-xs mt-1">
-                          <span className="text-[#64748B]">Inventory</span>
-                          <span className="text-[#F8FAFC]">{rec.inventory_source}</span>
+                          <span className="text-slate-500">Inventory</span>
+                          <span className="text-slate-900">{rec.inventory_source}</span>
                         </div>
                         <div className="flex justify-between text-xs mt-1">
-                          <span className="text-[#64748B]">Strategy</span>
-                          <span className="text-[#F8FAFC] capitalize">{rec.bid_strategy?.replace(/_/g, ' ')}</span>
+                          <span className="text-slate-500">Strategy</span>
+                          <span className="text-slate-900 capitalize">{rec.bid_strategy?.replace(/_/g, ' ')}</span>
                         </div>
                       </div>
                     </div>
@@ -535,7 +535,7 @@ export default function MediaPlanner() {
           {strategy?.optimization_checkpoints && (
             <Card className="surface-primary border-panel">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-[#8B5CF6]" />
                   Optimization Checkpoints
                 </CardTitle>
@@ -546,15 +546,15 @@ export default function MediaPlanner() {
                     <div key={idx} className="flex-1 relative">
                       <div className="flex items-center">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          idx === 0 ? "bg-[#3B82F6]" : "bg-[#2D3B55]"
+                          idx === 0 ? "bg-[#3B82F6]" : "bg-slate-200"
                         }`}>
                           <span className="text-sm font-medium text-white">D{checkpoint.day}</span>
                         </div>
                         {idx < strategy.optimization_checkpoints.length - 1 && (
-                          <div className="flex-1 h-0.5 bg-[#2D3B55]" />
+                          <div className="flex-1 h-0.5 bg-slate-200" />
                         )}
                       </div>
-                      <p className="text-xs text-[#94A3B8] mt-2 max-w-[150px]">{checkpoint.action}</p>
+                      <p className="text-xs text-slate-600 mt-2 max-w-[150px]">{checkpoint.action}</p>
                     </div>
                   ))}
                 </div>
@@ -568,29 +568,29 @@ export default function MediaPlanner() {
       {benchmarks && (
         <Card className="surface-primary border-panel">
           <CardHeader>
-            <CardTitle className="text-lg text-[#F8FAFC]">Industry Benchmarks by Format</CardTitle>
+            <CardTitle className="text-lg text-slate-900">Industry Benchmarks by Format</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 gap-4">
               {Object.entries(benchmarks.benchmarks || {}).map(([format, data]) => (
                 <div key={format} className="p-4 surface-secondary rounded-lg">
-                  <p className="text-sm font-medium text-[#F8FAFC] capitalize mb-3">{format}</p>
+                  <p className="text-sm font-medium text-slate-900 capitalize mb-3">{format}</p>
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-[#64748B]">CTR</span>
+                      <span className="text-slate-500">CTR</span>
                       <span className="text-[#10B981]">{data.ctr}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#64748B]">CVR</span>
+                      <span className="text-slate-500">CVR</span>
                       <span className="text-[#3B82F6]">{data.cvr}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#64748B]">CPM</span>
-                      <span className="text-[#F8FAFC]">${data.cpm_range?.[0]} - ${data.cpm_range?.[1]}</span>
+                      <span className="text-slate-500">CPM</span>
+                      <span className="text-slate-900">${data.cpm_range?.[0]} - ${data.cpm_range?.[1]}</span>
                     </div>
                     {data.viewability && (
                       <div className="flex justify-between">
-                        <span className="text-[#64748B]">Viewability</span>
+                        <span className="text-slate-500">Viewability</span>
                         <span className="text-[#F59E0B]">{data.viewability}%</span>
                       </div>
                     )}

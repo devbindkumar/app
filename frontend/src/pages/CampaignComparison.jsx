@@ -65,13 +65,13 @@ export default function CampaignComparison() {
     const minVal = Math.min(...values);
     if (values[idx] === maxVal && maxVal > 0) return "text-[#10B981]";
     if (values[idx] === minVal && minVal < maxVal) return "text-[#EF4444]";
-    return "text-[#F8FAFC]";
+    return "text-slate-900";
   };
 
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center h-64">
-        <div className="text-[#64748B]">Loading campaigns...</div>
+        <div className="text-slate-500">Loading campaigns...</div>
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function CampaignComparison() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#F8FAFC]">Campaign Comparison</h1>
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <h1 className="text-3xl font-bold text-slate-900">Campaign Comparison</h1>
+          <p className="text-sm text-slate-600 mt-1">
             Compare 2-3 campaigns side-by-side to identify optimization opportunities
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function CampaignComparison() {
       {/* Campaign Selection */}
       <Card className="surface-primary border-panel">
         <CardHeader>
-          <CardTitle className="text-lg text-[#F8FAFC]">Select Campaigns to Compare</CardTitle>
+          <CardTitle className="text-lg text-slate-900">Select Campaigns to Compare</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-3">
@@ -111,13 +111,13 @@ export default function CampaignComparison() {
                 className={`p-3 rounded border cursor-pointer transition-all ${
                   selectedIds.includes(campaign.id) 
                     ? "border-[#3B82F6] bg-[#3B82F6]/10" 
-                    : "border-[#2D3B55] hover:border-[#3B82F6]/50"
+                    : "border-slate-200 hover:border-[#3B82F6]/50"
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-[#F8FAFC]">{campaign.name}</p>
-                    <p className="text-xs text-[#64748B] mt-1">{campaign.status}</p>
+                    <p className="text-sm font-medium text-slate-900">{campaign.name}</p>
+                    <p className="text-xs text-slate-500 mt-1">{campaign.status}</p>
                   </div>
                   <Checkbox 
                     checked={selectedIds.includes(campaign.id)}
@@ -126,8 +126,8 @@ export default function CampaignComparison() {
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <span className="text-[#10B981]">${campaign.bid_price?.toFixed(2)}</span>
-                  <span className="text-[#64748B]">|</span>
-                  <span className="text-[#94A3B8]">{campaign.bids || 0} bids</span>
+                  <span className="text-slate-500">|</span>
+                  <span className="text-slate-600">{campaign.bids || 0} bids</span>
                 </div>
               </div>
             ))}
@@ -141,7 +141,7 @@ export default function CampaignComparison() {
           {/* Metrics Comparison */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                 <BarChart2 className="w-5 h-5 text-[#3B82F6]" />
                 Performance Metrics
               </CardTitle>
@@ -150,20 +150,20 @@ export default function CampaignComparison() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#2D3B55]">
-                      <th className="text-left py-3 px-4 text-[#64748B] text-sm font-medium">Metric</th>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-4 text-slate-500 text-sm font-medium">Metric</th>
                       {comparison.campaigns.map((c, idx) => (
-                        <th key={idx} className="text-right py-3 px-4 text-[#F8FAFC] text-sm font-medium">
+                        <th key={idx} className="text-right py-3 px-4 text-slate-900 text-sm font-medium">
                           {c.name}
                         </th>
                       ))}
-                      <th className="text-center py-3 px-4 text-[#64748B] text-sm font-medium">Best</th>
+                      <th className="text-center py-3 px-4 text-slate-500 text-sm font-medium">Best</th>
                     </tr>
                   </thead>
                   <tbody>
                     {Object.entries(comparison.metrics_comparison).map(([metric, data]) => (
-                      <tr key={metric} className="border-b border-[#2D3B55]/50">
-                        <td className="py-3 px-4 text-[#94A3B8] capitalize">{metric.replace("_", " ")}</td>
+                      <tr key={metric} className="border-b border-slate-200/50">
+                        <td className="py-3 px-4 text-slate-600 capitalize">{metric.replace("_", " ")}</td>
                         {data.values.map((val, idx) => (
                           <td 
                             key={idx} 
@@ -181,7 +181,7 @@ export default function CampaignComparison() {
                               {comparison.campaigns.find(c => c.id === data.best)?.name?.substring(0, 10)}
                             </Badge>
                           ) : (
-                            <span className="text-[#64748B]">-</span>
+                            <span className="text-slate-500">-</span>
                           )}
                         </td>
                       </tr>
@@ -195,7 +195,7 @@ export default function CampaignComparison() {
           {/* Targeting Differences */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+              <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                 <Target className="w-5 h-5 text-[#F59E0B]" />
                 Targeting Differences
               </CardTitle>
@@ -204,33 +204,33 @@ export default function CampaignComparison() {
               <div className="space-y-4">
                 {Object.entries(comparison.targeting_differences).map(([field, data]) => (
                   <div key={field} className="p-3 surface-secondary rounded">
-                    <p className="text-sm font-medium text-[#F8FAFC] mb-2">{field.replace(".", " → ")}</p>
+                    <p className="text-sm font-medium text-slate-900 mb-2">{field.replace(".", " → ")}</p>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-[#64748B] mb-1">Common</p>
+                        <p className="text-xs text-slate-500 mb-1">Common</p>
                         <div className="flex flex-wrap gap-1">
                           {data.common.length > 0 ? data.common.map((v, i) => (
                             <Badge key={i} variant="outline" className="text-xs bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30">
                               {v}
                             </Badge>
                           )) : (
-                            <span className="text-[#64748B] text-xs">None</span>
+                            <span className="text-slate-500 text-xs">None</span>
                           )}
                         </div>
                       </div>
                       <div>
-                        <p className="text-xs text-[#64748B] mb-1">Unique per campaign</p>
+                        <p className="text-xs text-slate-500 mb-1">Unique per campaign</p>
                         <div className="space-y-1">
                           {data.unique.map((u, idx) => (
                             <div key={idx} className="flex items-center gap-2">
-                              <span className="text-xs text-[#94A3B8]">{comparison.campaigns[idx]?.name?.substring(0, 15)}:</span>
+                              <span className="text-xs text-slate-600">{comparison.campaigns[idx]?.name?.substring(0, 15)}:</span>
                               <div className="flex flex-wrap gap-1">
                                 {u.length > 0 ? u.map((v, i) => (
-                                  <Badge key={i} variant="outline" className="text-[9px] text-[#64748B] border-[#2D3B55]">
+                                  <Badge key={i} variant="outline" className="text-[9px] text-slate-500 border-slate-200">
                                     {v}
                                   </Badge>
                                 )) : (
-                                  <span className="text-[#64748B] text-xs">-</span>
+                                  <span className="text-slate-500 text-xs">-</span>
                                 )}
                               </div>
                             </div>
@@ -248,7 +248,7 @@ export default function CampaignComparison() {
           {comparison.recommendations.length > 0 && (
             <Card className="surface-primary border-panel border-[#F59E0B]/30">
               <CardHeader>
-                <CardTitle className="text-lg text-[#F8FAFC] flex items-center gap-2">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-[#F59E0B]" />
                   Recommendations
                 </CardTitle>
@@ -258,7 +258,7 @@ export default function CampaignComparison() {
                   {comparison.recommendations.map((rec, idx) => (
                     <div key={idx} className="flex items-start gap-3 p-3 surface-secondary rounded">
                       <ChevronRight className="w-4 h-4 text-[#F59E0B] mt-0.5" />
-                      <p className="text-sm text-[#94A3B8]">{rec.message}</p>
+                      <p className="text-sm text-slate-600">{rec.message}</p>
                     </div>
                   ))}
                 </div>
