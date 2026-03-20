@@ -6,26 +6,26 @@
 
 @layer base {
     :root {
-        --background: 220 30% 2%;
-        --foreground: 210 40% 98%;
-        --card: 220 40% 6%;
-        --card-foreground: 210 40% 98%;
-        --popover: 220 40% 6%;
-        --popover-foreground: 210 40% 98%;
+        --background: 0 0% 100%;
+        --foreground: 222 47% 11%;
+        --card: 0 0% 100%;
+        --card-foreground: 222 47% 11%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222 47% 11%;
         --primary: 217 91% 60%;
-        --primary-foreground: 210 40% 98%;
-        --secondary: 220 30% 12%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 220 30% 15%;
-        --muted-foreground: 215 20% 55%;
-        --accent: 220 30% 15%;
-        --accent-foreground: 210 40% 98%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 210 40% 96%;
+        --secondary-foreground: 222 47% 11%;
+        --muted: 210 40% 96%;
+        --muted-foreground: 215 16% 47%;
+        --accent: 210 40% 96%;
+        --accent-foreground: 222 47% 11%;
         --destructive: 0 84% 60%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 220 30% 18%;
-        --input: 220 30% 12%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 214 32% 91%;
+        --input: 214 32% 91%;
         --ring: 217 91% 60%;
-        --radius: 0.25rem;
+        --radius: 0.5rem;
         
         --success: 160 84% 39%;
         --warning: 38 92% 50%;
@@ -47,7 +47,7 @@
     }
     
     body {
-        @apply bg-[#020408] text-foreground;
+        @apply bg-[#F8FAFC] text-foreground;
         font-feature-settings: "rlig" 1, "calt" 1;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -64,11 +64,11 @@
 
 @layer utilities {
     .surface-primary {
-        @apply bg-[#0B1221];
+        @apply bg-white;
     }
     
     .surface-secondary {
-        @apply bg-[#151F32];
+        @apply bg-[#F1F5F9];
     }
     
     .text-primary-brand {
@@ -76,23 +76,23 @@
     }
     
     .border-panel {
-        @apply border border-[#2D3B55];
+        @apply border border-[#E2E8F0];
     }
     
     .glow-primary {
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
     }
     
     .glow-success {
-        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
     }
     
     .glow-warning {
-        box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
     }
     
     .glow-error {
-        box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
     }
 }
 
@@ -103,11 +103,11 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: #0B1221;
+    background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #2D3B55;
+    background: #CBD5E1;
     border-radius: 3px;
 }
 
@@ -118,10 +118,10 @@
 /* Custom animations */
 @keyframes pulse-glow {
     0%, 100% {
-        box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.15);
     }
     50% {
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
     }
 }
 
@@ -146,32 +146,32 @@
 
 /* Table styles */
 .data-table th {
-    @apply bg-[#151F32] text-xs uppercase tracking-wider text-[#64748B] py-2 px-4 text-left font-medium;
+    @apply bg-[#F1F5F9] text-xs uppercase tracking-wider text-[#64748B] py-2 px-4 text-left font-medium;
 }
 
 .data-table td {
-    @apply py-2 px-4 text-sm font-mono border-b border-[#2D3B55];
+    @apply py-2 px-4 text-sm font-mono border-b border-[#E2E8F0];
 }
 
 .data-table tr:hover td {
-    @apply bg-[#151F32]/50;
+    @apply bg-[#F8FAFC];
 }
 
 /* JSON Syntax highlighting */
 .json-key {
-    @apply text-[#3B82F6];
+    @apply text-[#2563EB];
 }
 
 .json-string {
-    @apply text-[#10B981];
+    @apply text-[#059669];
 }
 
 .json-number {
-    @apply text-[#F59E0B];
+    @apply text-[#D97706];
 }
 
 .json-boolean {
-    @apply text-[#EC4899];
+    @apply text-[#DB2777];
 }
 
 .json-null {

@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020408] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -35,31 +35,31 @@ export default function Login() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center">
               <Zap className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-[#F8FAFC]">OpenRTB</span>
+            <span className="text-2xl font-bold text-slate-900">OpenRTB</span>
           </div>
-          <p className="text-[#64748B]">Sign in to your account</p>
+          <p className="text-slate-500">Sign in to your account</p>
         </div>
 
-        <Card className="surface-primary border-panel">
+        <Card className="bg-white border-slate-200 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-[#F8FAFC]">Welcome back</CardTitle>
-            <CardDescription className="text-[#64748B]">
+            <CardTitle className="text-slate-900">Welcome back</CardTitle>
+            <CardDescription className="text-slate-500">
               Enter your credentials to continue
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#94A3B8]">Email</Label>
+                <Label htmlFor="email" className="text-slate-700">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                    className="pl-10 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400"
                     required
                     data-testid="login-email"
                   />
@@ -67,23 +67,23 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#94A3B8]">Password</Label>
+                <Label htmlFor="password" className="text-slate-700">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 surface-secondary border-[#2D3B55] text-[#F8FAFC]"
+                    className="pl-10 pr-10 bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400"
                     required
                     data-testid="login-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#94A3B8]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -100,7 +100,7 @@ export default function Login() {
               </Button>
             </form>
 
-            <p className="text-sm text-[#64748B] text-center mt-6">
+            <p className="text-sm text-slate-500 text-center mt-6">
               Don't have an account?{" "}
               <Link to="/register" className="text-[#3B82F6] hover:underline">
                 Sign up
