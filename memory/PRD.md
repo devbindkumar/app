@@ -30,15 +30,16 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
   - Native creatives: Adds `imptrackers` array to native response
   - JS Tag creatives: Appends pixel tags to tag content
 
-### 3. Frequency Capping Input Fields Fix (Updated)
-- **Issue**: Unable to change field values in frequency capping section during campaign create/update - values not persisting
-- **Root Cause**: Using `type="number"` with immediate parseInt conversion caused unexpected behavior when typing
+### 3. Frequency Capping Input Fields Fix (Updated - Complete)
+- **Issue 1**: Unable to change field values in frequency capping section - values not persisting while typing
+- **Issue 2**: Values not being saved to database when clicking "Update campaign"
+- **Root Cause 1**: Using `type="number"` with immediate parseInt conversion caused unexpected behavior when typing
+- **Root Cause 2**: Backend `FrequencyCapConfig` model had `extra="ignore"` and only accepted old field names (`max_impressions_per_user`, `time_window_hours`), but frontend was sending different fields (`max_impressions`, `period`, `type`)
 - **Fix Applied**:
+  - Updated `/app/backend/models.py` FrequencyCapConfig to accept both legacy and new field names
   - Changed input type from `number` to `text` with `inputMode="numeric"` and `pattern="[0-9]*"`
-  - onChange handlers now filter non-numeric characters and store raw values
-  - onBlur handlers validate and set defaults if needed
+  - Updated `/app/frontend/src/pages/CampaignWizard/hooks/useWizardForm.js` to ensure values are converted to integers with `parseInt()` before sending
   - Response interceptor in api.js uses `JSON.parse(JSON.stringify())` to create clean data objects
-  - AuthContext uses `error?.message` to avoid passing full error objects that cause serialization issues
 
 ## Implemented Features
 
