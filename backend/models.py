@@ -547,10 +547,17 @@ class FrequencyCapConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     enabled: bool = Field(default=False)
+    # Legacy fields (keep for backwards compatibility)
     max_impressions_per_user: int = Field(default=3, description="Max impressions per user per time window")
     time_window_hours: int = Field(default=24, description="Time window in hours")
     max_impressions_per_day: int = Field(default=5, description="Max impressions per user per day")
     max_impressions_total: int = Field(default=10, description="Max total impressions per user for campaign")
+    # New fields from frontend
+    max_impressions: int = Field(default=5, description="Max impressions (from UI)")
+    period: str = Field(default="day", description="Capping period: hour, day, week, month, lifetime")
+    type: str = Field(default="user", description="Cap type: user or campaign")
+    daily_cap: int = Field(default=0, description="Daily cap per user (0 = unlimited)")
+    lifetime_cap: int = Field(default=0, description="Lifetime cap per user (0 = unlimited)")
 
 
 class SPOConfig(BaseModel):

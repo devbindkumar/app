@@ -1,0 +1,58 @@
+{
+  "summary": "Bug fix verified: Frequency capping values (Max Impressions, Period, Type, Daily Cap, Lifetime Cap) are now correctly saved when updating a campaign via 'Update campaign' button. Backend API tests (9/9 passed) confirm all frequency cap fields are persisted to database. Frontend UI tests confirm values are correctly loaded and displayed after save.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Dashboard", "issues": ["Minor: HTML nesting warning - <div> inside <p> tag in Badge component - does not affect functionality"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_frequency_capping.py",
+    "/app/test_reports/pytest/pytest_frequency_capping.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "FrequencyCapConfig model in models.py correctly accepts both legacy fields (max_impressions_per_user, time_window_hours) and new fields (max_impressions, period, type, daily_cap, lifetime_cap)",
+    "useWizardForm.js buildCampaignPayload() correctly converts frequency cap values to integers using parseInt()",
+    "ScheduleStep.jsx uses type='text' with inputMode='numeric' and pattern='[0-9]*' for numeric inputs - this allows proper typing without immediate parseInt conversion",
+    "Daily Cap and Lifetime Cap fields are conditionally shown only when Cap Type is 'Per User' - this is expected behavior"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_frequency_capping.py"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 tests passed)",
+    "frontend": "100% (All frequency cap fields verified)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Frequency capping bug fix verified. Test campaign ID: e74cfdc4-ae8d-40e3-9752-fd585020b09b (Demo Ak Freq cap). Current values in DB after testing: max_impressions=30, period=week, type=campaign, daily_cap=50, lifetime_cap=200. All frequency cap fields are correctly saved and loaded.",
+  "features_verified": {
+    "frequency_capping_persistence": {
+      "status": "VERIFIED",
+      "fields_tested": [
+        {"field": "max_impressions", "test": "API update to 50, 75", "result": "Values saved and retrieved correctly"},
+        {"field": "period", "test": "API update to hour/day/week/month/lifetime", "result": "All values saved correctly"},
+        {"field": "type", "test": "API update to user/campaign", "result": "Both values saved correctly"},
+        {"field": "daily_cap", "test": "API update to 100, 200", "result": "Values saved correctly"},
+        {"field": "lifetime_cap", "test": "API update to 500, 1000", "result": "Values saved correctly"}
+      ],
+      "ui_verification": [
+        "Period dropdown shows 'Per Week' after save (loaded from DB value 'week')",
+        "Cap Type dropdown shows 'Per Campaign' after save (loaded from DB value 'campaign')",
+        "Max Impressions input shows '30' after save",
+        "'Campaign updated successfully' toast appears after clicking Update campaign"
+      ]
+    }
+  },
+  "test_credentials": {
+    "super_admin": {"email": "superadmin@demo.com", "password": "demo123"}
+  },
+  "rca_of_the_issue": "Root cause was that the backend FrequencyCapConfig model had extra='ignore' and only accepted old field names (max_impressions_per_user, time_window_hours, etc.), but frontend was sending different fields (max_impressions, period, type). Fix: Updated FrequencyCapConfig model to accept both old and new field names. Also ensured frontend converts values to integers before sending using parseInt()."
+}

@@ -298,6 +298,11 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
   const buildCampaignPayload = useCallback(() => {
     const selectedCreative = form.creative_id || (form.creative_ids.length > 0 ? form.creative_ids[0] : "");
     
+    // Ensure frequency cap values are integers
+    const frequencyCapCount = parseInt(form.frequency_cap_count, 10) || 5;
+    const frequencyCapDaily = parseInt(form.frequency_cap_daily, 10) || 0;
+    const frequencyCapLifetime = parseInt(form.frequency_cap_lifetime, 10) || 0;
+    
     return {
       name: form.name,
       bid_price: parseFloat(form.bid_price) || 2.0,
@@ -315,11 +320,11 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
       bid_shading: { enabled: form.bid_shading_enabled },
       frequency_cap: {
         enabled: form.frequency_cap_enabled,
-        max_impressions: form.frequency_cap_count,
-        period: form.frequency_cap_period,
-        type: form.frequency_cap_type,
-        daily_cap: form.frequency_cap_daily,
-        lifetime_cap: form.frequency_cap_lifetime,
+        max_impressions: frequencyCapCount,
+        period: form.frequency_cap_period || "day",
+        type: form.frequency_cap_type || "user",
+        daily_cap: frequencyCapDaily,
+        lifetime_cap: frequencyCapLifetime,
       },
       spo: { enabled: form.spo_enabled },
       ml_prediction: { enabled: form.ml_prediction_enabled },
