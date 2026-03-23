@@ -701,6 +701,7 @@ class BiddingEngine:
         log_data["creative_id"] = winning["creative"]["id"]
         log_data["nurl"] = response["seatbid"][0]["bid"][0].get("nurl") if response.get("seatbid") else None
         log_data["burl"] = response["seatbid"][0]["bid"][0].get("burl") if response.get("seatbid") else None
+        log_data["bid_response"] = response  # Store the complete bid response JSON
         log_data["processing_time_ms"] = (time.time() - start_time) * 1000
         
         return response, log_data

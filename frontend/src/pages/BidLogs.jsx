@@ -261,6 +261,18 @@ export default function BidLogs() {
                     </div>
                   )}
 
+                  {/* Bid Response JSON - Only show if bid was made */}
+                  {selectedLog.bid_made && selectedLog.bid_response && (
+                    <div>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
+                        Bid Response (OpenRTB)
+                      </p>
+                      <div className="p-3 bg-[#3B82F6]/5 rounded border border-[#3B82F6]/20 overflow-auto max-h-96">
+                        <SimpleJsonViewer data={selectedLog.bid_response} />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Rejection Reasons */}
                   {selectedLog.rejection_reasons?.length > 0 && (
                     <div className="p-3 bg-[#EF4444]/10 rounded border border-[#EF4444]/30">

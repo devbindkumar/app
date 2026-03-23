@@ -1052,6 +1052,9 @@ class BidLog(BaseModel):
     campaign_id: Optional[str] = None
     creative_id: Optional[str] = None
     
+    # Bid Response - the actual OpenRTB response sent by the bidder
+    bid_response: Optional[Dict[str, Any]] = Field(default=None, description="The complete OpenRTB bid response JSON")
+    
     # Win notification tracking
     nurl: Optional[str] = None
     burl: Optional[str] = None
