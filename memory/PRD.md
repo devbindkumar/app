@@ -61,6 +61,14 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
   - Fixed `renderPreview()` to use `customWidth/customHeight` when `useCustomSize` is true
   - Live Preview dimensions label now correctly displays custom sizes
 
+### 6. Bid Response Display in Bid Logs (NEW)
+- **Feature**: Show the complete OpenRTB bid response sent by the bidder in the Bid Logs section
+- **Implementation**:
+  - Added `bid_response: Optional[Dict[str, Any]]` field to `BidLog` model in `/app/backend/models.py`
+  - Updated `process_bid_request()` in `/app/backend/openrtb_handler.py` to store response in `log_data["bid_response"]`
+  - Added "BID RESPONSE (OPENRTB)" section in `/app/frontend/src/pages/BidLogs.jsx` that displays only for successful bids
+  - Response JSON shows complete OpenRTB structure: id, seatbid, bid array with price/nurl/burl/adm/crid
+
 ## Implemented Features
 
 ### Core Bidding (Phases 1-3)
