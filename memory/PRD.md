@@ -41,6 +41,17 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
   - Updated `/app/frontend/src/pages/CampaignWizard/hooks/useWizardForm.js` to ensure values are converted to integers with `parseInt()` before sending
   - Response interceptor in api.js uses `JSON.parse(JSON.stringify())` to create clean data objects
 
+### 4. Creative Size Matching in Bid Response (NEW)
+- **Issue**: Bid response always showing 300x250 size even when multiple size creatives are available for a campaign
+- **Root Cause**: `_get_active_campaigns()` was using `find_one()` to get only the FIRST creative, regardless of dimensions
+- **Fix Applied**:
+  - Changed `find_one()` to `find()` in `/app/backend/openrtb_handler.py` to load ALL creatives for each campaign
+  - Added `_find_best_matching_creative()` function that:
+    - Checks impression's `banner.w`/`banner.h` and `banner.format` array
+    - Finds exact size match from available creatives
+    - Falls back to first creative of matching type if no exact match
+  - Added detailed logging for debugging: "Looking for creative matching sizes" and "Exact size match"
+
 ## Implemented Features
 
 ### Core Bidding (Phases 1-3)
