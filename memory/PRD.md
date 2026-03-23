@@ -52,6 +52,15 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
     - Falls back to first creative of matching type if no exact match
   - Added detailed logging for debugging: "Looking for creative matching sizes" and "Exact size match"
 
+### 5. Creative Editor Live Preview Size Bug (NEW)
+- **Issue**: Live Preview in Creative Editor always showing 300x250 for all creative sizes when editing existing creatives
+- **Root Cause 1**: `loadCreative()` was using `getCreatives()` to fetch all creatives, less efficient and may have issues
+- **Root Cause 2**: Live Preview dimensions label always showed `selectedSize.w/h` even when `useCustomSize` was true
+- **Fix Applied**:
+  - Changed `loadCreative()` to use `getCreative(id)` API directly for better efficiency
+  - Fixed `renderPreview()` to use `customWidth/customHeight` when `useCustomSize` is true
+  - Live Preview dimensions label now correctly displays custom sizes
+
 ## Implemented Features
 
 ### Core Bidding (Phases 1-3)
