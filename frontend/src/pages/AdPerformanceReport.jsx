@@ -32,6 +32,7 @@ import {
 
 // Dimensions configuration - Extended
 const DIMENSIONS = [
+  { id: "date", label: "Date", icon: Calendar, description: "Report date (YYYY-MM-DD)" },
   { id: "campaign_name", label: "Campaign Name", icon: Target, description: "Campaign identifier" },
   { id: "creative_name", label: "Creative Name", icon: Image, description: "Creative asset name" },
   { id: "source", label: "Source", icon: Server, description: "SSP/Exchange source" },
@@ -148,7 +149,7 @@ function TemplateCard({ template, onApply, onDelete, isCustom }) {
 
 export default function AdPerformanceReport() {
   // State
-  const [selectedDimensions, setSelectedDimensions] = useState(["campaign_name", "creative_name", "source", "domain"]);
+  const [selectedDimensions, setSelectedDimensions] = useState(["date", "campaign_name", "creative_name", "source", "domain"]);
   const [selectedMetrics, setSelectedMetrics] = useState(
     ALL_METRICS.filter(m => m.default).map(m => m.id)
   );
@@ -168,6 +169,7 @@ export default function AdPerformanceReport() {
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [selectedCreative, setSelectedCreative] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterDate, setFilterDate] = useState("all");  // Date filter for generated report
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -292,6 +294,7 @@ export default function AdPerformanceReport() {
       );
       setReportData(response.data);
       setCurrentPage(1);
+      setFilterDate("all");  // Reset date filter when generating new report
       setActiveTab("preview");
       toast.success("Report generated successfully");
     } catch (error) {
@@ -328,6 +331,11 @@ export default function AdPerformanceReport() {
       );
     }
     
+    // Apply date filter (client-side filtering for generated report)
+    if (filterDate && filterDate !== "all") {
+      filtered = filtered.filter(row => row.date === filterDate);
+    }
+    
     // Note: Campaign and Creative filters are already applied server-side via API params
     // We only need client-side filtering if user changes filter AFTER generating report
     // But since we regenerate on filter change, we can skip client-side filtering
@@ -346,7 +354,14 @@ export default function AdPerformanceReport() {
     });
     
     return filtered;
-  }, [reportData, searchTerm, sortColumn, sortDirection]);
+  }, [reportData, searchTerm, filterDate, sortColumn, sortDirection]);
+  
+  // Get unique dates from report data for the date filter dropdown
+  const availableDates = useMemo(() => {
+    if (!reportData?.data) return [];
+    const dates = [...new Set(reportData.data.map(row => row.date).filter(Boolean))];
+    return dates.sort((a, b) => b.localeCompare(a)); // Sort descending (newest first)
+  }, [reportData]);
 
   // Calculate totals from filtered data
   const totals = useMemo(() => {
@@ -807,6 +822,22 @@ export default function AdPerformanceReport() {
                         ))}
                       </SelectContent>
                     </Select>
+
+                    {/* Date Filter (for reports with date dimension) */}
+                    {availableDates.length > 0 && (
+                      <Select value={filterDate} onValueChange={(v) => { setFilterDate(v); setCurrentPage(1); }}>
+                        <SelectTrigger className="w-[160px] surface-primary border-slate-200 text-slate-900">
+                          <Calendar className="w-4 h-4 mr-2 text-slate-500" />
+                          <SelectValue placeholder="All Dates" />
+                        </SelectTrigger>
+                        <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
+                          <SelectItem value="all" className="text-slate-900">All Dates</SelectItem>
+                          {availableDates.map((date) => (
+                            <SelectItem key={date} value={date} className="text-slate-900">{date}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
 
                     {/* Data Source Badge */}
                     <Badge className={reportData.report_metadata?.is_real_data ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#F59E0B]/20 text-[#F59E0B]"}>

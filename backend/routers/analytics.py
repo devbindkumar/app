@@ -1049,22 +1049,44 @@ async def get_real_ad_performance_data(
     NO MOCK DATA - only real data from database.
     """
     try:
-        # Parse dates - be flexible with date format
+        # Parse dates - be flexible with date format and ensure timezone awareness
         try:
             start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-        except:
+        except (ValueError, TypeError):
             start_dt = datetime.strptime(start_date, "%Y-%m-%d")
         
         try:
             end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
-        except:
+        except (ValueError, TypeError):
             end_dt = datetime.strptime(end_date, "%Y-%m-%d")
         
-        # Add time to end date to include full day
-        end_dt = end_dt.replace(hour=23, minute=59, second=59)
+        # Ensure timezone awareness for proper comparison
+        if start_dt.tzinfo is None:
+            start_dt = start_dt.replace(tzinfo=timezone.utc)
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
         
-        # Build query - get ALL bid logs (no date filter for now to ensure we get data)
-        query = {}
+        # Start of day for start_dt
+        start_dt = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Add time to end date to include full day
+        end_dt = end_dt.replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Build query with date filter
+        # Note: Timestamps in DB may be stored as ISO strings, so use string comparison
+        start_str = start_dt.isoformat()
+        end_str = end_dt.isoformat()
+        
+        # Use $regex for string timestamps or $gte/$lte for datetime
+        # Since we can't know the format, try both approaches
+        query = {
+            "$or": [
+                # For datetime objects
+                {"timestamp": {"$gte": start_dt, "$lte": end_dt}},
+                # For ISO string timestamps (YYYY-MM-DD prefix match)
+                {"timestamp": {"$gte": start_str, "$lte": end_str}}
+            ]
+        }
         
         # Add campaign filter
         if campaign_id:
@@ -1074,8 +1096,11 @@ async def get_real_ad_performance_data(
         if creative_id:
             query["creative_id"] = creative_id
         
-        # Get ALL bid logs
+        # Get bid logs within date range
+        print(f"[DEBUG] Ad Performance Report Query: {query}")
+        print(f"[DEBUG] Date range: {start_dt} to {end_dt}")
         bid_logs = await db.bid_logs.find(query, {"_id": 0}).to_list(100000)
+        print(f"[DEBUG] Found {len(bid_logs)} bid logs")
         
         if not bid_logs:
             return [], False
@@ -1099,6 +1124,19 @@ async def get_real_ad_performance_data(
             # Build key from dimensions
             key_parts = []
             row = {}
+            
+            # Date dimension - always include the date from timestamp
+            if "date" in dimensions:
+                timestamp = log.get("timestamp")
+                if timestamp:
+                    if isinstance(timestamp, datetime):
+                        date_str = timestamp.strftime("%Y-%m-%d")
+                    else:
+                        date_str = str(timestamp)[:10]  # Extract YYYY-MM-DD
+                else:
+                    date_str = "Unknown"
+                row["date"] = date_str
+                key_parts.append(date_str)
             
             # Campaign name dimension
             if "campaign_name" in dimensions:

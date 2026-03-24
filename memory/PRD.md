@@ -69,6 +69,18 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
   - Added "BID RESPONSE (OPENRTB)" section in `/app/frontend/src/pages/BidLogs.jsx` that displays only for successful bids
   - Response JSON shows complete OpenRTB structure: id, seatbid, bid array with price/nurl/burl/adm/crid
 
+### 7. Advanced Report Date Filtering & Date Column (NEW)
+- **Issue**: Date range filter was not working - showing all reports regardless of selected dates
+- **Root Cause**: 
+  1. Query was hardcoded as `query = {}` without date filtering
+  2. Timestamps in DB stored as ISO strings, not datetime objects - comparison failed
+- **Fix Applied**:
+  - Added proper date query with `$gte/$lte` for both datetime and string timestamps
+  - Added timezone awareness to date parsing
+  - Added "Date" dimension option in frontend (first position in dimension list)
+  - Added date filter dropdown for generated reports
+  - Date column displays in YYYY-MM-DD format
+
 ## Implemented Features
 
 ### Core Bidding (Phases 1-3)
