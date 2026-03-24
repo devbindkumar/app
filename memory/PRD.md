@@ -81,6 +81,24 @@ Build a Demand-Side Platform (DSP) Bidder that handles OpenRTB 2.5/2.6 bid reque
   - Added date filter dropdown for generated reports
   - Date column displays in YYYY-MM-DD format
 
+### 8. OpenRTB Macros System (NEW)
+- **Feature**: Complete OpenRTB macro system for tracking URLs
+- **Implementation**:
+  - Created 61 macros covering 12 categories: Auction, Creative, Campaign, Site/App, Publisher, Device, Geo, User, SSP, Timestamp, Utility, Click
+  - Added `OPENRTB_MACROS` dictionary in `/app/backend/openrtb_handler.py`
+  - Added `replace_macros()` function that replaces macros with actual values from bid context
+  - Created `GET /api/creatives/macros` endpoint returning organized macro categories
+  - Added "Macros Reference" button in Creative Editor with full dialog showing all macros
+  - Click-to-copy functionality for easy macro insertion
+  - Macro replacement integrated into bid response generation for impression pixels
+
+**Key Macros:**
+- `${AUCTION_ID}`, `${AUCTION_PRICE}`, `${AUCTION_PRICE:B64}` - Auction data
+- `${CAMPAIGN_ID}`, `${CREATIVE_ID}` - Campaign/Creative IDs
+- `${SITE_DOMAIN}`, `${APP_BUNDLE}` - Publisher info
+- `${DEVICE_IFA}`, `${GEO_COUNTRY}`, `${GEO_CITY}` - User data
+- `${TIMESTAMP}`, `${CACHEBUSTER}` - Utility values
+
 ## Implemented Features
 
 ### Core Bidding (Phases 1-3)
