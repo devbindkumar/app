@@ -79,6 +79,7 @@ export const getCreative = (id) => api.get(`/creatives/${id}`);
 export const createCreative = (data) => api.post('/creatives', data);
 export const updateCreative = (id, data) => api.put(`/creatives/${id}`, data);
 export const deleteCreative = (id) => api.delete(`/creatives/${id}`);
+export const getCreativeMacros = () => api.get('/creatives/macros');
 
 // SSP Endpoints
 export const getSSPEndpoints = () => api.get('/ssp-endpoints');

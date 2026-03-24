@@ -6,6 +6,261 @@ from typing import Dict, Any, Optional, List, Tuple
 import time
 import logging
 
+
+import urllib.parse
+import base64
+import hashlib
+
+# OpenRTB Macro Definitions
+# Based on OpenRTB 2.5/2.6 specification
+OPENRTB_MACROS = {
+    # Auction Macros (Standard OpenRTB)
+    "${AUCTION_ID}": "Bid Request ID",
+    "${AUCTION_BID_ID}": "Bid ID returned by bidder",
+    "${AUCTION_IMP_ID}": "Impression ID",
+    "${AUCTION_SEAT_ID}": "Seat ID of the winning bidder",
+    "${AUCTION_AD_ID}": "Ad ID submitted by the bidder",
+    "${AUCTION_PRICE}": "Settlement price (unencoded)",
+    "${AUCTION_PRICE:B64}": "Settlement price (Base64 encoded)",
+    "${AUCTION_PRICE:HASH}": "Settlement price (SHA256 hashed)",
+    "${AUCTION_CURRENCY}": "Auction currency code (e.g., USD)",
+    "${AUCTION_MBR}": "Minimum bid to win (if applicable)",
+    "${AUCTION_LOSS}": "Loss reason code",
+    
+    # Creative Macros
+    "${CREATIVE_ID}": "Creative ID",
+    "${CREATIVE_NAME}": "Creative name",
+    "${CREATIVE_WIDTH}": "Creative width in pixels",
+    "${CREATIVE_HEIGHT}": "Creative height in pixels",
+    
+    # Campaign Macros
+    "${CAMPAIGN_ID}": "Campaign ID",
+    "${CAMPAIGN_NAME}": "Campaign name",
+    
+    # Site/App Macros
+    "${SITE_ID}": "Site ID from bid request",
+    "${SITE_NAME}": "Site name",
+    "${SITE_DOMAIN}": "Site domain",
+    "${SITE_PAGE}": "Page URL",
+    "${SITE_REF}": "Referrer URL",
+    "${APP_ID}": "App ID (for mobile)",
+    "${APP_NAME}": "App name",
+    "${APP_BUNDLE}": "App bundle ID",
+    "${APP_STORE_URL}": "App store URL",
+    
+    # Publisher Macros
+    "${PUBLISHER_ID}": "Publisher ID",
+    "${PUBLISHER_NAME}": "Publisher name",
+    
+    # Device Macros
+    "${DEVICE_IP}": "Device IP address",
+    "${DEVICE_UA}": "User agent string",
+    "${DEVICE_IFA}": "Device advertising ID (IDFA/GAID)",
+    "${DEVICE_MAKE}": "Device manufacturer",
+    "${DEVICE_MODEL}": "Device model",
+    "${DEVICE_OS}": "Operating system",
+    "${DEVICE_OSV}": "OS version",
+    "${DEVICE_TYPE}": "Device type (1=Mobile, 2=PC, etc.)",
+    "${DEVICE_LANGUAGE}": "Device language",
+    "${DEVICE_CARRIER}": "Mobile carrier",
+    "${DEVICE_CONNECTION}": "Connection type",
+    
+    # Geo Macros
+    "${GEO_COUNTRY}": "Country code (ISO 3166-1 alpha-3)",
+    "${GEO_REGION}": "Region/state code",
+    "${GEO_CITY}": "City name",
+    "${GEO_ZIP}": "ZIP/postal code",
+    "${GEO_LAT}": "Latitude",
+    "${GEO_LON}": "Longitude",
+    "${GEO_METRO}": "Metro code",
+    
+    # User Macros
+    "${USER_ID}": "User ID",
+    "${USER_BUYERUID}": "Buyer-specific user ID",
+    "${USER_GENDER}": "User gender",
+    "${USER_YOB}": "User year of birth",
+    "${USER_KEYWORDS}": "User keywords",
+    
+    # SSP/Exchange Macros
+    "${SSP_ID}": "SSP/Exchange ID",
+    "${SSP_NAME}": "SSP/Exchange name",
+    
+    # Timestamp Macros
+    "${TIMESTAMP}": "Unix timestamp (seconds)",
+    "${TIMESTAMP_MS}": "Unix timestamp (milliseconds)",
+    "${DATE}": "Current date (YYYY-MM-DD)",
+    "${TIME}": "Current time (HH:MM:SS)",
+    
+    # Random/Cache Buster
+    "${CACHEBUSTER}": "Random number for cache busting",
+    "${RANDOM}": "Random alphanumeric string",
+    
+    # Click Tracking
+    "${CLICK_URL}": "Click tracking URL (URL encoded)",
+    "${CLICK_URL_UNESC}": "Click tracking URL (unescoded)",
+}
+
+
+def replace_macros(
+    url: str,
+    bid_request: Dict[str, Any],
+    bid_response: Dict[str, Any],
+    campaign: Dict[str, Any],
+    creative: Dict[str, Any],
+    win_price: float = None,
+    click_url: str = None
+) -> str:
+    """
+    Replace OpenRTB macros in a URL with actual values from the bid context.
+    
+    Args:
+        url: URL containing macros to replace
+        bid_request: The original OpenRTB bid request
+        bid_response: The bid response being generated
+        campaign: Campaign data
+        creative: Creative data
+        win_price: Winning price (for win notifications)
+        click_url: Click tracking URL
+    
+    Returns:
+        URL with all macros replaced with actual values
+    """
+    if not url:
+        return url
+    
+    import time
+    import random
+    import string
+    from datetime import datetime, timezone
+    
+    # Extract data from bid request
+    imp = bid_request.get("imp", [{}])[0] if bid_request.get("imp") else {}
+    site = bid_request.get("site", {})
+    app = bid_request.get("app", {})
+    device = bid_request.get("device", {})
+    geo = device.get("geo", {})
+    user = bid_request.get("user", {})
+    publisher = site.get("publisher", {}) or app.get("publisher", {})
+    
+    # Get banner/video dimensions
+    banner = imp.get("banner", {})
+    video = imp.get("video", {})
+    creative_width = creative.get("banner_data", {}).get("width") or banner.get("w") or video.get("w") or ""
+    creative_height = creative.get("banner_data", {}).get("height") or banner.get("h") or video.get("h") or ""
+    
+    # Generate timestamps
+    now = datetime.now(timezone.utc)
+    timestamp = int(now.timestamp())
+    timestamp_ms = int(now.timestamp() * 1000)
+    
+    # Generate random values
+    cachebuster = random.randint(100000000, 999999999)
+    random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
+    
+    # Price encoding
+    price_str = str(win_price) if win_price is not None else "0"
+    price_b64 = base64.b64encode(price_str.encode()).decode()
+    price_hash = hashlib.sha256(price_str.encode()).hexdigest()[:16]
+    
+    # Macro replacement mapping
+    replacements = {
+        # Auction Macros
+        "${AUCTION_ID}": bid_request.get("id", ""),
+        "${AUCTION_BID_ID}": bid_response.get("id", ""),
+        "${AUCTION_IMP_ID}": imp.get("id", ""),
+        "${AUCTION_SEAT_ID}": bid_response.get("seatbid", [{}])[0].get("seat", "") if bid_response.get("seatbid") else "",
+        "${AUCTION_AD_ID}": creative.get("id", ""),
+        "${AUCTION_PRICE}": price_str,
+        "${AUCTION_PRICE:B64}": price_b64,
+        "${AUCTION_PRICE:HASH}": price_hash,
+        "${AUCTION_CURRENCY}": bid_request.get("cur", ["USD"])[0] if isinstance(bid_request.get("cur"), list) else bid_request.get("cur", "USD"),
+        "${AUCTION_MBR}": str(imp.get("bidfloor", "")),
+        "${AUCTION_LOSS}": "",
+        
+        # Creative Macros
+        "${CREATIVE_ID}": creative.get("id", ""),
+        "${CREATIVE_NAME}": creative.get("name", ""),
+        "${CREATIVE_WIDTH}": str(creative_width),
+        "${CREATIVE_HEIGHT}": str(creative_height),
+        
+        # Campaign Macros
+        "${CAMPAIGN_ID}": campaign.get("id", ""),
+        "${CAMPAIGN_NAME}": campaign.get("name", ""),
+        
+        # Site Macros
+        "${SITE_ID}": site.get("id", ""),
+        "${SITE_NAME}": site.get("name", ""),
+        "${SITE_DOMAIN}": site.get("domain", ""),
+        "${SITE_PAGE}": site.get("page", ""),
+        "${SITE_REF}": site.get("ref", ""),
+        
+        # App Macros
+        "${APP_ID}": app.get("id", ""),
+        "${APP_NAME}": app.get("name", ""),
+        "${APP_BUNDLE}": app.get("bundle", ""),
+        "${APP_STORE_URL}": app.get("storeurl", ""),
+        
+        # Publisher Macros
+        "${PUBLISHER_ID}": publisher.get("id", ""),
+        "${PUBLISHER_NAME}": publisher.get("name", ""),
+        
+        # Device Macros
+        "${DEVICE_IP}": device.get("ip", ""),
+        "${DEVICE_UA}": device.get("ua", ""),
+        "${DEVICE_IFA}": device.get("ifa", ""),
+        "${DEVICE_MAKE}": device.get("make", ""),
+        "${DEVICE_MODEL}": device.get("model", ""),
+        "${DEVICE_OS}": device.get("os", ""),
+        "${DEVICE_OSV}": device.get("osv", ""),
+        "${DEVICE_TYPE}": str(device.get("devicetype", "")),
+        "${DEVICE_LANGUAGE}": device.get("language", ""),
+        "${DEVICE_CARRIER}": device.get("carrier", ""),
+        "${DEVICE_CONNECTION}": str(device.get("connectiontype", "")),
+        
+        # Geo Macros
+        "${GEO_COUNTRY}": geo.get("country", ""),
+        "${GEO_REGION}": geo.get("region", ""),
+        "${GEO_CITY}": geo.get("city", ""),
+        "${GEO_ZIP}": geo.get("zip", ""),
+        "${GEO_LAT}": str(geo.get("lat", "")),
+        "${GEO_LON}": str(geo.get("lon", "")),
+        "${GEO_METRO}": geo.get("metro", ""),
+        
+        # User Macros
+        "${USER_ID}": user.get("id", ""),
+        "${USER_BUYERUID}": user.get("buyeruid", ""),
+        "${USER_GENDER}": user.get("gender", ""),
+        "${USER_YOB}": str(user.get("yob", "")),
+        "${USER_KEYWORDS}": user.get("keywords", ""),
+        
+        # SSP Macros
+        "${SSP_ID}": bid_request.get("ext", {}).get("ssp_id", ""),
+        "${SSP_NAME}": bid_request.get("ext", {}).get("ssp_name", ""),
+        
+        # Timestamp Macros
+        "${TIMESTAMP}": str(timestamp),
+        "${TIMESTAMP_MS}": str(timestamp_ms),
+        "${DATE}": now.strftime("%Y-%m-%d"),
+        "${TIME}": now.strftime("%H:%M:%S"),
+        
+        # Random/Cache Buster
+        "${CACHEBUSTER}": str(cachebuster),
+        "${RANDOM}": random_str,
+        
+        # Click Tracking
+        "${CLICK_URL}": urllib.parse.quote(click_url or "", safe=""),
+        "${CLICK_URL_UNESC}": click_url or "",
+    }
+    
+    # Perform replacements
+    result = url
+    for macro, value in replacements.items():
+        if macro in result:
+            result = result.replace(macro, str(value) if value else "")
+    
+    return result
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -385,9 +640,10 @@ class OpenRTBResponseBuilder:
         campaign: Dict[str, Any],
         seat_id: str = "default",
         nurl_base: str = None,
-        burl_base: str = None
+        burl_base: str = None,
+        bid_request: Dict[str, Any] = None
     ) -> Dict[str, Any]:
-        """Build a complete bid response"""
+        """Build a complete bid response with macro replacement"""
         
         # Generate nurl and burl with macros
         nurl = None
@@ -412,13 +668,38 @@ class OpenRTBResponseBuilder:
             "attr": creative.get("attr", []),
         }
         
+        # Build the basic response structure for macro replacement context
+        response_context = {
+            "id": bid_id,
+            "seatbid": [{"seat": seat_id, "bid": [bid]}],
+            "cur": "USD"
+        }
+        
         # Add ad markup based on creative type
         creative_type = creative.get("type")
         
         # Build impression pixel HTML for injection into ad markup
+        # Apply macro replacement to pixel URLs
         impression_pixels_html = ""
         impression_pixels = creative.get("impression_pixels", [])
-        if impression_pixels:
+        if impression_pixels and bid_request:
+            for pixel in impression_pixels:
+                if pixel.get("enabled", True) and pixel.get("url"):
+                    pixel_url = pixel.get("url", "")
+                    # Replace macros in pixel URL
+                    pixel_url = replace_macros(
+                        pixel_url, 
+                        bid_request, 
+                        response_context, 
+                        campaign, 
+                        creative,
+                        win_price=price,
+                        click_url=creative.get("click_url")
+                    )
+                    pixel_name = pixel.get("name", "pixel")
+                    impression_pixels_html += f'<img src="{pixel_url}" width="1" height="1" style="display:none;" alt="{pixel_name}" />'
+        elif impression_pixels:
+            # Fallback without macro replacement if no bid_request
             for pixel in impression_pixels:
                 if pixel.get("enabled", True) and pixel.get("url"):
                     pixel_url = pixel.get("url", "")
@@ -690,7 +971,8 @@ class BiddingEngine:
             creative=winning["creative"],
             campaign=winning["campaign"],
             nurl_base=nurl_base,
-            burl_base=nurl_base
+            burl_base=nurl_base,
+            bid_request=request  # Pass bid request for macro replacement
         )
         
         log_data["bid_made"] = True

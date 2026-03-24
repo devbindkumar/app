@@ -32,7 +32,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { toast } from "sonner";
-import { createCreative, updateCreative, getCreatives, getCreative, uploadImage, uploadVideo, uploadAudio } from "../lib/api";
+import { createCreative, updateCreative, getCreatives, getCreative, getCreativeMacros, uploadImage, uploadVideo, uploadAudio } from "../lib/api";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -96,6 +96,11 @@ export default function CreativeEditor() {
   
   // Impression Pixels
   const [impressionPixels, setImpressionPixels] = useState([]);
+  
+  // Macros Reference
+  const [macros, setMacros] = useState(null);
+  const [showMacrosDialog, setShowMacrosDialog] = useState(false);
+  const [macrosLoading, setMacrosLoading] = useState(false);
   
   const [form, setForm] = useState({
     name: "",
@@ -460,6 +465,32 @@ export default function CreativeEditor() {
 
   const removeImpressionPixel = (id) => {
     setImpressionPixels(prev => prev.filter(pixel => pixel.id !== id));
+  };
+
+  // Load available macros
+  const loadMacros = async () => {
+    if (macros) {
+      setShowMacrosDialog(true);
+      return;
+    }
+    
+    try {
+      setMacrosLoading(true);
+      const response = await getCreativeMacros();
+      setMacros(response.data);
+      setShowMacrosDialog(true);
+    } catch (error) {
+      console.error("Failed to load macros:", error);
+      toast.error("Failed to load macros reference");
+    } finally {
+      setMacrosLoading(false);
+    }
+  };
+
+  // Copy macro to clipboard
+  const copyMacro = (macro) => {
+    navigator.clipboard.writeText(macro);
+    toast.success(`Copied ${macro} to clipboard`);
   };
 
   const handleSubmit = async (e) => {
@@ -1624,7 +1655,22 @@ export default function CreativeEditor() {
           {/* Impression Pixels */}
           <Card className="surface-primary border-panel">
             <CardHeader>
-              <CardTitle className="text-lg text-slate-900">Impression Pixels</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg text-slate-900">Impression Pixels</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadMacros}
+                  disabled={macrosLoading}
+                  className="border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6]/10"
+                >
+                  {macrosLoading ? (
+                    <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Loading...</>
+                  ) : (
+                    <><Code className="w-4 h-4 mr-1" /> Macros Reference</>
+                  )}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1710,10 +1756,12 @@ export default function CreativeEditor() {
                           <Input
                             value={pixel.url}
                             onChange={(e) => updateImpressionPixel(pixel.id, 'url', e.target.value)}
-                            placeholder="https://tracking.example.com/pixel?id=xxx"
+                            placeholder="https://tracking.example.com/pixel?id=${AUCTION_ID}&cb=${CACHEBUSTER}"
                             className="surface-primary border-slate-200 text-slate-900 font-mono text-xs"
                           />
-                          <p className="text-xs text-slate-400">1x1 pixel URL that fires on the selected event</p>
+                          <p className="text-xs text-slate-400">
+                            1x1 pixel URL - Use macros like ${"{AUCTION_ID}"}, ${"{CAMPAIGN_ID}"}, ${"{CACHEBUSTER}"}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -1853,6 +1901,69 @@ export default function CreativeEditor() {
           <div className="flex justify-center p-8 surface-secondary rounded">
             {renderPreview()}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Macros Reference Dialog */}
+      <Dialog open={showMacrosDialog} onOpenChange={setShowMacrosDialog}>
+        <DialogContent className="surface-primary border-panel max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-slate-900 flex items-center gap-2">
+              <Code className="w-5 h-5 text-[#3B82F6]" />
+              OpenRTB Macros Reference
+            </DialogTitle>
+          </DialogHeader>
+          
+          {macros && (
+            <div className="overflow-y-auto max-h-[60vh] pr-2">
+              {/* Example Usage */}
+              <div className="mb-4 p-3 bg-[#3B82F6]/5 rounded-lg border border-[#3B82F6]/20">
+                <p className="text-xs font-medium text-slate-700 mb-1">Example Usage:</p>
+                <code className="text-xs font-mono text-[#3B82F6] break-all">
+                  {macros.example_usage}
+                </code>
+              </div>
+              
+              <p className="text-xs text-slate-500 mb-4">
+                Click on any macro to copy it to your clipboard. Total: {macros.total_macros} macros available.
+              </p>
+              
+              {/* Macro Categories */}
+              <div className="space-y-4">
+                {Object.entries(macros.categories).map(([key, category]) => (
+                  category.macros.length > 0 && (
+                    <div key={key} className="border border-slate-200 rounded-lg overflow-hidden">
+                      <div className="bg-slate-50 px-3 py-2 border-b border-slate-200">
+                        <h3 className="text-sm font-medium text-slate-900">{category.name}</h3>
+                        <p className="text-xs text-slate-500">{category.description}</p>
+                      </div>
+                      <div className="p-2">
+                        <div className="grid grid-cols-1 gap-1">
+                          {category.macros.map((m, idx) => (
+                            <div 
+                              key={idx}
+                              onClick={() => copyMacro(m.macro)}
+                              className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer group transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                <code className="text-xs font-mono text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">
+                                  {m.macro}
+                                </code>
+                                <span className="text-xs text-slate-500">{m.description}</span>
+                              </div>
+                              <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Click to copy
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

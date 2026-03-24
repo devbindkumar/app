@@ -50,6 +50,114 @@ async def get_creatives(
     return creatives
 
 
+@router.get("/creatives/macros")
+async def get_available_macros():
+    """
+    Get the list of all available OpenRTB macros for use in impression pixels and click URLs.
+    These macros will be replaced with actual values when the bid response is generated.
+    """
+    from openrtb_handler import OPENRTB_MACROS
+    
+    # Organize macros by category
+    categories = {
+        "auction": {
+            "name": "Auction Macros",
+            "description": "Standard OpenRTB auction-related values",
+            "macros": []
+        },
+        "creative": {
+            "name": "Creative Macros",
+            "description": "Information about the creative being served",
+            "macros": []
+        },
+        "campaign": {
+            "name": "Campaign Macros",
+            "description": "Campaign identification",
+            "macros": []
+        },
+        "site_app": {
+            "name": "Site/App Macros",
+            "description": "Publisher site or app information",
+            "macros": []
+        },
+        "publisher": {
+            "name": "Publisher Macros",
+            "description": "Publisher identification",
+            "macros": []
+        },
+        "device": {
+            "name": "Device Macros",
+            "description": "User device information",
+            "macros": []
+        },
+        "geo": {
+            "name": "Geo/Location Macros",
+            "description": "Geographic location data",
+            "macros": []
+        },
+        "user": {
+            "name": "User Macros",
+            "description": "User identification and demographics",
+            "macros": []
+        },
+        "ssp": {
+            "name": "SSP/Exchange Macros",
+            "description": "Supply-side platform information",
+            "macros": []
+        },
+        "timestamp": {
+            "name": "Timestamp Macros",
+            "description": "Date and time values",
+            "macros": []
+        },
+        "utility": {
+            "name": "Utility Macros",
+            "description": "Cache busting and random values",
+            "macros": []
+        },
+        "click": {
+            "name": "Click Tracking Macros",
+            "description": "Click URL placeholders",
+            "macros": []
+        }
+    }
+    
+    # Categorize each macro
+    for macro, description in OPENRTB_MACROS.items():
+        macro_entry = {"macro": macro, "description": description}
+        
+        if "AUCTION" in macro:
+            categories["auction"]["macros"].append(macro_entry)
+        elif "CREATIVE" in macro:
+            categories["creative"]["macros"].append(macro_entry)
+        elif "CAMPAIGN" in macro:
+            categories["campaign"]["macros"].append(macro_entry)
+        elif "SITE" in macro or "APP" in macro:
+            categories["site_app"]["macros"].append(macro_entry)
+        elif "PUBLISHER" in macro:
+            categories["publisher"]["macros"].append(macro_entry)
+        elif "DEVICE" in macro:
+            categories["device"]["macros"].append(macro_entry)
+        elif "GEO" in macro:
+            categories["geo"]["macros"].append(macro_entry)
+        elif "USER" in macro:
+            categories["user"]["macros"].append(macro_entry)
+        elif "SSP" in macro:
+            categories["ssp"]["macros"].append(macro_entry)
+        elif "TIMESTAMP" in macro or "DATE" in macro or "TIME" in macro:
+            categories["timestamp"]["macros"].append(macro_entry)
+        elif "CACHE" in macro or "RANDOM" in macro:
+            categories["utility"]["macros"].append(macro_entry)
+        elif "CLICK" in macro:
+            categories["click"]["macros"].append(macro_entry)
+    
+    return {
+        "categories": categories,
+        "total_macros": len(OPENRTB_MACROS),
+        "example_usage": "https://tracking.example.com/pixel?auction_id=${AUCTION_ID}&campaign=${CAMPAIGN_ID}&price=${AUCTION_PRICE}&cb=${CACHEBUSTER}"
+    }
+
+
 @router.get("/creatives/{creative_id}", response_model=Creative)
 async def get_creative(creative_id: str):
     """Get a single creative"""
