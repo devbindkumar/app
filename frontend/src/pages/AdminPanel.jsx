@@ -64,7 +64,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showCreateUser, setShowCreateUser] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "advertiser" });
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   
@@ -256,15 +256,14 @@ export default function AdminPanel() {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
-      }
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to setup 2FA");
+      }
       setTwoFASetup(data);
       setShow2FASetup(true);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to setup 2FA");
     }
   };
 
@@ -278,9 +277,9 @@ export default function AdminPanel() {
         },
         body: JSON.stringify({ code: verificationCode }),
       });
+      const data = await response.json();
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to enable 2FA");
       }
       toast.success("2FA enabled successfully!");
       setShow2FASetup(false);
@@ -288,7 +287,7 @@ export default function AdminPanel() {
       setVerificationCode("");
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to enable 2FA");
     }
   };
 
@@ -305,14 +304,14 @@ export default function AdminPanel() {
         },
         body: JSON.stringify({ code }),
       });
+      const data = await response.json();
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to disable 2FA");
       }
       toast.success("2FA disabled successfully");
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to disable 2FA");
     }
   };
 
@@ -334,9 +333,10 @@ export default function AdminPanel() {
         body: JSON.stringify(newUser),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to create user");
       }
 
       toast.success("User created successfully");
@@ -344,7 +344,7 @@ export default function AdminPanel() {
       setNewUser({ name: "", email: "", password: "", role: getAllowedRoles()[0] || "advertiser" });
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to create user");
     }
   };
 
@@ -355,15 +355,15 @@ export default function AdminPanel() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to update user status");
       }
 
       toast.success(`User ${!currentStatus ? "activated" : "deactivated"}`);
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to update user status");
     }
   };
 
@@ -374,15 +374,15 @@ export default function AdminPanel() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to update user role");
       }
 
       toast.success("User role updated");
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to update user role");
     }
   };
 
@@ -395,15 +395,15 @@ export default function AdminPanel() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to delete user");
       }
 
       toast.success("User deleted");
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to delete user");
     }
   };
 
@@ -438,18 +438,17 @@ export default function AdminPanel() {
         body: JSON.stringify({ user_ids: selectedUsers }),
       });
 
+      const result = await response.json();
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(result.detail || "Failed to delete users");
       }
 
-      const result = await response.json();
       toast.success(`Successfully deleted ${result.deleted_count} user(s)`);
       setSelectedUsers([]);
       setShowBulkDeleteConfirm(false);
       fetchData();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to delete users");
     }
   };
 
@@ -489,18 +488,17 @@ export default function AdminPanel() {
         }),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail);
+        throw new Error(data.detail || "Failed to update access");
       }
 
-      const data = await response.json();
       toast.success(`Access updated for ${selectedRole} role (${data.users_updated} users updated)`);
       setHasUnsavedChanges(false);
       fetchData();
       refreshUser();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to update access");
     } finally {
       setSaving(false);
     }
@@ -1005,7 +1003,10 @@ export default function AdminPanel() {
                         </Button>
                       )}
                       {/* Create */}
-                      <Button onClick={() => setShowCreateUser(true)} className="bg-[#3B82F6]" data-testid="create-user-btn">
+                      <Button onClick={() => {
+                        setNewUser({ name: "", email: "", password: "", role: getAllowedRoles()[0] || "admin" });
+                        setShowCreateUser(true);
+                      }} className="bg-[#3B82F6]" data-testid="create-user-btn">
                         <Plus className="w-4 h-4 mr-2" /> Add {isSuperAdmin ? "Admin" : "Advertiser"}
                       </Button>
                     </div>
