@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { 
   Gauge, 
   RefreshCw, 
@@ -118,7 +118,7 @@ export default function Pacing() {
   const [pacingData, setPacingData] = useState(null);
   const [showResetAll, setShowResetAll] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getPacingStatus();
@@ -128,14 +128,14 @@ export default function Pacing() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
     // Auto-refresh every 60 seconds
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchData]);
 
   const handleResetCampaign = async (campaignId) => {
     try {

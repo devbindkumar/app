@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { 
   Plus, Play, Pause, Trash2, Edit, MoreVertical, Target, DollarSign,
@@ -83,7 +83,7 @@ export default function Campaigns() {
   const [showBulkDelete, setShowBulkDelete] = useState(false);
   const [sort, setSort] = useState({ key: "created_at", direction: "desc" });
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getCampaigns();
@@ -93,11 +93,11 @@ export default function Campaigns() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [fetchCampaigns]);
 
   // Sorted campaigns
   const sortedCampaigns = useMemo(() => {

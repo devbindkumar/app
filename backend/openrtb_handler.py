@@ -129,7 +129,7 @@ def replace_macros(
         return url
     
     import time
-    import random
+    import secrets
     import string
     from datetime import datetime, timezone
     
@@ -153,9 +153,9 @@ def replace_macros(
     timestamp = int(now.timestamp())
     timestamp_ms = int(now.timestamp() * 1000)
     
-    # Generate random values
-    cachebuster = random.randint(100000000, 999999999)
-    random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
+    # Generate random values using cryptographically secure random
+    cachebuster = secrets.randbelow(900000000) + 100000000
+    random_str = secrets.token_urlsafe(12)[:16]
     
     # Price encoding
     price_str = str(win_price) if win_price is not None else "0"

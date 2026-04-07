@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Plus, 
@@ -744,7 +744,7 @@ export default function Creatives() {
   const [previewCreative, setPreviewCreative] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
 
-  const fetchCreatives = async () => {
+  const fetchCreatives = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getCreatives();
@@ -760,11 +760,11 @@ export default function Creatives() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCreatives();
-  }, []);
+  }, [fetchCreatives]);
 
   const handleDelete = async () => {
     if (!deleteId) return;

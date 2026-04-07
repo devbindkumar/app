@@ -354,7 +354,7 @@ async def send_new_user_notification(admin_email: str, admin_name: str, new_user
     """Send notification to admin when a new user is created under them"""
     # Check preferences if admin_id provided
     if admin_id:
-        from routers.auth import should_send_notification
+        from services.notification_preferences import should_send_notification
         if not await should_send_notification(admin_id, "new_user"):
             logger.info(f"New user notification skipped for {admin_email} (disabled in preferences)")
             return {"status": "skipped", "message": "Notification disabled in user preferences"}
@@ -369,7 +369,7 @@ async def send_password_reset_email(user_email: str, user_name: str, reset_token
     # Password reset emails are always sent (security critical)
     # But we still log the preference check
     if user_id:
-        from routers.auth import should_send_notification
+        from services.notification_preferences import should_send_notification
         should_send = await should_send_notification(user_id, "password_reset")
         if not should_send:
             logger.info(f"Password reset notification for {user_email} - preferences disabled but sending anyway (security)")
@@ -383,7 +383,7 @@ async def send_budget_alert(user_email: str, user_name: str, campaign_name: str,
     """Send budget alert notification"""
     # Check preferences if user_id provided
     if user_id:
-        from routers.auth import should_send_notification, get_budget_thresholds
+        from services.notification_preferences import should_send_notification, get_budget_thresholds
         if not await should_send_notification(user_id, "budget"):
             logger.info(f"Budget alert skipped for {user_email} (disabled in preferences)")
             return {"status": "skipped", "message": "Budget alerts disabled in user preferences"}
@@ -407,7 +407,7 @@ async def send_suspicious_login_alert(user_email: str, user_name: str, ip_addres
     """Send suspicious login alert"""
     # Security alerts are critical but can still be checked
     if user_id:
-        from routers.auth import should_send_notification
+        from services.notification_preferences import should_send_notification
         if not await should_send_notification(user_id, "security"):
             logger.info(f"Security alert skipped for {user_email} (disabled in preferences)")
             return {"status": "skipped", "message": "Security alerts disabled in user preferences"}

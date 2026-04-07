@@ -1807,8 +1807,8 @@ export default function CreativeEditor() {
                 {uploadedImages.length > 0 && (
                   <div className="mt-4 space-y-2">
                     <p className="text-xs text-slate-500">Uploaded Images</p>
-                    {uploadedImages.map((img, idx) => (
-                      <div key={idx} className="flex items-center gap-2 p-2 surface-secondary rounded">
+                    {uploadedImages.map((img) => (
+                      <div key={img.url || img.filename} className="flex items-center gap-2 p-2 surface-secondary rounded">
                         <img src={img.url} alt="" className="w-10 h-10 object-cover rounded" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-900 truncate">{img.filename}</p>
@@ -1939,9 +1939,9 @@ export default function CreativeEditor() {
                       </div>
                       <div className="p-2">
                         <div className="grid grid-cols-1 gap-1">
-                          {category.macros.map((m, idx) => (
+                          {category.macros.map((m) => (
                             <div 
-                              key={idx}
+                              key={m.macro}
                               onClick={() => copyMacro(m.macro)}
                               className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer group transition-colors"
                             >

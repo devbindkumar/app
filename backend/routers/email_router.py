@@ -1,6 +1,10 @@
 """
 Email notification API endpoints for testing and admin control.
+NOTE: Test endpoints use placeholder values for demonstration only.
+Production deployments should use real tokens from the system.
 """
+import os
+import secrets
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
 from typing import Optional
@@ -16,6 +20,9 @@ from routers.email_service import (
 )
 
 router = APIRouter(tags=["Email"])
+
+# Environment check for test endpoints
+IS_DEVELOPMENT = os.environ.get("ENVIRONMENT", "development") != "production"
 
 
 class TestEmailRequest(BaseModel):
@@ -46,10 +53,19 @@ async def send_test_email(
     current_user: dict = Depends(require_role([UserRole.SUPER_ADMIN]))
 ):
     """
-    Send a test email (Super Admin only).
+    Send a test email (Super Admin only, development environment only).
     Useful for verifying email configuration and templates.
     """
+    if not IS_DEVELOPMENT:
+        raise HTTPException(
+            status_code=403, 
+            detail="Test email endpoint is disabled in production"
+        )
+    
     try:
+        # Generate secure test token instead of hardcoded value
+        test_token = secrets.token_urlsafe(32)
+        
         if request.email_type == "welcome":
             result = await send_new_user_notification(
                 admin_email=request.recipient_email,
@@ -62,7 +78,7 @@ async def send_test_email(
             result = await send_password_reset_email(
                 user_email=request.recipient_email,
                 user_name=request.name,
-                reset_token="test-reset-token-12345"
+                reset_token=test_token  # Use secure random token
             )
         elif request.email_type == "budget_alert":
             result = await send_budget_alert(
@@ -77,8 +93,8 @@ async def send_test_email(
             result = await send_suspicious_login_alert(
                 user_email=request.recipient_email,
                 user_name=request.name,
-                ip_address="192.168.1.100",
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                ip_address="[TEST] 192.168.x.x",
+                user_agent="[TEST] Browser User Agent"
             )
         else:
             raise HTTPException(status_code=400, detail=f"Unknown email type: {request.email_type}")

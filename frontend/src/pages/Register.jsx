@@ -23,7 +23,8 @@ export default function Register() {
     try {
       await register(email, password, name, role);
     } catch (error) {
-      // Error handled in context
+      // Error is already handled and displayed in AuthContext
+      console.error('Registration failed:', error?.message || 'Unknown error');
     } finally {
       setLoading(false);
     }

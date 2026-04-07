@@ -235,8 +235,8 @@ function GeoSelector({ form, updateField, type = "include" }) {
           {/* Tier-wise city selection for India */}
           {countries[0] === "IND" && states.length > 0 ? (
             <div className="space-y-3">
-              {availableCitiesByTier.map((tierGroup, idx) => (
-                <div key={idx} className="space-y-2">
+              {availableCitiesByTier.map((tierGroup) => (
+                <div key={`${tierGroup.tier}-${tierGroup.state || 'all'}`} className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-medium px-2 py-1 rounded ${
                       tierGroup.tier === "Tier 1" ? "bg-[#10B981]/20 text-[#10B981]" :
