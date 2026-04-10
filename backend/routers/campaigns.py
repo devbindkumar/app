@@ -101,6 +101,7 @@ async def create_campaign(
         priority=input.priority,
         placements=input.placements,
         creative_id=input.creative_id,
+        creative_ids=input.creative_ids if input.creative_ids else [input.creative_id],
         budget=input.budget,
         bid_shading=input.bid_shading,
         frequency_cap=input.frequency_cap,

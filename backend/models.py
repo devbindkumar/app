@@ -624,6 +624,7 @@ class Campaign(BaseModel):
     
     # Creative
     creative_id: str
+    creative_ids: List[str] = Field(default_factory=list, description="List of creative IDs for multi-creative campaigns")
     
     # Targeting
     targeting: CampaignTargeting = Field(default_factory=CampaignTargeting)
