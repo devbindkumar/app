@@ -312,6 +312,7 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
       priority: form.priority,
       placements: [],
       creative_id: selectedCreative,
+      creative_ids: form.creative_ids.length > 0 ? form.creative_ids : [selectedCreative],
       budget: {
         daily_budget: form.daily_budget,
         total_budget: form.total_budget,
