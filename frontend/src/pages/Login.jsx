@@ -36,13 +36,14 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     
-    const result = await login(email, password);
-    
-    if (!result.success) {
-      toast.error(result.error || "Invalid credentials");
+    try {
+      await login(email, password);
+      // Success is handled in AuthContext (shows toast and navigates)
+    } catch (error) {
+      // Error toast is already shown in AuthContext
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   // Floating animation styles
