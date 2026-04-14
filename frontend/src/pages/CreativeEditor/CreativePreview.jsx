@@ -315,14 +315,30 @@ function JsTagPreview({ form }) {
               width={Math.min((parseInt(form.jsTagWidth) || 300) + 20, 420)}
               height={Math.min((parseInt(form.jsTagHeight) || 250) + 20, 320)}
               className="border-0"
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
             />
           </div>
+          <p className="text-xs text-slate-400 text-center">
+            Note: Some third-party tags may not render in preview due to security restrictions
+          </p>
+        </div>
+      ) : form.jsTagUrl ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-slate-500">External Tag URL</p>
+            <Badge className="bg-[#3B82F6]/20 text-[#3B82F6] text-xs">URL</Badge>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <code className="text-xs text-slate-600 break-all">{form.jsTagUrl}</code>
+          </div>
+          <p className="text-xs text-slate-400 text-center">
+            External JS tags load at runtime and cannot be previewed here
+          </p>
         </div>
       ) : (
         <div className="rounded-lg border-2 border-dashed border-slate-200 p-8 flex flex-col items-center justify-center text-slate-500">
           <Code className="w-10 h-10 mb-3" />
-          <p className="text-sm">Paste JS tag to preview</p>
+          <p className="text-sm">Paste JS tag content or enter URL to preview</p>
         </div>
       )}
     </div>
