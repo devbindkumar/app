@@ -231,7 +231,30 @@ function AudioPreview({ form, audioSourceType }) {
 }
 
 function JsTagPreview({ form }) {
-  const livePreviewHtml = `
+  // Check if tag uses document.write (common in older ad tags)
+  const usesDocumentWrite = form.jsTagContent && form.jsTagContent.includes('document.write');
+  
+  // For document.write tags, we need to let them write to the document during load
+  const livePreviewHtml = usesDocumentWrite ? `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          width: ${form.jsTagWidth || 300}px;
+          height: ${form.jsTagHeight || 250}px;
+          background: #fff;
+          overflow: hidden;
+        }
+      </style>
+    </head>
+    <body>
+      ${form.jsTagContent || ''}
+    </body>
+    </html>
+  ` : `
     <!DOCTYPE html>
     <html>
     <head>
@@ -302,7 +325,7 @@ function JsTagPreview({ form }) {
       {form.jsTagContent ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-500">Live Ad Preview</p>
+            <p className="text-xs text-slate-500">Live Ad Preview {usesDocumentWrite && "(document.write tag)"}</p>
             <Badge className="bg-[#10B981]/20 text-[#10B981] text-xs animate-pulse">LIVE</Badge>
           </div>
           <div 
@@ -314,12 +337,19 @@ function JsTagPreview({ form }) {
               title="Ad Preview"
               width={Math.min((parseInt(form.jsTagWidth) || 300) + 20, 420)}
               height={Math.min((parseInt(form.jsTagHeight) || 250) + 20, 320)}
-              className="border-0"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+              className="border-0 bg-white"
+              sandbox={usesDocumentWrite 
+                ? "allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation" 
+                : "allow-scripts allow-same-origin allow-popups allow-forms"
+              }
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
           <p className="text-xs text-slate-400 text-center">
-            Note: Some third-party tags may not render in preview due to security restrictions
+            {usesDocumentWrite 
+              ? "This tag uses document.write() - preview may not fully render due to browser security"
+              : "Note: Some third-party tags may not render in preview due to security restrictions"
+            }
           </p>
         </div>
       ) : form.jsTagUrl ? (
