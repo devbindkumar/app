@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import logging
 import json
+import asyncio
 from dotenv import load_dotenv
 from fastapi import WebSocket
 
@@ -51,12 +52,20 @@ class ConnectionManager:
         if not self.active_connections:
             return
         
-        message_json = json.dumps(message)
+        try:
+            message_json = json.dumps(message)
+        except Exception as e:
+            logger.error(f"Failed to serialize message: {e}")
+            return
+            
         disconnected = set()
         
-        for connection in self.active_connections:
+        for connection in self.active_connections.copy():  # Use copy to avoid modification during iteration
             try:
-                await connection.send_text(message_json)
+                await asyncio.wait_for(connection.send_text(message_json), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.warning("WebSocket send timed out")
+                disconnected.add(connection)
             except Exception:
                 disconnected.add(connection)
         

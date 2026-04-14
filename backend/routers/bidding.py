@@ -38,11 +38,15 @@ bid_stream_stats = {
 
 async def broadcast_new_bid(bid_data: dict):
     """Broadcast new bid to all connected WebSocket clients with stats"""
-    await ws_manager.broadcast({
-        "type": "new_bid",
-        "bid": bid_data,
-        "stats": bid_stream_stats.copy()
-    })
+    try:
+        await ws_manager.broadcast({
+            "type": "new_bid",
+            "bid": bid_data,
+            "stats": bid_stream_stats.copy()
+        })
+    except Exception as e:
+        # Don't let WebSocket errors affect bidding
+        logger.warning(f"WebSocket broadcast failed (non-blocking): {e}")
 
 
 # ==================== SSP ENDPOINT MANAGEMENT ====================
