@@ -85,7 +85,18 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      // Clone response before reading in case we need to read again
+      const responseClone = response.clone();
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // If JSON parsing fails, try reading as text
+        const text = await responseClone.text();
+        console.error('Response was not JSON:', text);
+        throw new Error('Server returned invalid response');
+      }
 
       if (!response.ok) {
         throw new Error(data.detail || 'Login failed');
@@ -100,7 +111,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       const errorMessage = error?.message || 'Login failed';
       toast.error(errorMessage);
-      throw new Error(errorMessage);
+      throw error;
     }
   };
 
