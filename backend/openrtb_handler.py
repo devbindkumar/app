@@ -3,6 +3,7 @@ OpenRTB Protocol Handler
 Handles parsing and response generation for OpenRTB 2.5 and 2.6
 """
 from typing import Dict, Any, Optional, List, Tuple
+from datetime import datetime, timezone
 import time
 import logging
 
@@ -1185,17 +1186,27 @@ class BiddingEngine:
         if not freq:
             return True  # No impressions yet
         
-        max_per_day = freq_config.get("max_impressions_per_day", 5)
-        max_total = freq_config.get("max_impressions_total", 10)
+        # Get caps from config (support both old and new field names)
+        max_impressions = freq_config.get("max_impressions", freq_config.get("max_impressions_per_day", 5))
+        daily_cap = freq_config.get("daily_cap", freq_config.get("max_impressions_per_day", 0))
+        lifetime_cap = freq_config.get("lifetime_cap", freq_config.get("max_impressions_total", 0))
+        period = freq_config.get("period", "day")
         
         current_count = freq.get("impression_count", 0)
         
-        # Check total cap
-        if current_count >= max_total:
+        # Check lifetime cap if set
+        if lifetime_cap > 0 and current_count >= lifetime_cap:
             return False
         
-        # Check daily cap (simplified - would need proper date tracking in production)
-        if current_count >= max_per_day:
+        # Check period-based cap
+        if period == "day" and daily_cap > 0:
+            # Get today's impressions
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            hourly = freq.get("hourly_impressions", {})
+            today_count = sum(v for k, v in hourly.items() if k.startswith(today))
+            if today_count >= daily_cap:
+                return False
+        elif max_impressions > 0 and current_count >= max_impressions:
             return False
         
         return True

@@ -511,6 +511,23 @@ async def win_notification(bid_id: str, price: float = 0.0):
             )
             
             await adjust_bid_shading(campaign_id, new_win_rate, campaign.get("bid_shading", {}))
+            
+            # Record frequency for user if frequency capping is enabled
+            freq_config = campaign.get("frequency_cap", {})
+            if freq_config.get("enabled", False):
+                user_id = bid_log.get("user_id") or bid_log.get("device_id")
+                if user_id:
+                    now = datetime.now(timezone.utc)
+                    hour_key = now.strftime("%Y-%m-%d-%H")
+                    await db.user_frequencies.update_one(
+                        {"campaign_id": campaign_id, "user_id": user_id},
+                        {
+                            "$inc": {"impression_count": 1, f"hourly_impressions.{hour_key}": 1},
+                            "$set": {"last_impression": now.isoformat()}
+                        },
+                        upsert=True
+                    )
+                    logger.info(f"Frequency recorded: campaign={campaign_id}, user={user_id}")
     
     if ssp_id:
         impression_cost = win_price / 1000
