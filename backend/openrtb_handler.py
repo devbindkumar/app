@@ -772,18 +772,35 @@ class OpenRTBResponseBuilder:
                 bid["nurl"] = video_data["vast_url"]
         elif creative_type == "native" and creative.get("native_data"):
             bid["adm"] = self._build_native_response(creative["native_data"], impression_pixels)
-        elif creative_type == "js_tag" and creative.get("js_tag_data"):
-            js_tag_data = creative["js_tag_data"]
+        elif creative_type == "js_tag":
+            js_tag_data = creative.get("js_tag_data", {})
+            # Also check for legacy js_tag field
+            legacy_js_tag = creative.get("js_tag", "")
+            
             # For JS tags, wrap in container with impression pixels
-            tag_content = js_tag_data.get("tag_content", "")
+            tag_content = js_tag_data.get("tag_content", "") if js_tag_data else ""
+            tag_url = js_tag_data.get("tag_url", "") if js_tag_data else ""
+            
             if tag_content:
                 bid["adm"] = tag_content + impression_pixels_html
-            elif js_tag_data.get("tag_url"):
+            elif tag_url:
                 # If tag URL, create script tag wrapper
-                tag_url = js_tag_data.get("tag_url")
                 bid["adm"] = f'<script src="{tag_url}"></script>{impression_pixels_html}'
-            bid["w"] = js_tag_data.get("width")
-            bid["h"] = js_tag_data.get("height")
+            elif legacy_js_tag:
+                # Fallback to legacy js_tag field
+                bid["adm"] = legacy_js_tag + impression_pixels_html
+            else:
+                # No JS tag content found, log warning and use placeholder
+                logger.warning(f"JS tag creative {creative.get('name')} has no tag content or URL")
+                bid["adm"] = f'<!-- JS Tag Creative: {creative.get("name", "unknown")} -->{impression_pixels_html}'
+                
+            # Set dimensions from js_tag_data or defaults
+            if js_tag_data:
+                bid["w"] = js_tag_data.get("width") or 300
+                bid["h"] = js_tag_data.get("height") or 250
+            else:
+                bid["w"] = 300
+                bid["h"] = 250
         
         # Handle mtype (2.6) vs ext.prebid.type (2.5)
         mtype_mapping = {"banner": 1, "video": 2, "audio": 3, "native": 4}
