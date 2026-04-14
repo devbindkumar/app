@@ -556,8 +556,8 @@ export default function CreativeEditor() {
         payload.js_tag_data = {
           tag_content: form.jsTagContent || "",
           tag_url: form.jsTagUrl || null,
-          width: parseInt(form.jsTagWidth) || null,
-          height: parseInt(form.jsTagHeight) || null,
+          width: parseInt(form.jsTagWidth) || 300,
+          height: parseInt(form.jsTagHeight) || 250,
           vendor: form.jsTagVendor || null,
           tag_type: form.jsTagType || "script",
           is_secure: form.jsTagIsSecure
