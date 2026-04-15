@@ -1041,6 +1041,7 @@ async def get_real_ad_performance_data(
     num_rows: int = 10000,
     campaign_id: Optional[str] = None,
     creative_id: Optional[str] = None,
+    creative_ids: Optional[List[str]] = None,
     metrics: Optional[List[str]] = None
 ) -> tuple[List[dict], bool]:
     """
@@ -1092,8 +1093,10 @@ async def get_real_ad_performance_data(
         if campaign_id:
             query["campaign_id"] = campaign_id
         
-        # Add creative filter
-        if creative_id:
+        # Add creative filter (single or multiple)
+        if creative_ids and len(creative_ids) > 0:
+            query["creative_id"] = {"$in": creative_ids}
+        elif creative_id:
             query["creative_id"] = creative_id
         
         # Get bid logs within date range
@@ -1607,11 +1610,19 @@ async def export_ad_performance_csv(
     num_rows: int = 100,
     use_real_data: bool = True,
     campaign_id: Optional[str] = None,
-    creative_id: Optional[str] = None
+    creative_id: Optional[str] = None,
+    creative_ids: Optional[str] = None  # Comma-separated list of creative IDs
 ):
     """Export ad performance report as CSV"""
     dims = [d.strip() for d in dimensions.split(",")]
     selected_metrics = [m.strip() for m in metrics.split(",") if m.strip()]
+    
+    # Parse creative_ids if provided
+    creative_id_list = None
+    if creative_ids:
+        creative_id_list = [c.strip() for c in creative_ids.split(",") if c.strip()]
+    elif creative_id:
+        creative_id_list = [creative_id]
     
     if not end_date:
         end_dt = datetime.now(timezone.utc)
@@ -1630,7 +1641,8 @@ async def export_ad_performance_csv(
             end_date=end_date,
             num_rows=min(num_rows, 10000),
             campaign_id=campaign_id,
-            creative_id=creative_id,
+            creative_id=creative_id_list[0] if creative_id_list and len(creative_id_list) == 1 else None,
+            creative_ids=creative_id_list if creative_id_list and len(creative_id_list) > 1 else None,
             metrics=selected_metrics
         )
     
@@ -1727,11 +1739,19 @@ async def export_ad_performance_excel(
     num_rows: int = 100,
     use_real_data: bool = True,
     campaign_id: Optional[str] = None,
-    creative_id: Optional[str] = None
+    creative_id: Optional[str] = None,
+    creative_ids: Optional[str] = None  # Comma-separated list of creative IDs
 ):
     """Export ad performance report as Excel (XLSX)"""
     dims = [d.strip() for d in dimensions.split(",")]
     selected_metrics = [m.strip() for m in metrics.split(",") if m.strip()]
+    
+    # Parse creative_ids if provided
+    creative_id_list = None
+    if creative_ids:
+        creative_id_list = [c.strip() for c in creative_ids.split(",") if c.strip()]
+    elif creative_id:
+        creative_id_list = [creative_id]
     
     if not end_date:
         end_dt = datetime.now(timezone.utc)
@@ -1750,7 +1770,8 @@ async def export_ad_performance_excel(
             end_date=end_date,
             num_rows=min(num_rows, 10000),
             campaign_id=campaign_id,
-            creative_id=creative_id,
+            creative_id=creative_id_list[0] if creative_id_list and len(creative_id_list) == 1 else None,
+            creative_ids=creative_id_list if creative_id_list and len(creative_id_list) > 1 else None,
             metrics=selected_metrics
         )
     
@@ -1762,7 +1783,7 @@ async def export_ad_performance_excel(
             end_date=end_date,
             num_rows=min(num_rows, 10000),
             campaign_id=campaign_id,
-            creative_id=creative_id,
+            creative_id=creative_id_list[0] if creative_id_list else None,
             metrics=selected_metrics
         )
     

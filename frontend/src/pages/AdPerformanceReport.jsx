@@ -4,7 +4,7 @@ import {
   MousePointerClick, Users, Target, Layers, Globe, CheckCircle, Loader2,
   AlertCircle, Save, Trash2, Server, Image, Database, BookMarked, Plus,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, Search,
-  MapPin, Smartphone, Package, Monitor, Wifi, DollarSign
+  MapPin, Smartphone, Package, Monitor, Wifi, DollarSign, ChevronDown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -167,7 +167,7 @@ export default function AdPerformanceReport() {
   const [campaigns, setCampaigns] = useState([]);
   const [creatives, setCreatives] = useState([]);
   const [selectedCampaign, setSelectedCampaign] = useState("all");
-  const [selectedCreative, setSelectedCreative] = useState("all");
+  const [selectedCreatives, setSelectedCreatives] = useState([]); // Changed to array for multi-select
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");  // Date filter for generated report
   
@@ -195,13 +195,34 @@ export default function AdPerformanceReport() {
   // Reset creative selection when campaign changes
   useEffect(() => {
     if (selectedCampaign !== "all") {
-      // Check if currently selected creative is still valid
+      // Check if currently selected creatives are still valid
       const validCreativeIds = filteredCreatives.map(c => c.id);
-      if (selectedCreative !== "all" && !validCreativeIds.includes(selectedCreative)) {
-        setSelectedCreative("all");
+      const validSelectedCreatives = selectedCreatives.filter(id => validCreativeIds.includes(id));
+      if (validSelectedCreatives.length !== selectedCreatives.length) {
+        setSelectedCreatives(validSelectedCreatives);
       }
     }
-  }, [selectedCampaign, filteredCreatives, selectedCreative]);
+  }, [selectedCampaign, filteredCreatives, selectedCreatives]);
+  
+  // Toggle creative selection
+  const toggleCreativeSelection = (creativeId) => {
+    setSelectedCreatives(prev => {
+      if (prev.includes(creativeId)) {
+        return prev.filter(id => id !== creativeId);
+      } else {
+        return [...prev, creativeId];
+      }
+    });
+  };
+  
+  // Select/deselect all creatives
+  const toggleAllCreatives = () => {
+    if (selectedCreatives.length === filteredCreatives.length) {
+      setSelectedCreatives([]);
+    } else {
+      setSelectedCreatives(filteredCreatives.map(c => c.id));
+    }
+  };
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -322,7 +343,7 @@ export default function AdPerformanceReport() {
         10000, // Get all rows
         useRealData,
         selectedCampaign !== "all" ? selectedCampaign : null,
-        selectedCreative !== "all" ? selectedCreative : null
+        selectedCreatives.length > 0 ? selectedCreatives.join(',') : null
       );
       setReportData(response.data);
       setCurrentPage(1);
@@ -337,12 +358,28 @@ export default function AdPerformanceReport() {
   };
 
   const handleExportCSV = () => {
-    exportAdPerformanceCSV(selectedDimensions, selectedMetrics, startDate, endDate, 10000);
+    exportAdPerformanceCSV(
+      selectedDimensions, 
+      selectedMetrics, 
+      startDate, 
+      endDate, 
+      10000,
+      selectedCampaign !== "all" ? selectedCampaign : null,
+      selectedCreatives.length > 0 ? selectedCreatives : null
+    );
     toast.success("Downloading CSV...");
   };
 
   const handleExportExcel = () => {
-    exportAdPerformanceExcel(selectedDimensions, selectedMetrics, startDate, endDate, 10000);
+    exportAdPerformanceExcel(
+      selectedDimensions, 
+      selectedMetrics, 
+      startDate, 
+      endDate, 
+      10000,
+      selectedCampaign !== "all" ? selectedCampaign : null,
+      selectedCreatives.length > 0 ? selectedCreatives : null
+    );
     toast.success("Downloading Excel...");
   };
 
@@ -572,22 +609,42 @@ export default function AdPerformanceReport() {
                   </Select>
                 </div>
 
-                {/* Creative Filter */}
+                {/* Creative Filter - Multi-select */}
                 <div className="space-y-2">
-                  <Label className="text-slate-600">Creative</Label>
-                  <Select value={selectedCreative} onValueChange={setSelectedCreative}>
-                    <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
-                      <SelectValue placeholder="All Creatives" />
-                    </SelectTrigger>
-                    <SelectContent className="surface-primary border-slate-200">
-                      <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
-                      {filteredCreatives.map((c) => (
-                        <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedCampaign !== "all" && filteredCreatives.length === 0 && (
-                    <p className="text-xs text-amber-600">No creatives linked to this campaign</p>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-slate-600">Creatives</Label>
+                    {filteredCreatives.length > 0 && (
+                      <button 
+                        onClick={toggleAllCreatives}
+                        className="text-xs text-[#3B82F6] hover:underline"
+                      >
+                        {selectedCreatives.length === filteredCreatives.length ? "Deselect All" : "Select All"}
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-md p-2 surface-primary">
+                    {filteredCreatives.length === 0 ? (
+                      <p className="text-sm text-slate-500 text-center py-2">
+                        {selectedCampaign !== "all" ? "No creatives linked to this campaign" : "No creatives available"}
+                      </p>
+                    ) : (
+                      <div className="space-y-1">
+                        {filteredCreatives.map((c) => (
+                          <label key={c.id} className="flex items-center gap-2 p-1 hover:bg-slate-100 rounded cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selectedCreatives.includes(c.id)}
+                              onChange={() => toggleCreativeSelection(c.id)}
+                              className="rounded border-slate-300 text-[#3B82F6] focus:ring-[#3B82F6]"
+                            />
+                            <span className="text-sm text-slate-700 truncate">{c.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {selectedCreatives.length > 0 && (
+                    <p className="text-xs text-slate-500">{selectedCreatives.length} creative(s) selected</p>
                   )}
                 </div>
 
@@ -822,40 +879,83 @@ export default function AdPerformanceReport() {
                       </SelectContent>
                     </Select>
 
-                    {/* Creative Filter */}
-                    <Select value={selectedCreative} onValueChange={async (v) => { 
-                      setSelectedCreative(v); 
-                      setCurrentPage(1);
-                      // Auto-regenerate report with new filter
-                      try {
-                        setLoading(true);
-                        const response = await generateAdPerformanceReport(
-                          selectedDimensions,
-                          selectedMetrics,
-                          startDate,
-                          endDate,
-                          10000,
-                          useRealData,
-                          selectedCampaign !== "all" ? selectedCampaign : null,
-                          v !== "all" ? v : null
-                        );
-                        setReportData(response.data);
-                      } catch (error) {
-                        toast.error("Failed to refresh report");
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}>
-                      <SelectTrigger className="w-[200px] surface-primary border-slate-200 text-slate-900">
-                        <SelectValue placeholder="All Creatives" />
-                      </SelectTrigger>
-                      <SelectContent className="surface-primary border-slate-200">
-                        <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
+                    {/* Creative Filter - Simplified dropdown showing selected count */}
+                    <div className="relative">
+                      <button
+                        onClick={() => document.getElementById('creative-dropdown-results').classList.toggle('hidden')}
+                        className="flex items-center justify-between w-[200px] h-10 px-3 py-2 rounded-md border border-slate-200 surface-primary text-slate-900 text-sm"
+                      >
+                        <span>{selectedCreatives.length === 0 ? "All Creatives" : `${selectedCreatives.length} Creative(s)`}</span>
+                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                      </button>
+                      <div id="creative-dropdown-results" className="hidden absolute z-50 mt-1 w-[250px] max-h-60 overflow-y-auto rounded-md border border-slate-200 surface-primary shadow-lg">
+                        <div className="p-2 border-b border-slate-200">
+                          <button 
+                            onClick={async () => {
+                              toggleAllCreatives();
+                              // Regenerate report
+                              try {
+                                setLoading(true);
+                                const newCreatives = selectedCreatives.length === filteredCreatives.length ? [] : filteredCreatives.map(c => c.id);
+                                const response = await generateAdPerformanceReport(
+                                  selectedDimensions,
+                                  selectedMetrics,
+                                  startDate,
+                                  endDate,
+                                  10000,
+                                  useRealData,
+                                  selectedCampaign !== "all" ? selectedCampaign : null,
+                                  newCreatives.length > 0 ? newCreatives.join(',') : null
+                                );
+                                setReportData(response.data);
+                              } catch (error) {
+                                toast.error("Failed to refresh report");
+                              } finally {
+                                setLoading(false);
+                              }
+                            }}
+                            className="text-xs text-[#3B82F6] hover:underline"
+                          >
+                            {selectedCreatives.length === filteredCreatives.length ? "Deselect All" : "Select All"}
+                          </button>
+                        </div>
                         {filteredCreatives.map((c) => (
-                          <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
+                          <label key={c.id} className="flex items-center gap-2 p-2 hover:bg-slate-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selectedCreatives.includes(c.id)}
+                              onChange={async () => {
+                                toggleCreativeSelection(c.id);
+                                // Auto-regenerate report
+                                try {
+                                  setLoading(true);
+                                  const newCreatives = selectedCreatives.includes(c.id) 
+                                    ? selectedCreatives.filter(id => id !== c.id)
+                                    : [...selectedCreatives, c.id];
+                                  const response = await generateAdPerformanceReport(
+                                    selectedDimensions,
+                                    selectedMetrics,
+                                    startDate,
+                                    endDate,
+                                    10000,
+                                    useRealData,
+                                    selectedCampaign !== "all" ? selectedCampaign : null,
+                                    newCreatives.length > 0 ? newCreatives.join(',') : null
+                                  );
+                                  setReportData(response.data);
+                                } catch (error) {
+                                  toast.error("Failed to refresh report");
+                                } finally {
+                                  setLoading(false);
+                                }
+                              }}
+                              className="rounded border-slate-300 text-[#3B82F6] focus:ring-[#3B82F6]"
+                            />
+                            <span className="text-sm text-slate-700 truncate">{c.name}</span>
+                          </label>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                    </div>
 
                     {/* Date Filter (for reports with date dimension) */}
                     {availableDates.length > 0 && (
