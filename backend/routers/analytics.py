@@ -1208,6 +1208,11 @@ async def get_real_ad_performance_data(
                 row["make"] = make
                 key_parts.append(make)
             
+            if "model" in dimensions:
+                model = (log.get("request_summary") or {}).get("model") or "Unknown"
+                row["model"] = model
+                key_parts.append(model)
+            
             key = "|".join(key_parts) if key_parts else "total"
             
             if key not in aggregated:
@@ -1337,6 +1342,19 @@ def generate_mock_ad_performance_data(
     mock_os = ["Android", "iOS", "Windows", "macOS", "Linux"]
     # Mock device makes
     mock_makes = ["Samsung", "Apple", "Xiaomi", "OnePlus", "Oppo", "Vivo", "Google", "Huawei", "LG", "Sony"]
+    # Mock device models
+    mock_models = {
+        "Samsung": ["Galaxy S24", "Galaxy S23", "Galaxy A54", "Galaxy Z Fold 5", "Galaxy Tab S9"],
+        "Apple": ["iPhone 15 Pro", "iPhone 15", "iPhone 14", "iPad Pro", "iPad Air"],
+        "Xiaomi": ["14 Pro", "13 Ultra", "Redmi Note 13", "Pad 6"],
+        "OnePlus": ["12", "11", "Nord 3"],
+        "Oppo": ["Find X7", "Reno 11 Pro", "A79"],
+        "Vivo": ["X100 Pro", "V30 Pro", "Y100"],
+        "Google": ["Pixel 8 Pro", "Pixel 8", "Pixel 7a"],
+        "Huawei": ["Mate 60 Pro", "P60 Pro", "Nova 12"],
+        "LG": ["Wing", "Velvet", "K92"],
+        "Sony": ["Xperia 1 V", "Xperia 5 V", "Xperia 10 V"]
+    }
     
     data = []
     
@@ -1375,7 +1393,13 @@ def generate_mock_ad_performance_data(
         if "os" in dimensions:
             row["os"] = random.choice(mock_os)
         if "make" in dimensions:
-            row["make"] = random.choice(mock_makes)
+            make = random.choice(mock_makes)
+            row["make"] = make
+        if "model" in dimensions:
+            # Get model based on make if make is in dimensions, otherwise random
+            make_for_model = row.get("make", random.choice(mock_makes))
+            models_for_make = mock_models.get(make_for_model, ["Unknown Model"])
+            row["model"] = random.choice(models_for_make)
         
         # Performance metrics
         impressions = random.randint(1000, 500000)
@@ -1673,7 +1697,8 @@ async def export_ad_performance_csv(
         "ip": "IP Address",
         "device_ifa": "Device ID",
         "os": "OS",
-        "make": "Make"
+        "make": "Device Make",
+        "model": "Device Model"
     }
     
     # Define all metric labels
@@ -1819,7 +1844,8 @@ async def export_ad_performance_excel(
         "ip": "IP Address",
         "device_ifa": "Device ID",
         "os": "OS",
-        "make": "Make"
+        "make": "Device Make",
+        "model": "Device Model"
     }
     
     # Define all metric labels

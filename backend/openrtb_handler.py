@@ -1902,6 +1902,7 @@ class BiddingEngine:
         summary["device_type"] = device.get("devicetype")
         summary["os"] = device.get("os")
         summary["make"] = device.get("make")
+        summary["model"] = device.get("model")
         summary["ip"] = device.get("ip")  # IP address from device
         summary["device_ifa"] = device.get("ifa")  # Device ID (IDFA/GAID)
         summary["device_ua"] = device.get("ua")  # User Agent

@@ -308,6 +308,8 @@ export default function BidStream() {
                   <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Campaign</th>
                   <th className="text-right py-2 px-3 text-xs text-slate-500 font-medium">Bid</th>
                   <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Device</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Make / Model</th>
+                  <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">OS</th>
                   <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Geo</th>
                   <th className="text-left py-2 px-3 text-xs text-slate-500 font-medium">Domain</th>
                 </tr>
@@ -349,6 +351,13 @@ export default function BidStream() {
                         {getDeviceIcon(bid.device_type)}
                         {getDeviceName(bid.device_type)}
                       </div>
+                    </td>
+                    <td className="py-2 px-3 text-xs text-slate-600">
+                      <span className="font-medium text-[#F59E0B]">{bid.device_make || "-"}</span>
+                      {bid.device_model && <span className="text-slate-500"> / {bid.device_model}</span>}
+                    </td>
+                    <td className="py-2 px-3 text-xs text-slate-600">
+                      {bid.os || "-"}
                     </td>
                     <td className="py-2 px-3 text-xs text-slate-600">
                       {bid.geo_country || "-"}

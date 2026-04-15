@@ -358,6 +358,9 @@ async def _process_bid_request_internal(
         "bid_price": log_data.get("bid_price"),
         "ssp_id": ssp_id,
         "device_type": bid_request.get("device", {}).get("devicetype"),
+        "device_make": bid_request.get("device", {}).get("make"),
+        "device_model": bid_request.get("device", {}).get("model"),
+        "os": bid_request.get("device", {}).get("os"),
         "geo_country": bid_request.get("device", {}).get("geo", {}).get("country"),
         "domain": bid_request.get("site", {}).get("domain") or bid_request.get("app", {}).get("bundle")
     }

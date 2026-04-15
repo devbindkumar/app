@@ -44,7 +44,8 @@ const DIMENSIONS = [
   { id: "ip", label: "IP Address", icon: Wifi, description: "User IP address" },
   { id: "device_ifa", label: "Device ID", icon: Smartphone, description: "Device IFA (IDFA/GAID)" },
   { id: "os", label: "OS", icon: Monitor, description: "Operating system" },
-  { id: "make", label: "Make", icon: Smartphone, description: "Device manufacturer" },
+  { id: "make", label: "Device Make", icon: Smartphone, description: "Device manufacturer (Apple, Samsung, etc.)" },
+  { id: "model", label: "Device Model", icon: Smartphone, description: "Device model (iPhone 15, Galaxy S24, etc.)" },
 ];
 
 // Metrics configuration - Selectable

@@ -91,6 +91,11 @@ function BidLogEntry({ log, onSelect, isSelected }) {
               {log.request_summary.os}
             </Badge>
           )}
+          {(log.request_summary.make || log.request_summary.model) && (
+            <Badge variant="outline" className="text-[10px] bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/30">
+              {log.request_summary.make}{log.request_summary.model ? ` ${log.request_summary.model}` : ''}
+            </Badge>
+          )}
           {log.request_summary.has_video && (
             <Badge variant="outline" className="text-[10px] bg-[#10B981]/20 text-[#10B981] border-[#10B981]/30">
               video
@@ -256,6 +261,38 @@ export default function BidLogs() {
                         <div>
                           <p className="text-[10px] text-slate-500">Creative</p>
                           <p className="text-xs font-mono text-slate-900 truncate">{selectedLog.creative_id?.substring(0, 12)}...</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Device Info */}
+                  {selectedLog.request_summary && (
+                    <div className="p-3 surface-secondary rounded border border-[#F59E0B]/30">
+                      <p className="text-[10px] text-[#F59E0B] uppercase tracking-wider mb-2">Device Information</p>
+                      <div className="grid grid-cols-4 gap-4">
+                        <div>
+                          <p className="text-[10px] text-slate-500">Make</p>
+                          <p className="text-xs font-medium text-slate-900">{selectedLog.request_summary.make || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500">Model</p>
+                          <p className="text-xs font-medium text-slate-900">{selectedLog.request_summary.model || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500">OS</p>
+                          <p className="text-xs font-medium text-slate-900">{selectedLog.request_summary.os || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500">Device Type</p>
+                          <p className="text-xs font-medium text-slate-900">
+                            {selectedLog.request_summary.device_type === 1 ? 'Mobile' : 
+                             selectedLog.request_summary.device_type === 2 ? 'Desktop' :
+                             selectedLog.request_summary.device_type === 3 ? 'CTV' :
+                             selectedLog.request_summary.device_type === 4 ? 'Phone' :
+                             selectedLog.request_summary.device_type === 5 ? 'Tablet' :
+                             selectedLog.request_summary.device_type || '-'}
+                          </p>
                         </div>
                       </div>
                     </div>
