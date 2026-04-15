@@ -524,6 +524,7 @@ class BudgetConfig(BaseModel):
     total_budget: float = Field(default=0.0)
     daily_spend: float = Field(default=0.0)
     total_spend: float = Field(default=0.0)
+    pending_spend: float = Field(default=0.0, description="Reserved spend for bids awaiting win notifications")
     
     # Pacing configuration
     pacing_type: str = Field(default="even", description="even, asap, or custom")

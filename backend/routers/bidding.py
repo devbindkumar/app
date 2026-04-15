@@ -333,9 +333,20 @@ async def _process_bid_request_internal(
     
     # Update campaign stats if bid was made
     if log_data.get("bid_made") and log_data.get("campaign_id"):
+        # Calculate potential cost for this bid (CPM / 1000)
+        bid_price = log_data.get("shaded_price") or log_data.get("bid_price", 0)
+        potential_cost = bid_price / 1000
+        
+        # Reserve the potential cost immediately to prevent budget overspend
+        # This is deducted from pending_spend when win notification arrives
         await db.campaigns.update_one(
             {"id": log_data["campaign_id"]},
-            {"$inc": {"bids": 1}}
+            {
+                "$inc": {
+                    "bids": 1,
+                    "budget.pending_spend": potential_cost  # Reserve potential cost
+                }
+            }
         )
     
     # Add to real-time bid stream
@@ -488,6 +499,8 @@ async def win_notification(bid_id: str, price: float = 0.0):
     
     if campaign_id:
         impression_cost = win_price / 1000
+        # Also calculate the reserved cost that was added when bid was placed
+        reserved_cost = bid_price / 1000
         
         await db.campaigns.update_one(
             {"id": campaign_id},
@@ -496,7 +509,8 @@ async def win_notification(bid_id: str, price: float = 0.0):
                     "wins": 1,
                     "impressions": 1,
                     "budget.daily_spend": impression_cost,
-                    "budget.total_spend": impression_cost
+                    "budget.total_spend": impression_cost,
+                    "budget.pending_spend": -reserved_cost  # Release the reservation
                 }
             }
         )
@@ -872,7 +886,7 @@ async def test_full_flow(request: Request):
         "burl_to_call": f"{nurl_base}/api/notify/billing/{test_bid_id}?price=2.0",
         "instructions": [
             f"1. Call the nurl: curl '{nurl_base}/api/notify/win/{test_bid_id}?price=2.0'",
-            f"2. Verify campaign wins increased",
+            "2. Verify campaign wins increased",
             f"3. Call the burl: curl '{nurl_base}/api/notify/billing/{test_bid_id}?price=2.0'"
         ]
     }
@@ -1010,4 +1024,157 @@ async def sync_all_campaign_stats():
         "status": "success",
         "campaigns_synced": len(results),
         "results": results
+    }
+
+
+
+# ==================== BUDGET MANAGEMENT ====================
+
+@router.post("/budget/release-stale-pending")
+async def release_stale_pending_spend():
+    """
+    Release pending_spend for bids that are older than 5 minutes and have not received win notifications.
+    This handles "lost bids" where the SSP never sent a win notification.
+    Should be called periodically (e.g., every 5 minutes) via a cron job or scheduled task.
+    """
+    from datetime import timedelta
+    
+    # Bids older than 5 minutes without win notification are considered lost
+    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
+    cutoff_iso = cutoff_time.isoformat()
+    
+    # Find all campaigns with pending bids that are stale
+    campaigns = await db.campaigns.find(
+        {"budget.pending_spend": {"$gt": 0}},
+        {"_id": 0, "id": 1, "name": 1, "budget.pending_spend": 1}
+    ).to_list(100)
+    
+    results = []
+    for campaign in campaigns:
+        campaign_id = campaign["id"]
+        
+        # Count stale bids (bids made, no win notification, older than cutoff)
+        stale_bids = await db.bid_logs.find(
+            {
+                "campaign_id": campaign_id,
+                "bid_made": True,
+                "win_notified": False,
+                "timestamp": {"$lt": cutoff_iso}
+            },
+            {"_id": 0, "shaded_price": 1, "bid_price": 1}
+        ).to_list(1000)
+        
+        if stale_bids:
+            # Calculate total stale pending spend
+            stale_spend = sum(
+                (b.get("shaded_price") or b.get("bid_price", 0)) / 1000 
+                for b in stale_bids
+            )
+            
+            # Mark these bids as "lost" so they're not counted again
+            await db.bid_logs.update_many(
+                {
+                    "campaign_id": campaign_id,
+                    "bid_made": True,
+                    "win_notified": False,
+                    "timestamp": {"$lt": cutoff_iso},
+                    "bid_lost": {"$ne": True}  # Not already marked
+                },
+                {"$set": {"bid_lost": True, "lost_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            
+            # Release the stale pending spend
+            current_pending = campaign.get("budget", {}).get("pending_spend", 0)
+            new_pending = max(0, current_pending - stale_spend)
+            
+            await db.campaigns.update_one(
+                {"id": campaign_id},
+                {"$set": {"budget.pending_spend": new_pending}}
+            )
+            
+            results.append({
+                "campaign_id": campaign_id,
+                "campaign_name": campaign["name"],
+                "stale_bids_count": len(stale_bids),
+                "released_spend": round(stale_spend, 4),
+                "new_pending_spend": round(new_pending, 4)
+            })
+    
+    logger.info(f"Released stale pending spend for {len(results)} campaigns")
+    return {
+        "status": "success",
+        "campaigns_processed": len(results),
+        "results": results
+    }
+
+
+@router.post("/budget/reset-daily-spend")
+async def reset_daily_spend():
+    """
+    Reset daily_spend and pending_spend for all campaigns.
+    Should be called once per day at midnight (UTC) via a cron job.
+    Also clears stale pending_spend to prevent accumulation.
+    """
+    # Reset daily_spend and pending_spend for all campaigns
+    result = await db.campaigns.update_many(
+        {},
+        {"$set": {"budget.daily_spend": 0.0, "budget.pending_spend": 0.0}}
+    )
+    
+    logger.info(f"Reset daily spend for {result.modified_count} campaigns")
+    return {
+        "status": "success",
+        "campaigns_reset": result.modified_count,
+        "reset_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.get("/budget/status/{campaign_id}")
+async def get_budget_status(campaign_id: str):
+    """Get detailed budget status for a campaign including pending spend"""
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    budget = campaign.get("budget", {})
+    daily_budget = budget.get("daily_budget", 0)
+    daily_spend = budget.get("daily_spend", 0)
+    pending_spend = budget.get("pending_spend", 0)
+    total_budget = budget.get("total_budget", 0)
+    total_spend = budget.get("total_spend", 0)
+    
+    # Calculate effective spend (actual + pending)
+    effective_daily_spend = daily_spend + pending_spend
+    effective_total_spend = total_spend + pending_spend
+    
+    # Calculate remaining budget
+    daily_remaining = max(0, daily_budget - effective_daily_spend) if daily_budget > 0 else float('inf')
+    total_remaining = max(0, total_budget - effective_total_spend) if total_budget > 0 else float('inf')
+    
+    # Count pending bids (not yet won or lost)
+    pending_bids_count = await db.bid_logs.count_documents({
+        "campaign_id": campaign_id,
+        "bid_made": True,
+        "win_notified": False,
+        "bid_lost": {"$ne": True}
+    })
+    
+    return {
+        "campaign_id": campaign_id,
+        "campaign_name": campaign.get("name"),
+        "status": campaign.get("status"),
+        "budget": {
+            "daily_budget": daily_budget,
+            "daily_spend": round(daily_spend, 4),
+            "pending_spend": round(pending_spend, 4),
+            "effective_daily_spend": round(effective_daily_spend, 4),
+            "daily_remaining": round(daily_remaining, 4) if daily_remaining != float('inf') else "unlimited",
+            "daily_utilization_pct": round((effective_daily_spend / daily_budget) * 100, 2) if daily_budget > 0 else 0,
+            "total_budget": total_budget,
+            "total_spend": round(total_spend, 4),
+            "effective_total_spend": round(effective_total_spend, 4),
+            "total_remaining": round(total_remaining, 4) if total_remaining != float('inf') else "unlimited",
+        },
+        "pending_bids_count": pending_bids_count,
+        "can_bid": effective_daily_spend < daily_budget if daily_budget > 0 else True
     }

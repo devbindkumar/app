@@ -1125,16 +1125,21 @@ class BiddingEngine:
         """Check if campaign can bid based on budget and pacing"""
         budget = campaign.get("budget", {})
         
-        # Check total budget
+        # Get pending spend (reserved for bids awaiting win notifications)
+        pending_spend = budget.get("pending_spend", 0)
+        
+        # Check total budget (include pending spend to prevent overspend)
         total_budget = budget.get("total_budget", 0)
         total_spend = budget.get("total_spend", 0)
-        if total_budget > 0 and total_spend >= total_budget:
+        effective_total_spend = total_spend + pending_spend
+        if total_budget > 0 and effective_total_spend >= total_budget:
             return False
         
-        # Check daily budget
+        # Check daily budget (include pending spend to prevent overspend)
         daily_budget = budget.get("daily_budget", 0)
         daily_spend = budget.get("daily_spend", 0)
-        if daily_budget > 0 and daily_spend >= daily_budget:
+        effective_daily_spend = daily_spend + pending_spend
+        if daily_budget > 0 and effective_daily_spend >= daily_budget:
             return False
         
         # Check pacing (even distribution)
@@ -1144,8 +1149,8 @@ class BiddingEngine:
             current_hour = datetime.now(timezone.utc).hour
             ideal_spend = (daily_budget / 24) * (current_hour + 1)
             
-            # Allow 20% over-pacing buffer
-            if daily_spend > ideal_spend * 1.2:
+            # Allow 20% over-pacing buffer (use effective spend)
+            if effective_daily_spend > ideal_spend * 1.2:
                 return False
         
         return True
@@ -1440,13 +1445,17 @@ class BiddingEngine:
                 logger.info(f"Campaign {campaign['name']}: privacy compliance failed")
                 continue
             
-            # Check budget
+            # Check budget (include pending_spend to prevent overspend)
             budget = campaign.get("budget", {})
-            if budget.get("daily_budget", 0) > 0 and budget.get("daily_spend", 0) >= budget.get("daily_budget", 0):
-                logger.debug(f"Campaign {campaign['name']}: daily budget exhausted")
+            pending_spend = budget.get("pending_spend", 0)
+            effective_daily = budget.get("daily_spend", 0) + pending_spend
+            effective_total = budget.get("total_spend", 0) + pending_spend
+            
+            if budget.get("daily_budget", 0) > 0 and effective_daily >= budget.get("daily_budget", 0):
+                logger.debug(f"Campaign {campaign['name']}: daily budget exhausted (effective: {effective_daily:.2f})")
                 continue
-            if budget.get("total_budget", 0) > 0 and budget.get("total_spend", 0) >= budget.get("total_budget", 0):
-                logger.debug(f"Campaign {campaign['name']}: total budget exhausted")
+            if budget.get("total_budget", 0) > 0 and effective_total >= budget.get("total_budget", 0):
+                logger.debug(f"Campaign {campaign['name']}: total budget exhausted (effective: {effective_total:.2f})")
                 continue
             
             # Calculate match score
