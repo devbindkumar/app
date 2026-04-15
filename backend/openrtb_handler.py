@@ -104,19 +104,25 @@ OPENRTB_MACROS = {
 
 def _extract_bid_context(bid_request: Dict[str, Any], creative: Dict[str, Any]) -> Dict[str, Any]:
     """Extract common context data from bid request."""
+    if not bid_request:
+        bid_request = {}
+    if not creative:
+        creative = {}
+        
     imp = bid_request.get("imp", [{}])[0] if bid_request.get("imp") else {}
     site = bid_request.get("site", {})
     app = bid_request.get("app", {})
     device = bid_request.get("device", {})
-    geo = device.get("geo", {})
+    geo = device.get("geo", {}) if device else {}
     user = bid_request.get("user", {})
     publisher = site.get("publisher", {}) or app.get("publisher", {})
     
     # Get banner/video dimensions
-    banner = imp.get("banner", {})
-    video = imp.get("video", {})
-    creative_width = creative.get("banner_data", {}).get("width") or banner.get("w") or video.get("w") or ""
-    creative_height = creative.get("banner_data", {}).get("height") or banner.get("h") or video.get("h") or ""
+    banner = imp.get("banner", {}) if imp else {}
+    video = imp.get("video", {}) if imp else {}
+    banner_data = creative.get("banner_data", {}) or {}
+    creative_width = banner_data.get("width") or banner.get("w") or video.get("w") or ""
+    creative_height = banner_data.get("height") or banner.get("h") or video.get("h") or ""
     
     return {
         "imp": imp, "site": site, "app": app, "device": device,
