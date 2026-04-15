@@ -300,7 +300,8 @@ async def _process_bid_request_internal(
             nurl_base=nurl_base
         )
     except Exception as e:
-        logger.error(f"Bid processing error: {e}")
+        import traceback
+        logger.error(f"Bid processing error: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Bid processing failed")
     
     # Save bid log with SSP info
