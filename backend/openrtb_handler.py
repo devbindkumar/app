@@ -1401,30 +1401,34 @@ class BiddingEngine:
                 continue
             
             # Check all targeting rules
-            targeting = campaign.get("targeting", {})
+            targeting = campaign.get("targeting", {}) or {}
+            device = request.get("device", {}) or {}
+            site = request.get("site", {}) or {}
+            app = request.get("app", {}) or {}
             
-            if not self._check_geo_targeting(targeting.get("geo", {}), request.get("device", {}).get("geo")):
+            if not self._check_geo_targeting(targeting.get("geo", {}), device.get("geo")):
                 logger.info(f"Campaign {campaign['name']}: geo targeting mismatch")
                 continue
             
-            if not self._check_device_targeting(targeting.get("device", {}), request.get("device", {})):
+            if not self._check_device_targeting(targeting.get("device", {}), device):
                 logger.info(f"Campaign {campaign['name']}: device targeting mismatch")
                 continue
             
             if not self._check_inventory_targeting(
                 targeting.get("inventory", {}),
-                request.get("site"),
-                request.get("app")
+                site,
+                app
             ):
                 logger.info(f"Campaign {campaign['name']}: inventory targeting mismatch")
                 continue
             
-            if not self._check_video_targeting(targeting.get("video", {}), imp.get("video")):
+            imp_obj = imp or {}
+            if not self._check_video_targeting(targeting.get("video", {}), imp_obj.get("video")):
                 logger.info(f"Campaign {campaign['name']}: video targeting mismatch")
                 continue
             
-            site_content = (request.get("site") or {}).get("content")
-            app_content = (request.get("app") or {}).get("content")
+            site_content = site.get("content")
+            app_content = app.get("content")
             if not self._check_content_targeting(
                 targeting.get("content", {}),
                 site_content or app_content
@@ -1432,7 +1436,7 @@ class BiddingEngine:
                 logger.info(f"Campaign {campaign['name']}: content targeting mismatch")
                 continue
             
-            if not self._check_privacy_compliance(targeting.get("privacy", {}), request.get("regs", {})):
+            if not self._check_privacy_compliance(targeting.get("privacy", {}), request.get("regs", {}) or {}):
                 logger.info(f"Campaign {campaign['name']}: privacy compliance failed")
                 continue
             
