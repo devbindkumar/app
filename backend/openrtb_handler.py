@@ -1491,16 +1491,28 @@ class BiddingEngine:
             elif creative_type == "js_tag" and imp_banner:
                 # JS tags can serve as banner ads
                 js_data = creative.get("js_tag_data", {})
-                creative_width = js_data.get("width")
-                creative_height = js_data.get("height")
+                creative_width = js_data.get("width") if js_data else None
+                creative_height = js_data.get("height") if js_data else None
+                
+                logger.info(f"  -> JS tag creative: {creative.get('name')}, size: {creative_width}x{creative_height}, acceptable: {acceptable_sizes}")
                 
                 if not acceptable_sizes:
                     logger.info(f"  -> No size requirement, accepting JS tag: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
                 
+                # Convert to int for comparison
+                try:
+                    creative_width = int(creative_width) if creative_width else 300
+                    creative_height = int(creative_height) if creative_height else 250
+                except (ValueError, TypeError):
+                    creative_width = 300
+                    creative_height = 250
+                
                 if (creative_width, creative_height) in acceptable_sizes:
                     logger.info(f"  -> Exact JS tag size match: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
+                else:
+                    logger.info(f"  -> JS tag size mismatch: ({creative_width}, {creative_height}) not in {acceptable_sizes}")
                     
             elif creative_type == "video" and imp_video:
                 if self._creative_matches_impression(creative, imp):
