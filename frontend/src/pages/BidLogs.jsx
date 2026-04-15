@@ -4,12 +4,23 @@ import {
   CheckCircle, 
   XCircle,
   Clock,
-  Zap
+  Zap,
+  Filter,
+  Calendar,
+  X
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "../components/ui/select";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "../components/ui/popover";
 import { toast } from "sonner";
 import { getBidLogs, getBidLog } from "../lib/api";
 
@@ -117,13 +128,30 @@ export default function BidLogs() {
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState(null);
   const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState({ bid_made: 0, no_bid: 0 });
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    bid_status: "",      // "", "bid_made", "no_bid"
+    start_date: "",      // ISO datetime string
+    end_date: "",        // ISO datetime string
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (filterParams = filters) => {
     try {
       setLoading(true);
-      const response = await getBidLogs(50, 0);
+      const params = {
+        limit: 50,
+        offset: 0,
+        ...(filterParams.bid_status && { bid_status: filterParams.bid_status }),
+        ...(filterParams.start_date && { start_date: filterParams.start_date }),
+        ...(filterParams.end_date && { end_date: filterParams.end_date }),
+      };
+      const response = await getBidLogs(params);
       setLogs(response.data.logs);
       setTotal(response.data.total);
+      setStats(response.data.stats || { bid_made: 0, no_bid: 0 });
     } catch (error) {
       toast.error("Failed to load bid logs");
     } finally {
@@ -144,10 +172,40 @@ export default function BidLogs() {
     }
   };
 
+  const handleFilterChange = (key, value) => {
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+  };
+
+  const applyFilters = () => {
+    fetchLogs(filters);
+    setShowFilters(false);
+  };
+
+  const clearFilters = () => {
+    const clearedFilters = { bid_status: "", start_date: "", end_date: "" };
+    setFilters(clearedFilters);
+    fetchLogs(clearedFilters);
+  };
+
+  const hasActiveFilters = filters.bid_status || filters.start_date || filters.end_date;
+
+  // Helper to format datetime for input
+  const formatDateTimeForInput = (isoString) => {
+    if (!isoString) return "";
+    return isoString.slice(0, 16); // "YYYY-MM-DDTHH:mm"
+  };
+
+  // Helper to convert input datetime to ISO
+  const inputToISO = (inputValue) => {
+    if (!inputValue) return "";
+    return new Date(inputValue).toISOString();
+  };
+
   return (
     <div className="p-6 h-[calc(100vh-1px)]" data-testid="bid-logs-page">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Bid Logs</h1>
           <p className="text-sm text-slate-600 mt-1">
@@ -155,16 +213,171 @@ export default function BidLogs() {
             {total > 0 && <span className="ml-2 text-slate-500">({total} total)</span>}
           </p>
         </div>
-        <Button 
-          variant="outline"
-          onClick={fetchLogs}
-          className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-          data-testid="refresh-logs-btn"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Filter Button */}
+          <Popover open={showFilters} onOpenChange={setShowFilters}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline"
+                className={`border-slate-200 ${hasActiveFilters ? 'bg-[#3B82F6]/10 border-[#3B82F6] text-[#3B82F6]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+                data-testid="filter-btn"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filters
+                {hasActiveFilters && (
+                  <Badge className="ml-2 bg-[#3B82F6] text-white text-[10px] px-1.5">
+                    {[filters.bid_status, filters.start_date, filters.end_date].filter(Boolean).length}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4" align="end">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-slate-900">Filter Logs</h4>
+                  {hasActiveFilters && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={clearFilters}
+                      className="text-xs text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10 h-7 px-2"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear All
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Bid Status Filter */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-slate-600">Bid Status</Label>
+                  <Select 
+                    value={filters.bid_status} 
+                    onValueChange={(v) => handleFilterChange("bid_status", v)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="bid_made">
+                        <span className="flex items-center gap-2">
+                          <CheckCircle className="w-3 h-3 text-[#10B981]" />
+                          Bid Made
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="no_bid">
+                        <span className="flex items-center gap-2">
+                          <XCircle className="w-3 h-3 text-[#EF4444]" />
+                          No Bid
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Date/Time Range */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-slate-600">Date & Time Range</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-[10px] text-slate-500">From</Label>
+                      <Input
+                        type="datetime-local"
+                        value={formatDateTimeForInput(filters.start_date)}
+                        onChange={(e) => handleFilterChange("start_date", inputToISO(e.target.value))}
+                        className="text-xs h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[10px] text-slate-500">To</Label>
+                      <Input
+                        type="datetime-local"
+                        value={formatDateTimeForInput(filters.end_date)}
+                        onChange={(e) => handleFilterChange("end_date", inputToISO(e.target.value))}
+                        className="text-xs h-9"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Apply Button */}
+                <Button 
+                  onClick={applyFilters} 
+                  className="w-full bg-[#3B82F6] hover:bg-[#60A5FA]"
+                >
+                  Apply Filters
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          <Button 
+            variant="outline"
+            onClick={() => fetchLogs()}
+            className="border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            data-testid="refresh-logs-btn"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <Card className="surface-primary border-panel">
+          <CardContent className="p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-[#3B82F6]" />
+              <span className="text-sm text-slate-600">Total</span>
+            </div>
+            <span className="text-lg font-bold text-slate-900">{total.toLocaleString()}</span>
+          </CardContent>
+        </Card>
+        <Card className="surface-primary border-panel">
+          <CardContent className="p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-[#10B981]" />
+              <span className="text-sm text-slate-600">Bid Made</span>
+            </div>
+            <span className="text-lg font-bold text-[#10B981]">{stats.bid_made.toLocaleString()}</span>
+          </CardContent>
+        </Card>
+        <Card className="surface-primary border-panel">
+          <CardContent className="p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <XCircle className="w-4 h-4 text-[#EF4444]" />
+              <span className="text-sm text-slate-600">No Bid</span>
+            </div>
+            <span className="text-lg font-bold text-[#EF4444]">{stats.no_bid.toLocaleString()}</span>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Active Filters Badge */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {filters.bid_status && (
+            <Badge variant="secondary" className="bg-[#3B82F6]/10 text-[#3B82F6]">
+              Status: {filters.bid_status === "bid_made" ? "Bid Made" : "No Bid"}
+              <button onClick={() => { handleFilterChange("bid_status", ""); fetchLogs({ ...filters, bid_status: "" }); }} className="ml-1">×</button>
+            </Badge>
+          )}
+          {filters.start_date && (
+            <Badge variant="secondary" className="bg-[#10B981]/10 text-[#10B981]">
+              From: {new Date(filters.start_date).toLocaleString()}
+              <button onClick={() => { handleFilterChange("start_date", ""); fetchLogs({ ...filters, start_date: "" }); }} className="ml-1">×</button>
+            </Badge>
+          )}
+          {filters.end_date && (
+            <Badge variant="secondary" className="bg-[#F59E0B]/10 text-[#F59E0B]">
+              To: {new Date(filters.end_date).toLocaleString()}
+              <button onClick={() => { handleFilterChange("end_date", ""); fetchLogs({ ...filters, end_date: "" }); }} className="ml-1">×</button>
+            </Badge>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -173,13 +386,26 @@ export default function BidLogs() {
       ) : logs.length === 0 ? (
         <Card className="surface-primary border-panel">
           <CardContent className="empty-state py-16">
-            <Zap className="empty-state-icon" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No bid logs yet</h3>
-            <p className="text-sm text-slate-600">Bid requests will appear here once SSPs start sending traffic</p>
+            {hasActiveFilters ? (
+              <>
+                <Filter className="w-12 h-12 mx-auto mb-3 opacity-50 text-slate-400" />
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No logs match your filters</h3>
+                <p className="text-sm text-slate-600 mb-4">Try adjusting your filter criteria</p>
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              </>
+            ) : (
+              <>
+                <Zap className="empty-state-icon" />
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No bid logs yet</h3>
+                <p className="text-sm text-slate-600">Bid requests will appear here once SSPs start sending traffic</p>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-12 gap-4 h-[calc(100%-80px)]">
+        <div className="grid grid-cols-12 gap-4 h-[calc(100%-200px)]">
           {/* Log List */}
           <Card className="surface-primary border-panel col-span-5 flex flex-col">
             <CardHeader className="py-3 px-4 border-b border-slate-200">

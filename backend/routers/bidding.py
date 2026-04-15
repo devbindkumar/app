@@ -138,20 +138,64 @@ async def regenerate_endpoint_token(endpoint_id: str):
 # ==================== BID LOGS ====================
 
 @router.get("/bid-logs")
-async def get_bid_logs(limit: int = 50, offset: int = 0):
-    """Get bid logs with pagination"""
+async def get_bid_logs(
+    limit: int = 50, 
+    offset: int = 0,
+    bid_status: Optional[str] = None,  # "bid_made", "no_bid", or None for all
+    start_date: Optional[str] = None,  # ISO format: 2024-01-01T00:00:00
+    end_date: Optional[str] = None,    # ISO format: 2024-01-01T23:59:59
+    ssp_id: Optional[str] = None,
+    campaign_id: Optional[str] = None
+):
+    """Get bid logs with pagination and filters"""
+    # Build query filter
+    query = {}
+    
+    # Filter by bid status
+    if bid_status == "bid_made":
+        query["bid_made"] = True
+    elif bid_status == "no_bid":
+        query["bid_made"] = False
+    
+    # Filter by date range
+    if start_date or end_date:
+        query["timestamp"] = {}
+        if start_date:
+            query["timestamp"]["$gte"] = start_date
+        if end_date:
+            query["timestamp"]["$lte"] = end_date
+        # Remove empty timestamp filter
+        if not query["timestamp"]:
+            del query["timestamp"]
+    
+    # Filter by SSP
+    if ssp_id:
+        query["ssp_id"] = ssp_id
+    
+    # Filter by campaign
+    if campaign_id:
+        query["campaign_id"] = campaign_id
+    
     logs = await db.bid_logs.find(
-        {},
+        query,
         {"_id": 0}
     ).sort("timestamp", -1).skip(offset).limit(limit).to_list(limit)
     
-    total = await db.bid_logs.count_documents({})
+    total = await db.bid_logs.count_documents(query)
+    
+    # Get summary stats for filtered results
+    bid_made_count = await db.bid_logs.count_documents({**query, "bid_made": True})
+    no_bid_count = await db.bid_logs.count_documents({**query, "bid_made": False})
     
     return {
         "logs": logs,
         "total": total,
         "limit": limit,
-        "offset": offset
+        "offset": offset,
+        "stats": {
+            "bid_made": bid_made_count,
+            "no_bid": no_bid_count
+        }
     }
 
 

@@ -90,8 +90,12 @@ export const updateSSPStatus = (id, status) =>
   api.put(`/ssp-endpoints/${id}/status`, null, { params: { status } });
 
 // Bid Logs
-export const getBidLogs = (limit = 50, offset = 0) => 
-  api.get('/bid-logs', { params: { limit, offset } });
+export const getBidLogs = (params = {}) => {
+  const { limit = 50, offset = 0, bid_status, start_date, end_date, ssp_id, campaign_id } = params;
+  return api.get('/bid-logs', { 
+    params: { limit, offset, bid_status, start_date, end_date, ssp_id, campaign_id } 
+  });
+};
 export const getBidLog = (id) => api.get(`/bid-logs/${id}`);
 
 // Migration Matrix
