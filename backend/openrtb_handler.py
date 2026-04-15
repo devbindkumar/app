@@ -2,7 +2,7 @@
 OpenRTB Protocol Handler
 Handles parsing and response generation for OpenRTB 2.5 and 2.6
 """
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List, Tuple, Union
 from datetime import datetime, timezone
 import time
 import logging
@@ -1415,8 +1415,11 @@ class BiddingEngine:
                 logger.info(f"Campaign {campaign['name']}: geo targeting mismatch")
                 continue
             
-            if not self._check_device_targeting(targeting.get("device", {}), device):
-                logger.info(f"Campaign {campaign['name']}: device targeting mismatch")
+            device_targeting_result = self._check_device_targeting(targeting.get("device", {}), device)
+            if device_targeting_result is not True:
+                # device_targeting_result contains the rejection reason
+                reason = device_targeting_result if isinstance(device_targeting_result, str) else "device targeting mismatch"
+                logger.info(f"Campaign {campaign['name']}: {reason}")
                 continue
             
             if not self._check_inventory_targeting(
@@ -1687,8 +1690,11 @@ class BiddingEngine:
         
         return True
     
-    def _check_device_targeting(self, targeting: Dict[str, Any], device: Dict[str, Any]) -> bool:
-        """Check device targeting rules"""
+    def _check_device_targeting(self, targeting: Dict[str, Any], device: Dict[str, Any]) -> Union[bool, str]:
+        """
+        Check device targeting rules.
+        Returns True if targeting passes, or a string with rejection reason if it fails.
+        """
         # Check if there's any actual targeting criteria
         has_targeting = bool(
             targeting.get("device_types") or
@@ -1705,27 +1711,66 @@ class BiddingEngine:
         # Check device types
         device_types = targeting.get("device_types", [])
         if device_types and device.get("devicetype") not in device_types:
-            return False
+            return f"device type {device.get('devicetype')} not in targeted types {device_types}"
         
-        # Check makes
+        # Check makes (case-insensitive, partial match)
         makes = targeting.get("makes", [])
-        if makes and device.get("make") and device.get("make").upper() not in [m.upper() for m in makes]:
-            return False
+        if makes:
+            device_make = (device.get("make") or "").lower().strip()
+            if device_make:
+                # Check if device make matches any targeted make (case-insensitive)
+                make_matched = False
+                for target_make in makes:
+                    target_make_lower = target_make.lower().strip()
+                    # Exact match or partial match (e.g., "Samsung" matches "SAMSUNG", "samsung electronics")
+                    if target_make_lower == device_make or target_make_lower in device_make or device_make in target_make_lower:
+                        make_matched = True
+                        break
+                if not make_matched:
+                    return f"device make '{device.get('make')}' not in targeted makes {makes}"
         
-        # Check models
+        # Check models (case-insensitive, flexible matching)
         models = targeting.get("models", [])
-        if models and device.get("model") and device.get("model") not in models:
-            return False
+        if models:
+            device_model = (device.get("model") or "").lower().strip()
+            if device_model:
+                # Check if device model matches any targeted model (flexible matching)
+                model_matched = False
+                for target_model in models:
+                    target_model_lower = target_model.lower().strip()
+                    # Normalize common variations (e.g., "iPhone 15 Pro" matches "iPhone15Pro", "iphone 15 pro")
+                    device_model_normalized = device_model.replace(" ", "").replace("-", "").replace("_", "")
+                    target_model_normalized = target_model_lower.replace(" ", "").replace("-", "").replace("_", "")
+                    
+                    # Exact match, partial match, or normalized match
+                    if (target_model_lower == device_model or 
+                        target_model_lower in device_model or 
+                        device_model in target_model_lower or
+                        target_model_normalized == device_model_normalized or
+                        target_model_normalized in device_model_normalized):
+                        model_matched = True
+                        break
+                if not model_matched:
+                    return f"device model '{device.get('model')}' not in targeted models {models}"
         
-        # Check OS
+        # Check OS (case-insensitive)
         os_list = targeting.get("os_list", [])
-        if os_list and device.get("os") and device.get("os").lower() not in [o.lower() for o in os_list]:
-            return False
+        if os_list:
+            device_os = (device.get("os") or "").lower().strip()
+            if device_os:
+                os_matched = False
+                for target_os in os_list:
+                    target_os_lower = target_os.lower().strip()
+                    if target_os_lower == device_os or target_os_lower in device_os or device_os in target_os_lower:
+                        os_matched = True
+                        break
+                if not os_matched:
+                    return f"device OS '{device.get('os')}' not in targeted OS list {os_list}"
         
         # Check connection types
         connection_types = targeting.get("connection_types", [])
         if connection_types and device.get("connectiontype") not in connection_types:
-            return False
+            return f"connection type {device.get('connectiontype')} not in {connection_types}"
         
         return True
     
