@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 import { 
   COUNTRIES, COUNTRY_STATES, COUNTRY_CITIES, INDIA_STATE_CITIES, TELECOM_OPERATORS,
-  DEVICE_TYPES, OS_LIST, OS_VERSIONS, BROWSERS, CONNECTION_SPEEDS,
+  DEVICE_TYPES, DEVICE_MAKES, DEVICE_MODELS, OS_LIST, OS_VERSIONS, BROWSERS, CONNECTION_SPEEDS,
   AD_PLACEMENTS_DISPLAY, AD_PLACEMENTS_INCONTENT, AD_PLACEMENTS_NATIVE,
   SUPPLY_SOURCES
 } from "../constants";
@@ -548,6 +548,128 @@ export function TargetingStep({ form, updateField }) {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Device Make & Model */}
+          <Card className="surface-secondary border-[#F59E0B]/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-[#F59E0B]">Device Make & Model</CardTitle>
+              <CardDescription className="text-xs text-slate-500">Target specific device manufacturers and models</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Device Makes */}
+              <div className="space-y-2">
+                <Label className="text-slate-600">Device Makes (Manufacturers)</Label>
+                <Select 
+                  onValueChange={(v) => {
+                    if (v && !form.device_makes.includes(v)) {
+                      updateField("device_makes", [...form.device_makes, v]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="surface-primary border-slate-200 text-slate-900">
+                    <SelectValue placeholder="Select device manufacturer" />
+                  </SelectTrigger>
+                  <SelectContent className="surface-primary border-slate-200 max-h-[300px]">
+                    {DEVICE_MAKES.map((make) => (
+                      <SelectItem key={make.value} value={make.value} className="text-slate-900">
+                        {make.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.device_makes.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {form.device_makes.map((make) => (
+                      <Badge key={make} variant="secondary" className="bg-[#F59E0B]/20 text-[#F59E0B]">
+                        {make}
+                        <button 
+                          onClick={() => {
+                            updateField("device_makes", form.device_makes.filter(m => m !== make));
+                            // Also remove models from this make
+                            const makeModels = DEVICE_MODELS[make] || [];
+                            updateField("device_models", form.device_models.filter(m => !makeModels.includes(m)));
+                          }} 
+                          className="ml-2"
+                        >
+                          x
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Device Models - shown when makes are selected */}
+              {form.device_makes.length > 0 && (
+                <div className="space-y-3">
+                  <Label className="text-slate-600">Device Models</Label>
+                  {form.device_makes.map((make) => {
+                    const models = DEVICE_MODELS[make] || [];
+                    if (models.length === 0) return null;
+                    
+                    return (
+                      <div key={make} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium px-2 py-1 rounded bg-[#F59E0B]/20 text-[#F59E0B]">
+                            {make}
+                          </span>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-xs h-6 px-2"
+                            onClick={() => {
+                              const newModels = [...form.device_models, ...models.filter(m => !form.device_models.includes(m))];
+                              updateField("device_models", newModels);
+                            }}
+                          >
+                            Select All
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-xs h-6 px-2 text-[#EF4444]"
+                            onClick={() => {
+                              updateField("device_models", form.device_models.filter(m => !models.includes(m)));
+                            }}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {models.map((model) => {
+                            const isSelected = form.device_models.includes(model);
+                            return (
+                              <Badge 
+                                key={model} 
+                                variant="secondary" 
+                                className={`cursor-pointer ${isSelected ? "bg-[#F59E0B]/20 text-[#F59E0B]" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    updateField("device_models", form.device_models.filter(m => m !== model));
+                                  } else {
+                                    updateField("device_models", [...form.device_models, model]);
+                                  }
+                                }}
+                              >
+                                {isSelected && <Check className="w-3 h-3 mr-1" />}
+                                {model}
+                              </Badge>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {form.device_models.length > 0 && (
+                    <div className="pt-2 border-t border-slate-200">
+                      <span className="text-xs text-slate-500">Selected Models ({form.device_models.length})</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

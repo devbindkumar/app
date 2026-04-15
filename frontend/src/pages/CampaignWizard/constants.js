@@ -155,6 +155,119 @@ export const CONNECTION_SPEEDS = [
   { value: "wifi", label: "WiFi" },
 ];
 
+// ==================== DEVICE MAKES & MODELS ====================
+
+export const DEVICE_MAKES = [
+  { value: "Apple", label: "Apple" },
+  { value: "Samsung", label: "Samsung" },
+  { value: "Google", label: "Google" },
+  { value: "Xiaomi", label: "Xiaomi" },
+  { value: "OnePlus", label: "OnePlus" },
+  { value: "Oppo", label: "Oppo" },
+  { value: "Vivo", label: "Vivo" },
+  { value: "Realme", label: "Realme" },
+  { value: "Huawei", label: "Huawei" },
+  { value: "Motorola", label: "Motorola" },
+  { value: "Nokia", label: "Nokia" },
+  { value: "Sony", label: "Sony" },
+  { value: "LG", label: "LG" },
+  { value: "Asus", label: "Asus" },
+  { value: "Lenovo", label: "Lenovo" },
+  { value: "HP", label: "HP" },
+  { value: "Dell", label: "Dell" },
+  { value: "Microsoft", label: "Microsoft" },
+  { value: "Acer", label: "Acer" },
+  { value: "TCL", label: "TCL" },
+  { value: "Honor", label: "Honor" },
+  { value: "Nothing", label: "Nothing" },
+  { value: "iQOO", label: "iQOO" },
+  { value: "Poco", label: "Poco" },
+];
+
+export const DEVICE_MODELS = {
+  Apple: [
+    "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+    "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
+    "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 Mini",
+    "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 Mini",
+    "iPhone SE (3rd Gen)", "iPhone SE (2nd Gen)",
+    "iPad Pro 12.9", "iPad Pro 11", "iPad Air", "iPad Mini", "iPad"
+  ],
+  Samsung: [
+    "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
+    "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23",
+    "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
+    "Galaxy Z Fold 5", "Galaxy Z Flip 5", "Galaxy Z Fold 4", "Galaxy Z Flip 4",
+    "Galaxy A54", "Galaxy A34", "Galaxy A24", "Galaxy A14",
+    "Galaxy M54", "Galaxy M34", "Galaxy M14",
+    "Galaxy Tab S9", "Galaxy Tab S8", "Galaxy Tab A8"
+  ],
+  Google: [
+    "Pixel 8 Pro", "Pixel 8", "Pixel 8a",
+    "Pixel 7 Pro", "Pixel 7", "Pixel 7a",
+    "Pixel 6 Pro", "Pixel 6", "Pixel 6a",
+    "Pixel Fold", "Pixel Tablet"
+  ],
+  Xiaomi: [
+    "14 Ultra", "14 Pro", "14",
+    "13 Ultra", "13 Pro", "13", "13T Pro", "13T",
+    "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
+    "Redmi 13C", "Redmi 12", "Redmi A3",
+    "Pad 6", "Pad 5"
+  ],
+  OnePlus: [
+    "12", "12R", "11", "11R",
+    "Open", "Nord 3", "Nord CE 3", "Nord N30"
+  ],
+  Oppo: [
+    "Find X7 Ultra", "Find X7", "Find X6 Pro",
+    "Reno 11 Pro", "Reno 11", "Reno 10 Pro+",
+    "A79", "A58", "A38"
+  ],
+  Vivo: [
+    "X100 Pro", "X100", "X90 Pro",
+    "V30 Pro", "V30", "V29 Pro",
+    "Y100", "Y56"
+  ],
+  Realme: [
+    "GT 5 Pro", "GT 5", "GT 3",
+    "12 Pro+", "12 Pro", "12",
+    "Narzo 60 Pro", "Narzo 60", "C55"
+  ],
+  Huawei: [
+    "Mate 60 Pro", "Mate 60", "P60 Pro", "P60",
+    "Nova 12 Pro", "Nova 12"
+  ],
+  Motorola: [
+    "Edge 40 Pro", "Edge 40", "Edge 30 Ultra",
+    "Razr 40 Ultra", "Razr 40",
+    "G84", "G54", "G34"
+  ],
+  Nokia: [
+    "G42", "G22", "C32", "C22"
+  ],
+  Sony: [
+    "Xperia 1 V", "Xperia 5 V", "Xperia 10 V"
+  ],
+  Microsoft: [
+    "Surface Pro 9", "Surface Pro 8", "Surface Laptop 5",
+    "Surface Go 3", "Surface Duo 2"
+  ],
+  Honor: [
+    "Magic 6 Pro", "Magic 6", "Magic V2",
+    "90 Pro", "90", "X9b"
+  ],
+  Nothing: [
+    "Phone 2", "Phone 1", "Phone 2a"
+  ],
+  iQOO: [
+    "12", "11", "Neo 9 Pro", "Neo 9", "Z9"
+  ],
+  Poco: [
+    "F6 Pro", "F6", "X6 Pro", "X6", "M6 Pro"
+  ]
+};
+
 // ==================== GEO TARGETING ====================
 
 export const COUNTRIES = [
@@ -553,6 +666,8 @@ export const INITIAL_FORM_STATE = {
   
   // Device Targeting
   device_types: [],
+  device_makes: [],
+  device_models: [],
   os_list: [],
   os_versions: [],
   browsers_include: [],

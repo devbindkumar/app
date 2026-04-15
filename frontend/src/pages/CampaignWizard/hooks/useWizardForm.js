@@ -87,6 +87,8 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
           
           // Device Targeting
           device_types: c.targeting?.device?.device_types || [],
+          device_makes: c.targeting?.device?.makes || [],
+          device_models: c.targeting?.device?.models || [],
           os_list: c.targeting?.device?.os_list || [],
           os_versions: c.targeting?.device?.os_versions || [],
           browsers_include: c.targeting?.technical?.browsers_include || [],
@@ -349,6 +351,8 @@ export function useWizardForm({ id, isEdit, fromMediaPlan, planData }) {
         },
         device: { 
           device_types: form.device_types, 
+          makes: form.device_makes,
+          models: form.device_models,
           os_list: form.os_list,
           os_versions: form.os_versions,
         },
