@@ -171,6 +171,38 @@ export default function AdPerformanceReport() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");  // Date filter for generated report
   
+  // Filtered creatives based on selected campaign
+  const filteredCreatives = useMemo(() => {
+    if (selectedCampaign === "all") {
+      return creatives;
+    }
+    const campaign = campaigns.find(c => c.id === selectedCampaign);
+    if (!campaign) {
+      return creatives;
+    }
+    // Get creative IDs from campaign (both creative_id and creative_ids)
+    const campaignCreativeIds = new Set();
+    if (campaign.creative_id) {
+      campaignCreativeIds.add(campaign.creative_id);
+    }
+    if (campaign.creative_ids && Array.isArray(campaign.creative_ids)) {
+      campaign.creative_ids.forEach(id => campaignCreativeIds.add(id));
+    }
+    // Filter creatives that belong to this campaign
+    return creatives.filter(c => campaignCreativeIds.has(c.id));
+  }, [selectedCampaign, campaigns, creatives]);
+  
+  // Reset creative selection when campaign changes
+  useEffect(() => {
+    if (selectedCampaign !== "all") {
+      // Check if currently selected creative is still valid
+      const validCreativeIds = filteredCreatives.map(c => c.id);
+      if (selectedCreative !== "all" && !validCreativeIds.includes(selectedCreative)) {
+        setSelectedCreative("all");
+      }
+    }
+  }, [selectedCampaign, filteredCreatives, selectedCreative]);
+  
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -549,11 +581,14 @@ export default function AdPerformanceReport() {
                     </SelectTrigger>
                     <SelectContent className="surface-primary border-slate-200">
                       <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
-                      {creatives.map((c) => (
+                      {filteredCreatives.map((c) => (
                         <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {selectedCampaign !== "all" && filteredCreatives.length === 0 && (
+                    <p className="text-xs text-amber-600">No creatives linked to this campaign</p>
+                  )}
                 </div>
 
                 {/* Date Range */}
@@ -816,7 +851,7 @@ export default function AdPerformanceReport() {
                       </SelectTrigger>
                       <SelectContent className="surface-primary border-slate-200">
                         <SelectItem value="all" className="text-slate-900">All Creatives</SelectItem>
-                        {creatives.map((c) => (
+                        {filteredCreatives.map((c) => (
                           <SelectItem key={c.id} value={c.id} className="text-slate-900">{c.name}</SelectItem>
                         ))}
                       </SelectContent>
