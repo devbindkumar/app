@@ -1451,7 +1451,23 @@ class BiddingEngine:
             
             # Calculate match score
             score = campaign.get("priority", 1) * campaign.get("bid_price", 0)
-            logger.info(f"Campaign {campaign['name']}: MATCHED with creative {matching_creative.get('name')} ({matching_creative.get('banner_data', {}).get('width', 'N/A')}x{matching_creative.get('banner_data', {}).get('height', 'N/A')}) score {score}")
+            
+            # Defensive check - matching_creative should not be None here
+            if not matching_creative:
+                logger.warning(f"Campaign {campaign['name']}: matching_creative became None unexpectedly")
+                continue
+                
+            # Get creative dimensions for logging
+            creative_name = matching_creative.get('name', 'Unknown')
+            creative_type = matching_creative.get('type', '')
+            if creative_type == 'js_tag':
+                js_data = matching_creative.get('js_tag_data', {}) or {}
+                creative_dims = f"{js_data.get('width', 'N/A')}x{js_data.get('height', 'N/A')}"
+            else:
+                banner_data = matching_creative.get('banner_data', {}) or {}
+                creative_dims = f"{banner_data.get('width', 'N/A')}x{banner_data.get('height', 'N/A')}"
+            
+            logger.info(f"Campaign {campaign['name']}: MATCHED with creative {creative_name} ({creative_dims}) score {score}")
             matches.append((campaign, matching_creative, score))
         
         return matches
