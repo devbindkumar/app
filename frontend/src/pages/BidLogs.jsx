@@ -6,21 +6,16 @@ import {
   Clock,
   Zap,
   Filter,
-  Calendar,
-  X
+  Calendar
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "../components/ui/select";
-import {
-  Popover, PopoverContent, PopoverTrigger,
-} from "../components/ui/popover";
 import { toast } from "sonner";
 import { getBidLogs, getBidLog } from "../lib/api";
 
@@ -38,6 +33,20 @@ function SimpleJsonViewer({ data }) {
 }
 
 function BidLogEntry({ log, onSelect, isSelected }) {
+  // Format timestamp to show date and time
+  const formatDateTime = (timestamp) => {
+    if (!timestamp) return "-";
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  };
+
   return (
     <div 
       className={`log-entry p-3 border-b border-slate-200 cursor-pointer transition-colors duration-150 ${
@@ -46,6 +55,19 @@ function BidLogEntry({ log, onSelect, isSelected }) {
       onClick={() => onSelect(log)}
       data-testid={`bid-log-${log.id}`}
     >
+      {/* Date/Time Row */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <Calendar className="w-3 h-3" />
+          <span className="font-medium">{formatDateTime(log.timestamp)}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <Clock className="w-3 h-3" />
+          {log.processing_time_ms?.toFixed(1)}ms
+        </div>
+      </div>
+
+      {/* Status Row */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {log.bid_made ? (
@@ -66,27 +88,18 @@ function BidLogEntry({ log, onSelect, isSelected }) {
             v{log.openrtb_version}
           </Badge>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Clock className="w-3 h-3" />
-          {log.processing_time_ms?.toFixed(1)}ms
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <div>
-          <span className="text-slate-500">Request: </span>
-          <span className="text-slate-600 font-mono">{log.request_id?.substring(0, 16)}...</span>
-        </div>
         {log.bid_made && log.bid_price && (
-          <div>
-            <span className="text-slate-500">Bid: </span>
-            <span className="text-[#3B82F6] font-mono">${log.bid_price.toFixed(2)}</span>
-          </div>
+          <span className="text-sm font-mono text-[#10B981] font-medium">${log.bid_price.toFixed(2)}</span>
         )}
       </div>
       
+      <div className="text-xs mb-2">
+        <span className="text-slate-500">Request: </span>
+        <span className="text-slate-600 font-mono">{log.request_id?.substring(0, 20)}...</span>
+      </div>
+      
       {log.request_summary && (
-        <div className="mt-2 flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1">
           {log.request_summary.inventory_type && (
             <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-600 border-slate-200">
               {log.request_summary.inventory_type}
@@ -133,10 +146,7 @@ export default function BidLogs() {
   // Filter states
   const [filters, setFilters] = useState({
     bid_status: "",      // "", "bid_made", "no_bid"
-    start_date: "",      // ISO datetime string
-    end_date: "",        // ISO datetime string
   });
-  const [showFilters, setShowFilters] = useState(false);
 
   const fetchLogs = async (filterParams = filters) => {
     try {
@@ -145,8 +155,6 @@ export default function BidLogs() {
         limit: 50,
         offset: 0,
         ...(filterParams.bid_status && { bid_status: filterParams.bid_status }),
-        ...(filterParams.start_date && { start_date: filterParams.start_date }),
-        ...(filterParams.end_date && { end_date: filterParams.end_date }),
       };
       const response = await getBidLogs(params);
       setLogs(response.data.logs);
@@ -172,35 +180,19 @@ export default function BidLogs() {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    const newFilters = { ...filters, [key]: value };
+  const handleFilterChange = (value) => {
+    const newFilters = { bid_status: value === "all" ? "" : value };
     setFilters(newFilters);
-  };
-
-  const applyFilters = () => {
-    fetchLogs(filters);
-    setShowFilters(false);
+    fetchLogs(newFilters);
   };
 
   const clearFilters = () => {
-    const clearedFilters = { bid_status: "", start_date: "", end_date: "" };
+    const clearedFilters = { bid_status: "" };
     setFilters(clearedFilters);
     fetchLogs(clearedFilters);
   };
 
-  const hasActiveFilters = filters.bid_status || filters.start_date || filters.end_date;
-
-  // Helper to format datetime for input
-  const formatDateTimeForInput = (isoString) => {
-    if (!isoString) return "";
-    return isoString.slice(0, 16); // "YYYY-MM-DDTHH:mm"
-  };
-
-  // Helper to convert input datetime to ISO
-  const inputToISO = (inputValue) => {
-    if (!inputValue) return "";
-    return new Date(inputValue).toISOString();
-  };
+  const hasActiveFilters = !!filters.bid_status;
 
   return (
     <div className="p-6 h-[calc(100vh-1px)]" data-testid="bid-logs-page">
@@ -213,104 +205,34 @@ export default function BidLogs() {
             {total > 0 && <span className="ml-2 text-slate-500">({total} total)</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Filter Button */}
-          <Popover open={showFilters} onOpenChange={setShowFilters}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline"
-                className={`border-slate-200 ${hasActiveFilters ? 'bg-[#3B82F6]/10 border-[#3B82F6] text-[#3B82F6]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-                data-testid="filter-btn"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-                {hasActiveFilters && (
-                  <Badge className="ml-2 bg-[#3B82F6] text-white text-[10px] px-1.5">
-                    {[filters.bid_status, filters.start_date, filters.end_date].filter(Boolean).length}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-4" align="end">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-slate-900">Filter Logs</h4>
-                  {hasActiveFilters && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={clearFilters}
-                      className="text-xs text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10 h-7 px-2"
-                    >
-                      <X className="w-3 h-3 mr-1" />
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-                
-                {/* Bid Status Filter */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-slate-600">Bid Status</Label>
-                  <Select 
-                    value={filters.bid_status} 
-                    onValueChange={(v) => handleFilterChange("bid_status", v)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="bid_made">
-                        <span className="flex items-center gap-2">
-                          <CheckCircle className="w-3 h-3 text-[#10B981]" />
-                          Bid Made
-                        </span>
-                      </SelectItem>
-                      <SelectItem value="no_bid">
-                        <span className="flex items-center gap-2">
-                          <XCircle className="w-3 h-3 text-[#EF4444]" />
-                          No Bid
-                        </span>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Date/Time Range */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-slate-600">Date & Time Range</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label className="text-[10px] text-slate-500">From</Label>
-                      <Input
-                        type="datetime-local"
-                        value={formatDateTimeForInput(filters.start_date)}
-                        onChange={(e) => handleFilterChange("start_date", inputToISO(e.target.value))}
-                        className="text-xs h-9"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-[10px] text-slate-500">To</Label>
-                      <Input
-                        type="datetime-local"
-                        value={formatDateTimeForInput(filters.end_date)}
-                        onChange={(e) => handleFilterChange("end_date", inputToISO(e.target.value))}
-                        className="text-xs h-9"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Apply Button */}
-                <Button 
-                  onClick={applyFilters} 
-                  className="w-full bg-[#3B82F6] hover:bg-[#60A5FA]"
-                >
-                  Apply Filters
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+        <div className="flex items-center gap-3">
+          {/* Bid Status Filter - Inline */}
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-slate-500">Status:</Label>
+            <Select 
+              value={filters.bid_status || "all"} 
+              onValueChange={handleFilterChange}
+            >
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue placeholder="All statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="bid_made">
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-[#10B981]" />
+                    Bid Made
+                  </span>
+                </SelectItem>
+                <SelectItem value="no_bid">
+                  <span className="flex items-center gap-2">
+                    <XCircle className="w-3 h-3 text-[#EF4444]" />
+                    No Bid
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
           <Button 
             variant="outline"
@@ -354,30 +276,6 @@ export default function BidLogs() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Active Filters Badge */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {filters.bid_status && (
-            <Badge variant="secondary" className="bg-[#3B82F6]/10 text-[#3B82F6]">
-              Status: {filters.bid_status === "bid_made" ? "Bid Made" : "No Bid"}
-              <button onClick={() => { handleFilterChange("bid_status", ""); fetchLogs({ ...filters, bid_status: "" }); }} className="ml-1">×</button>
-            </Badge>
-          )}
-          {filters.start_date && (
-            <Badge variant="secondary" className="bg-[#10B981]/10 text-[#10B981]">
-              From: {new Date(filters.start_date).toLocaleString()}
-              <button onClick={() => { handleFilterChange("start_date", ""); fetchLogs({ ...filters, start_date: "" }); }} className="ml-1">×</button>
-            </Badge>
-          )}
-          {filters.end_date && (
-            <Badge variant="secondary" className="bg-[#F59E0B]/10 text-[#F59E0B]">
-              To: {new Date(filters.end_date).toLocaleString()}
-              <button onClick={() => { handleFilterChange("end_date", ""); fetchLogs({ ...filters, end_date: "" }); }} className="ml-1">×</button>
-            </Badge>
-          )}
-        </div>
-      )}
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
