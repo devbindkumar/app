@@ -471,11 +471,38 @@ async def handle_bid_request_by_token(
     """Handle OpenRTB bid requests for a specific SSP by unique token"""
     start_time = time.time()
     
-    # Look up SSP by endpoint_token
-    endpoint = await db.ssp_endpoints.find_one(
-        {"endpoint_token": endpoint_token},
-        {"_id": 0}
-    )
+    # Look up SSP by endpoint_token (use cache if available)
+    cache_key = f"ssp:{endpoint_token}"
+    endpoint = None
+    
+    # Try Redis cache first
+    from routers.redis_cache import get_redis_client, is_redis_available
+    if is_redis_available():
+        client = get_redis_client()
+        if client:
+            try:
+                cached = client.get(cache_key)
+                if cached:
+                    import json
+                    endpoint = json.loads(cached)
+            except Exception:
+                pass
+    
+    # If not in cache, fetch from DB
+    if not endpoint:
+        endpoint = await db.ssp_endpoints.find_one(
+            {"endpoint_token": endpoint_token},
+            {"_id": 0}
+        )
+        # Cache for 60 seconds
+        if endpoint and is_redis_available():
+            try:
+                client = get_redis_client()
+                if client:
+                    import json
+                    client.setex(cache_key, 60, json.dumps(endpoint))
+            except Exception:
+                pass
     
     if not endpoint:
         raise HTTPException(status_code=404, detail="SSP endpoint not found")
@@ -486,24 +513,36 @@ async def handle_bid_request_by_token(
     # Process the bid request
     response = await _process_bid_request_internal(request, x_openrtb_version, endpoint.get("id"))
     
-    # Update performance metrics (only response time, request count is handled in _process_bid_request_internal)
+    # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
-    await db.ssp_endpoints.update_one(
-        {"id": endpoint.get("id")},
-        {"$set": {"last_request_at": datetime.now(timezone.utc).isoformat()}}
-    )
     
-    # Update avg response time (rolling average)
-    current_avg = endpoint.get("avg_response_time_ms", 0)
-    total_reqs = endpoint.get("total_requests", 0)
-    if total_reqs > 0:
-        new_avg = ((current_avg * (total_reqs - 1)) + response_time_ms) / total_reqs
-        await db.ssp_endpoints.update_one(
-            {"id": endpoint.get("id")},
-            {"$set": {"avg_response_time_ms": round(new_avg, 2)}}
-        )
+    # Move SSP stats update to background (non-blocking)
+    asyncio.create_task(_update_ssp_stats_background(
+        endpoint.get("id"),
+        response_time_ms,
+        endpoint.get("avg_response_time_ms", 0),
+        endpoint.get("total_requests", 0)
+    ))
     
     return response
+
+
+async def _update_ssp_stats_background(ssp_id: str, response_time_ms: float, current_avg: float, total_reqs: int):
+    """Background task to update SSP performance stats"""
+    try:
+        await db.ssp_endpoints.update_one(
+            {"id": ssp_id},
+            {"$set": {"last_request_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        if total_reqs > 0:
+            new_avg = ((current_avg * (total_reqs - 1)) + response_time_ms) / total_reqs
+            await db.ssp_endpoints.update_one(
+                {"id": ssp_id},
+                {"$set": {"avg_response_time_ms": round(new_avg, 2)}}
+            )
+    except Exception as e:
+        logger.warning(f"SSP stats update failed: {e}")
 
 
 @bid_router.post("")

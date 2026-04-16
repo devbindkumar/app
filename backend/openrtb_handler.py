@@ -1201,7 +1201,7 @@ class BiddingEngine:
         return None
     
     async def _check_frequency_cap(self, campaign: Dict[str, Any], user_id: Optional[str]) -> bool:
-        """Check if user has reached frequency cap"""
+        """Check if user has reached frequency cap (uses Redis for speed)"""
         freq_config = campaign.get("frequency_cap", {})
         
         if not freq_config.get("enabled", False):
@@ -1210,30 +1210,41 @@ class BiddingEngine:
         if not user_id:
             return True  # Can't track without user ID
         
-        # Get user frequency
+        # Try Redis first (much faster than MongoDB)
+        from routers.redis_cache import get_user_frequency, is_redis_available
+        
+        max_impressions = freq_config.get("max_impressions", freq_config.get("max_impressions_per_day", 5))
+        daily_cap = freq_config.get("daily_cap", freq_config.get("max_impressions_per_day", 0))
+        lifetime_cap = freq_config.get("lifetime_cap", freq_config.get("max_impressions_total", 0))
+        
+        if is_redis_available():
+            freq_count = get_user_frequency(user_id, campaign["id"])
+            
+            if lifetime_cap > 0 and freq_count >= lifetime_cap:
+                return False
+            if daily_cap > 0 and freq_count >= daily_cap:
+                return False
+            if max_impressions > 0 and freq_count >= max_impressions:
+                return False
+            
+            return True
+        
+        # Fallback to MongoDB (slower - only if Redis unavailable)
         freq = await self.db.user_frequencies.find_one(
             {"campaign_id": campaign["id"], "user_id": user_id},
-            {"_id": 0}
+            {"_id": 0, "impression_count": 1, "hourly_impressions": 1}
         )
         
         if not freq:
             return True  # No impressions yet
         
-        # Get caps from config (support both old and new field names)
-        max_impressions = freq_config.get("max_impressions", freq_config.get("max_impressions_per_day", 5))
-        daily_cap = freq_config.get("daily_cap", freq_config.get("max_impressions_per_day", 0))
-        lifetime_cap = freq_config.get("lifetime_cap", freq_config.get("max_impressions_total", 0))
         period = freq_config.get("period", "day")
-        
         current_count = freq.get("impression_count", 0)
         
-        # Check lifetime cap if set
         if lifetime_cap > 0 and current_count >= lifetime_cap:
             return False
         
-        # Check period-based cap
         if period == "day" and daily_cap > 0:
-            # Get today's impressions
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             hourly = freq.get("hourly_impressions", {})
             today_count = sum(v for k, v in hourly.items() if k.startswith(today))
