@@ -7,8 +7,24 @@ import json
 import logging
 from typing import Optional, Any, List, Dict
 from datetime import datetime, timezone
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# Load .env file if not already loaded
+def _load_env():
+    """Load environment variables from .env file"""
+    env_path = Path(__file__).parent.parent / ".env"
+    if env_path.exists():
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    if key not in os.environ:
+                        os.environ[key] = value
+
+_load_env()
 
 # Redis connection (lazy initialization)
 _redis_client = None
