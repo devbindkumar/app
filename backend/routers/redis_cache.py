@@ -53,12 +53,21 @@ def get_redis_client():
     
     try:
         import redis
-        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+        redis_url = os.environ.get("REDIS_URL", "").strip()
+        
+        # Debug logging
+        logger.info(f"REDIS_URL from env: '{redis_url}'")
+        
+        if not redis_url:
+            # Try default localhost
+            redis_url = "redis://localhost:6379/0"
+            logger.info(f"No REDIS_URL found, trying default: {redis_url}")
+        
         _redis_client = redis.from_url(redis_url, decode_responses=True)
         # Test connection
         _redis_client.ping()
         _redis_available = True
-        logger.info(f"Redis connected: {redis_url}")
+        logger.info(f"Redis connected successfully: {redis_url}")
         return _redis_client
     except Exception as e:
         logger.warning(f"Redis not available, using in-memory fallback: {e}")
