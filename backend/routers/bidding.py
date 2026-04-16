@@ -189,15 +189,13 @@ async def regenerate_endpoint_token(endpoint_id: str):
 
 @router.get("/bid-logs")
 async def get_bid_logs(
-    limit: int = 50, 
+    limit: int = 20,  # Reduced default for faster loading
     offset: int = 0,
     bid_status: Optional[str] = None,  # "bid_made", "no_bid", or None for all
-    start_date: Optional[str] = None,  # ISO format: 2024-01-01T00:00:00
-    end_date: Optional[str] = None,    # ISO format: 2024-01-01T23:59:59
     ssp_id: Optional[str] = None,
     campaign_id: Optional[str] = None
 ):
-    """Get bid logs with pagination and filters"""
+    """Get bid logs with pagination and filters - optimized for speed"""
     # Build query filter
     query = {}
     
@@ -207,17 +205,6 @@ async def get_bid_logs(
     elif bid_status == "no_bid":
         query["bid_made"] = False
     
-    # Filter by date range
-    if start_date or end_date:
-        query["timestamp"] = {}
-        if start_date:
-            query["timestamp"]["$gte"] = start_date
-        if end_date:
-            query["timestamp"]["$lte"] = end_date
-        # Remove empty timestamp filter
-        if not query["timestamp"]:
-            del query["timestamp"]
-    
     # Filter by SSP
     if ssp_id:
         query["ssp_id"] = ssp_id
@@ -226,12 +213,35 @@ async def get_bid_logs(
     if campaign_id:
         query["campaign_id"] = campaign_id
     
+    # Limit max to 100 for performance
+    limit = min(limit, 100)
+    
+    # Only fetch essential fields for list view (faster)
+    projection = {
+        "_id": 0,
+        "id": 1,
+        "timestamp": 1,
+        "bid_made": 1,
+        "bid_price": 1,
+        "campaign_name": 1,
+        "openrtb_version": 1,
+        "processing_time_ms": 1,
+        "request_id": 1,
+        "request_summary": 1
+    }
+    
     logs = await db.bid_logs.find(
         query,
-        {"_id": 0}
+        projection
     ).sort("timestamp", -1).skip(offset).limit(limit).to_list(limit)
     
-    total = await db.bid_logs.count_documents(query)
+    # Get approximate total count (faster than exact count for large collections)
+    # Use estimated count when no filters, exact count when filtered
+    if not query:
+        total = await db.bid_logs.estimated_document_count()
+    else:
+        # For filtered queries, limit the count scan
+        total = await db.bid_logs.count_documents(query, limit=10000)
     
     # Get summary stats for filtered results
     bid_made_count = await db.bid_logs.count_documents({**query, "bid_made": True})

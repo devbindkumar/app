@@ -76,6 +76,29 @@ class ConnectionManager:
 ws_manager = ConnectionManager()
 
 
+# ==================== DATABASE INDEXES ====================
+
+async def ensure_indexes():
+    """Create indexes for better query performance"""
+    try:
+        # Bid logs indexes - critical for fast queries
+        await db.bid_logs.create_index([("timestamp", -1)])  # Sort by newest
+        await db.bid_logs.create_index([("bid_made", 1), ("timestamp", -1)])  # Filter + sort
+        await db.bid_logs.create_index([("ssp_id", 1), ("timestamp", -1)])
+        await db.bid_logs.create_index([("campaign_id", 1), ("timestamp", -1)])
+        
+        # Campaigns indexes
+        await db.campaigns.create_index([("status", 1)])
+        await db.campaigns.create_index([("id", 1)], unique=True)
+        
+        # Creatives indexes
+        await db.creatives.create_index([("id", 1)], unique=True)
+        
+        logger.info("Database indexes created/verified")
+    except Exception as e:
+        logger.warning(f"Index creation warning (may already exist): {e}")
+
+
 # ==================== AUTH HELPERS ====================
 
 async def verify_api_key(x_api_key: str = Header(None)) -> Optional[Dict[str, Any]]:

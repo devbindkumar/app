@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
 
-from routers.shared import client, logger
+from routers.shared import client, logger, ensure_indexes
 
 # Import all routers
 from routers.reference import router as reference_router
@@ -29,6 +29,8 @@ from routers.email_router import router as email_router
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     logger.info("OpenRTB Bidder starting up...")
+    # Create database indexes for better performance
+    await ensure_indexes()
     yield
     logger.info("OpenRTB Bidder shutting down...")
     client.close()

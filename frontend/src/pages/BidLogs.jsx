@@ -152,7 +152,7 @@ export default function BidLogs() {
     try {
       setLoading(true);
       const params = {
-        limit: 50,
+        limit: 20,  // Load fewer for faster response
         offset: 0,
         ...(filterParams.bid_status && { bid_status: filterParams.bid_status }),
       };
