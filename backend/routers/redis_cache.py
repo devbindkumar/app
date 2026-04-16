@@ -258,6 +258,11 @@ def increment_user_frequency(user_id: str, campaign_id: str, ttl_hours: int = 24
 
 def redis_health_check() -> Dict[str, Any]:
     """Check Redis health and return stats"""
+    global _redis_available
+    
+    # Force retry connection for health check
+    _redis_available = None
+    
     client = get_redis_client()
     if not client:
         return {"available": False, "message": "Redis not configured"}
