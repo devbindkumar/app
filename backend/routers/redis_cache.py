@@ -53,24 +53,39 @@ def get_redis_client():
     
     try:
         import redis
+        
+        # First try environment variable
         redis_url = os.environ.get("REDIS_URL", "").strip()
         
-        # Debug logging
-        logger.info(f"REDIS_URL from env: '{redis_url}'")
-        
+        # If not in env, try to read from .env file directly
         if not redis_url:
-            # Try default localhost
-            redis_url = "redis://localhost:6379/0"
-            logger.info(f"No REDIS_URL found, trying default: {redis_url}")
+            env_path = Path(__file__).parent.parent / ".env"
+            if env_path.exists():
+                with open(env_path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("REDIS_URL="):
+                            redis_url = line.split("=", 1)[1].strip()
+                            break
         
-        _redis_client = redis.from_url(redis_url, decode_responses=True)
+        # Default to localhost if still not found
+        if not redis_url:
+            redis_url = "redis://localhost:6379/0"
+        
+        logger.info(f"Attempting Redis connection: {redis_url}")
+        
+        _redis_client = redis.from_url(redis_url, decode_responses=True, socket_timeout=2)
         # Test connection
         _redis_client.ping()
         _redis_available = True
-        logger.info(f"Redis connected successfully: {redis_url}")
+        logger.info(f"Redis connected successfully!")
         return _redis_client
+    except ImportError:
+        logger.warning("Redis library not installed")
+        _redis_available = False
+        return None
     except Exception as e:
-        logger.warning(f"Redis not available, using in-memory fallback: {e}")
+        logger.warning(f"Redis connection failed: {type(e).__name__}: {e}")
         _redis_available = False
         return None
 
