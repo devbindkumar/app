@@ -1346,15 +1346,24 @@ class BiddingEngine:
         return round(base_price * final_adjustment, 6)
     
     async def _get_active_campaigns(self) -> List[Dict[str, Any]]:
-        """Get all active campaigns with their creatives (with caching)"""
+        """Get all active campaigns with their creatives (with Redis/in-memory caching)"""
         import time as time_module
+        from routers.redis_cache import get_cached_campaigns, set_cached_campaigns, is_redis_available
+        
         current_time = time_module.time()
         
-        # Check if cache is valid
-        if (BiddingEngine._campaigns_cache is not None and 
-            current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
-            logger.debug(f"Using cached campaigns ({len(BiddingEngine._campaigns_cache)} campaigns)")
-            return BiddingEngine._campaigns_cache
+        # Try Redis cache first (for distributed caching with multiple workers)
+        if is_redis_available():
+            cached = get_cached_campaigns()
+            if cached is not None:
+                logger.debug(f"Using Redis cached campaigns ({len(cached)} campaigns)")
+                return cached
+        else:
+            # Fall back to in-memory cache (single worker mode)
+            if (BiddingEngine._campaigns_cache is not None and 
+                current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
+                logger.debug(f"Using in-memory cached campaigns ({len(BiddingEngine._campaigns_cache)} campaigns)")
+                return BiddingEngine._campaigns_cache
         
         # Cache miss or expired - fetch from database
         logger.info("Refreshing campaigns cache...")
@@ -1365,9 +1374,13 @@ class BiddingEngine:
         ).to_list(1000)
         
         if not campaigns:
-            BiddingEngine._campaigns_cache = []
+            result = []
+            # Update both caches
+            if is_redis_available():
+                set_cached_campaigns(result)
+            BiddingEngine._campaigns_cache = result
             BiddingEngine._campaigns_cache_time = current_time
-            return []
+            return result
         
         # Collect all creative IDs for batch fetch
         all_creative_ids = set()
@@ -1401,7 +1414,9 @@ class BiddingEngine:
         
         result = [c for c in campaigns if "_creative" in c]
         
-        # Update cache
+        # Update both caches
+        if is_redis_available():
+            set_cached_campaigns(result)
         BiddingEngine._campaigns_cache = result
         BiddingEngine._campaigns_cache_time = current_time
         

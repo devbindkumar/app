@@ -15,13 +15,21 @@ router = APIRouter(tags=["Campaigns"])
 
 
 def invalidate_campaigns_cache():
-    """Invalidate the campaigns cache in the bidding engine"""
+    """Invalidate the campaigns cache in both Redis and in-memory"""
+    # Invalidate Redis cache
+    try:
+        from routers.redis_cache import invalidate_campaigns_cache as redis_invalidate
+        redis_invalidate()
+    except Exception:
+        pass
+    
+    # Also invalidate in-memory cache
     try:
         from openrtb_handler import BiddingEngine
         BiddingEngine._campaigns_cache = None
         BiddingEngine._campaigns_cache_time = 0
     except Exception:
-        pass  # Ignore if bidding engine not initialized
+        pass
 
 
 async def get_user_data_scope(user: dict):

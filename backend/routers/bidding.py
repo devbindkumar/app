@@ -58,11 +58,18 @@ async def _save_bid_stats_background(
     stream_entry: dict
 ):
     """
-    Background task to save bid stats to database.
+    Background task to save bid stats to database and Redis.
     This runs AFTER the bid response is sent to minimize latency.
     """
+    from routers.redis_cache import increment_bid_stats, add_recent_bid, is_redis_available
+    
     try:
-        # Save bid log
+        # Update Redis stats (if available) - fast, atomic operation
+        if is_redis_available():
+            increment_bid_stats(bid_made)
+            add_recent_bid(stream_entry)
+        
+        # Save bid log to MongoDB
         await db.bid_logs.insert_one(log_doc)
         
         # Update SSP stats
@@ -1248,3 +1255,39 @@ async def get_budget_status(campaign_id: str):
         "pending_bids_count": pending_bids_count,
         "can_bid": effective_daily_spend < daily_budget if daily_budget > 0 else True
     }
+
+
+
+# ==================== REDIS HEALTH CHECK ====================
+
+@router.get("/cache/health")
+async def get_cache_health():
+    """Get Redis cache health and stats"""
+    from routers.redis_cache import redis_health_check, get_bid_stats, is_redis_available
+    
+    health = redis_health_check()
+    
+    if is_redis_available():
+        health["bid_stats"] = get_bid_stats()
+    else:
+        health["bid_stats"] = bid_stream_stats.copy()
+        health["fallback"] = "in-memory"
+    
+    return health
+
+
+@router.post("/cache/invalidate")
+async def invalidate_cache():
+    """Manually invalidate all caches (campaigns, etc.)"""
+    from routers.redis_cache import invalidate_campaigns_cache as redis_invalidate, is_redis_available
+    from openrtb_handler import BiddingEngine
+    
+    # Invalidate Redis
+    if is_redis_available():
+        redis_invalidate()
+    
+    # Invalidate in-memory
+    BiddingEngine._campaigns_cache = None
+    BiddingEngine._campaigns_cache_time = 0
+    
+    return {"status": "success", "message": "All caches invalidated"}
