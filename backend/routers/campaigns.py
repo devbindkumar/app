@@ -14,6 +14,16 @@ from routers.audit import log_audit, AuditAction
 router = APIRouter(tags=["Campaigns"])
 
 
+def invalidate_campaigns_cache():
+    """Invalidate the campaigns cache in the bidding engine"""
+    try:
+        from openrtb_handler import BiddingEngine
+        BiddingEngine._campaigns_cache = None
+        BiddingEngine._campaigns_cache_time = 0
+    except Exception:
+        pass  # Ignore if bidding engine not initialized
+
+
 async def get_user_data_scope(user: dict):
     """Get the IDs of users whose data the current user can access"""
     role = user["role"]
@@ -45,7 +55,7 @@ async def get_campaigns(
             scope = await get_user_data_scope(user)
             if scope is not None:  # Not super admin
                 query["owner_id"] = {"$in": scope}
-        except:
+        except Exception:
             pass  # If auth fails, show all (for backward compatibility)
     
     campaigns = await db.campaigns.find(query, {"_id": 0}).to_list(1000)
@@ -90,7 +100,7 @@ async def create_campaign(
             user = await get_current_user(authorization)
             owner_id = user["id"]
             owner_email = user["email"]
-        except:
+        except Exception:
             pass
     
     campaign = Campaign(
@@ -151,6 +161,9 @@ async def create_campaign(
             success=True
         )
     
+    # Invalidate campaigns cache for bidding engine
+    invalidate_campaigns_cache()
+    
     return campaign
 
 
@@ -189,6 +202,9 @@ async def update_campaign(campaign_id: str, input: CampaignUpdate):
         {"$set": update_data}
     )
     
+    # Invalidate campaigns cache for bidding engine
+    invalidate_campaigns_cache()
+    
     updated = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
     return updated
 
@@ -199,6 +215,10 @@ async def delete_campaign(campaign_id: str):
     result = await db.campaigns.delete_one({"id": campaign_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Invalidate campaigns cache for bidding engine
+    invalidate_campaigns_cache()
+    
     return {"status": "deleted"}
 
 
@@ -211,6 +231,10 @@ async def activate_campaign(campaign_id: str):
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Invalidate campaigns cache for bidding engine
+    invalidate_campaigns_cache()
+    
     return {"status": "active"}
 
 
@@ -223,6 +247,10 @@ async def pause_campaign(campaign_id: str):
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Invalidate campaigns cache for bidding engine
+    invalidate_campaigns_cache()
+    
     return {"status": "paused"}
 
 

@@ -49,6 +49,49 @@ async def broadcast_new_bid(bid_data: dict):
         logger.warning(f"WebSocket broadcast failed (non-blocking): {e}")
 
 
+async def _save_bid_stats_background(
+    log_doc: dict,
+    ssp_id: str,
+    bid_made: bool,
+    campaign_id: str,
+    bid_price: float,
+    stream_entry: dict
+):
+    """
+    Background task to save bid stats to database.
+    This runs AFTER the bid response is sent to minimize latency.
+    """
+    try:
+        # Save bid log
+        await db.bid_logs.insert_one(log_doc)
+        
+        # Update SSP stats
+        if ssp_id:
+            await db.ssp_endpoints.update_one(
+                {"id": ssp_id},
+                {"$inc": {"total_requests": 1, "total_bids": 1 if bid_made else 0}}
+            )
+        
+        # Update campaign stats if bid was made
+        if bid_made and campaign_id:
+            potential_cost = bid_price / 1000
+            await db.campaigns.update_one(
+                {"id": campaign_id},
+                {
+                    "$inc": {
+                        "bids": 1,
+                        "budget.pending_spend": potential_cost
+                    }
+                }
+            )
+        
+        # Broadcast to WebSocket clients
+        await broadcast_new_bid(stream_entry)
+        
+    except Exception as e:
+        logger.error(f"Background stats save failed: {e}")
+
+
 # ==================== SSP ENDPOINT MANAGEMENT ====================
 
 @router.get("/ssp-endpoints", response_model=List[SSPEndpoint])
@@ -348,14 +391,17 @@ async def _process_bid_request_internal(
         logger.error(f"Bid processing error: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Bid processing failed")
     
-    # Save bid log with SSP info
+    # ====== CRITICAL PATH OPTIMIZATION ======
+    # All database updates after bid response are moved to background tasks
+    # to ensure fast response times for SSPs (typically need < 100ms)
+    
+    # Prepare log data for background save
     log_data["ssp_id"] = ssp_id
     log = BidLog(**log_data)
     log_doc = log.model_dump()
     log_doc["timestamp"] = log_doc["timestamp"].isoformat()
-    await db.bid_logs.insert_one(log_doc)
     
-    # Update global in-memory counters for real-time stats
+    # Update in-memory counters immediately (fast, no I/O)
     global bid_stream_stats
     bid_stream_stats["total_requests"] += 1
     if log_data.get("bid_made"):
@@ -363,37 +409,7 @@ async def _process_bid_request_internal(
     else:
         bid_stream_stats["total_no_bids"] += 1
     
-    # Update SSP stats
-    if ssp_id:
-        await db.ssp_endpoints.update_one(
-            {"id": ssp_id},
-            {"$inc": {"total_requests": 1}}
-        )
-        if log_data.get("bid_made"):
-            await db.ssp_endpoints.update_one(
-                {"id": ssp_id},
-                {"$inc": {"total_bids": 1}}
-            )
-    
-    # Update campaign stats if bid was made
-    if log_data.get("bid_made") and log_data.get("campaign_id"):
-        # Calculate potential cost for this bid (CPM / 1000)
-        bid_price = log_data.get("shaded_price") or log_data.get("bid_price", 0)
-        potential_cost = bid_price / 1000
-        
-        # Reserve the potential cost immediately to prevent budget overspend
-        # This is deducted from pending_spend when win notification arrives
-        await db.campaigns.update_one(
-            {"id": log_data["campaign_id"]},
-            {
-                "$inc": {
-                    "bids": 1,
-                    "budget.pending_spend": potential_cost  # Reserve potential cost
-                }
-            }
-        )
-    
-    # Add to real-time bid stream
+    # Add to real-time bid stream (in-memory, fast)
     stream_entry = {
         "id": log_data.get("id"),
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -412,10 +428,17 @@ async def _process_bid_request_internal(
     if len(recent_bids) > MAX_RECENT_BIDS:
         recent_bids = recent_bids[-MAX_RECENT_BIDS:]
     
-    # Broadcast to WebSocket clients
-    asyncio.create_task(broadcast_new_bid(stream_entry))
+    # Schedule ALL database operations as background tasks (non-blocking)
+    asyncio.create_task(_save_bid_stats_background(
+        log_doc=log_doc,
+        ssp_id=ssp_id,
+        bid_made=log_data.get("bid_made", False),
+        campaign_id=log_data.get("campaign_id"),
+        bid_price=log_data.get("shaded_price") or log_data.get("bid_price", 0),
+        stream_entry=stream_entry
+    ))
     
-    # Return no-bid (204) or bid response (200)
+    # Return no-bid (204) or bid response (200) IMMEDIATELY
     if not log_data.get("bid_made"):
         return Response(status_code=204)
     

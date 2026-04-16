@@ -882,7 +882,12 @@ class OpenRTBResponseBuilder:
 
 
 class BiddingEngine:
-    """Real-time bidding decision engine"""
+    """Real-time bidding decision engine with caching"""
+    
+    # Class-level cache for campaigns (shared across all instances)
+    _campaigns_cache = None
+    _campaigns_cache_time = 0
+    _cache_ttl = 10  # Cache TTL in seconds (refresh campaigns every 10 seconds)
     
     def __init__(self, db):
         self.db = db
@@ -1341,40 +1346,66 @@ class BiddingEngine:
         return round(base_price * final_adjustment, 6)
     
     async def _get_active_campaigns(self) -> List[Dict[str, Any]]:
-        """Get all active campaigns with their creatives"""
+        """Get all active campaigns with their creatives (with caching)"""
+        import time as time_module
+        current_time = time_module.time()
+        
+        # Check if cache is valid
+        if (BiddingEngine._campaigns_cache is not None and 
+            current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
+            logger.debug(f"Using cached campaigns ({len(BiddingEngine._campaigns_cache)} campaigns)")
+            return BiddingEngine._campaigns_cache
+        
+        # Cache miss or expired - fetch from database
+        logger.info("Refreshing campaigns cache...")
+        
         campaigns = await self.db.campaigns.find(
             {"status": "active"},
             {"_id": 0}
         ).to_list(1000)
         
-        logger.info(f"Found {len(campaigns)} active campaigns")
+        if not campaigns:
+            BiddingEngine._campaigns_cache = []
+            BiddingEngine._campaigns_cache_time = current_time
+            return []
         
-        # Load creatives for each campaign
+        # Collect all creative IDs for batch fetch
+        all_creative_ids = set()
         for campaign in campaigns:
-            # Support both creative_id (singular) and creative_ids (array)
+            creative_ids = campaign.get("creative_ids", [])
+            if campaign.get("creative_id"):
+                creative_ids.append(campaign["creative_id"])
+            all_creative_ids.update(creative_ids)
+        
+        # Batch fetch ALL creatives in one query (major optimization!)
+        creatives_map = {}
+        if all_creative_ids:
+            creatives_cursor = self.db.creatives.find(
+                {"id": {"$in": list(all_creative_ids)}},
+                {"_id": 0}
+            )
+            creatives_list = await creatives_cursor.to_list(length=500)
+            creatives_map = {c["id"]: c for c in creatives_list}
+        
+        # Attach creatives to campaigns
+        for campaign in campaigns:
             creative_ids = campaign.get("creative_ids", [])
             if campaign.get("creative_id"):
                 creative_ids.append(campaign["creative_id"])
             
-            logger.info(f"Campaign {campaign['name']}: creative_ids={creative_ids}")
+            campaign_creatives = [creatives_map[cid] for cid in creative_ids if cid in creatives_map]
             
-            if creative_ids:
-                # Get ALL creatives for this campaign (not just the first one)
-                creatives_cursor = self.db.creatives.find(
-                    {"id": {"$in": creative_ids}},
-                    {"_id": 0}
-                )
-                creatives_list = await creatives_cursor.to_list(length=100)
-                
-                if creatives_list:
-                    campaign["_creatives"] = creatives_list  # Store all creatives
-                    campaign["_creative"] = creatives_list[0]  # Keep backwards compatibility
-                    logger.info(f"  -> Loaded {len(creatives_list)} creatives: {[c['name'] for c in creatives_list]}")
-                else:
-                    logger.warning(f"  -> No creative found for IDs: {creative_ids}")
+            if campaign_creatives:
+                campaign["_creatives"] = campaign_creatives
+                campaign["_creative"] = campaign_creatives[0]
         
         result = [c for c in campaigns if "_creative" in c]
-        logger.info(f"Returning {len(result)} campaigns with creatives")
+        
+        # Update cache
+        BiddingEngine._campaigns_cache = result
+        BiddingEngine._campaigns_cache_time = current_time
+        
+        logger.info(f"Cached {len(result)} campaigns with creatives")
         return result
     
     async def _match_campaigns(
