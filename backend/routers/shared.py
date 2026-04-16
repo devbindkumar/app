@@ -87,12 +87,19 @@ async def ensure_indexes():
         await db.bid_logs.create_index([("ssp_id", 1), ("timestamp", -1)])
         await db.bid_logs.create_index([("campaign_id", 1), ("timestamp", -1)])
         
+        # SSP endpoints - critical for fast bid request handling
+        await db.ssp_endpoints.create_index([("endpoint_token", 1)], unique=True)
+        await db.ssp_endpoints.create_index([("id", 1)], unique=True)
+        
         # Campaigns indexes
         await db.campaigns.create_index([("status", 1)])
         await db.campaigns.create_index([("id", 1)], unique=True)
         
         # Creatives indexes
         await db.creatives.create_index([("id", 1)], unique=True)
+        
+        # User frequencies for frequency capping
+        await db.user_frequencies.create_index([("campaign_id", 1), ("user_id", 1)])
         
         logger.info("Database indexes created/verified")
     except Exception as e:

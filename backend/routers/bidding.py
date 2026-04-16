@@ -492,7 +492,6 @@ async def handle_bid_request_by_token(
             try:
                 cached = client.get(cache_key)
                 if cached:
-                    import json
                     endpoint = json.loads(cached)
             except Exception:
                 pass
@@ -503,13 +502,12 @@ async def handle_bid_request_by_token(
             {"endpoint_token": endpoint_token},
             {"_id": 0}
         )
-        # Cache for 60 seconds
+        # Cache for 300 seconds (5 minutes) to reduce DB hits
         if endpoint and is_redis_available():
             try:
                 client = get_redis_client()
                 if client:
-                    import json
-                    client.setex(cache_key, 60, json.dumps(endpoint))
+                    client.setex(cache_key, 300, json.dumps(endpoint))
             except Exception:
                 pass
     
@@ -519,13 +517,11 @@ async def handle_bid_request_by_token(
     if endpoint.get("status") != "active":
         raise HTTPException(status_code=403, detail="SSP endpoint is inactive")
     
-    # Process the bid request
+    # Process the bid request - this is the critical path
     response = await _process_bid_request_internal(request, x_openrtb_version, endpoint.get("id"))
     
-    # Calculate response time
+    # Calculate response time (non-blocking stats update)
     response_time_ms = (time.time() - start_time) * 1000
-    
-    # Move SSP stats update to background (non-blocking)
     asyncio.create_task(_update_ssp_stats_background(
         endpoint.get("id"),
         response_time_ms,
