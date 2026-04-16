@@ -1377,7 +1377,7 @@ class BiddingEngine:
                 return BiddingEngine._campaigns_cache
         
         # Cache miss or expired - fetch from database
-        logger.info("Refreshing campaigns cache...")
+        logger.debug("Refreshing campaigns cache...")
         
         campaigns = await self.db.campaigns.find(
             {"status": "active"},
@@ -1431,7 +1431,7 @@ class BiddingEngine:
         BiddingEngine._campaigns_cache = result
         BiddingEngine._campaigns_cache_time = current_time
         
-        logger.info(f"Cached {len(result)} campaigns with creatives")
+        logger.debug(f"Cached {len(result)} campaigns with creatives")
         return result
     
     async def _match_campaigns(
@@ -1459,7 +1459,7 @@ class BiddingEngine:
             matching_creative = self._find_best_matching_creative(creatives, imp)
             
             if not matching_creative:
-                logger.info(f"Campaign {campaign['name']}: no creative matches impression dimensions")
+                logger.debug(f"Campaign {campaign['name']}: no creative matches impression dimensions")
                 continue
             
             # Check all targeting rules
@@ -1469,14 +1469,14 @@ class BiddingEngine:
             app = request.get("app", {}) or {}
             
             if not self._check_geo_targeting(targeting.get("geo", {}), device.get("geo")):
-                logger.info(f"Campaign {campaign['name']}: geo targeting mismatch")
+                logger.debug(f"Campaign {campaign['name']}: geo targeting mismatch")
                 continue
             
             device_targeting_result = self._check_device_targeting(targeting.get("device", {}), device)
             if device_targeting_result is not True:
                 # device_targeting_result contains the rejection reason
                 reason = device_targeting_result if isinstance(device_targeting_result, str) else "device targeting mismatch"
-                logger.info(f"Campaign {campaign['name']}: {reason}")
+                logger.debug(f"Campaign {campaign['name']}: {reason}")
                 continue
             
             if not self._check_inventory_targeting(
@@ -1484,12 +1484,12 @@ class BiddingEngine:
                 site,
                 app
             ):
-                logger.info(f"Campaign {campaign['name']}: inventory targeting mismatch")
+                logger.debug(f"Campaign {campaign['name']}: inventory targeting mismatch")
                 continue
             
             imp_obj = imp or {}
             if not self._check_video_targeting(targeting.get("video", {}), imp_obj.get("video")):
-                logger.info(f"Campaign {campaign['name']}: video targeting mismatch")
+                logger.debug(f"Campaign {campaign['name']}: video targeting mismatch")
                 continue
             
             site_content = site.get("content")
@@ -1498,11 +1498,11 @@ class BiddingEngine:
                 targeting.get("content", {}),
                 site_content or app_content
             ):
-                logger.info(f"Campaign {campaign['name']}: content targeting mismatch")
+                logger.debug(f"Campaign {campaign['name']}: content targeting mismatch")
                 continue
             
             if not self._check_privacy_compliance(targeting.get("privacy", {}), request.get("regs", {}) or {}):
-                logger.info(f"Campaign {campaign['name']}: privacy compliance failed")
+                logger.debug(f"Campaign {campaign['name']}: privacy compliance failed")
                 continue
             
             # Check budget (include pending_spend to prevent overspend)
@@ -1536,7 +1536,7 @@ class BiddingEngine:
                 banner_data = matching_creative.get('banner_data', {}) or {}
                 creative_dims = f"{banner_data.get('width', 'N/A')}x{banner_data.get('height', 'N/A')}"
             
-            logger.info(f"Campaign {campaign['name']}: MATCHED with creative {creative_name} ({creative_dims}) score {score}")
+            logger.debug(f"Campaign {campaign['name']}: MATCHED with creative {creative_name} ({creative_dims}) score {score}")
             matches.append((campaign, matching_creative, score))
         
         return matches
@@ -1561,7 +1561,7 @@ class BiddingEngine:
         else:
             acceptable_sizes = []  # No size requirement
         
-        logger.info(f"Looking for creative matching sizes: {acceptable_sizes} (requested: {requested_width}x{requested_height})")
+        logger.debug(f"Looking for creative matching sizes: {acceptable_sizes} (requested: {requested_width}x{requested_height})")
         
         # First, try exact matches
         for creative in creatives:
@@ -1575,12 +1575,12 @@ class BiddingEngine:
                 
                 # If no size requirement, accept any banner
                 if not acceptable_sizes:
-                    logger.info(f"  -> No size requirement, accepting creative: {creative.get('name')} ({creative_width}x{creative_height})")
+                    logger.debug(f"  -> No size requirement, accepting creative: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
                 
                 # Check for exact match
                 if (creative_width, creative_height) in acceptable_sizes:
-                    logger.info(f"  -> Exact size match: {creative.get('name')} ({creative_width}x{creative_height})")
+                    logger.debug(f"  -> Exact size match: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
                     
             elif creative_type == "js_tag" and imp_banner:
@@ -1589,10 +1589,10 @@ class BiddingEngine:
                 creative_width = js_data.get("width") if js_data else None
                 creative_height = js_data.get("height") if js_data else None
                 
-                logger.info(f"  -> JS tag creative: {creative.get('name')}, size: {creative_width}x{creative_height}, acceptable: {acceptable_sizes}")
+                logger.debug(f"  -> JS tag creative: {creative.get('name')}, size: {creative_width}x{creative_height}, acceptable: {acceptable_sizes}")
                 
                 if not acceptable_sizes:
-                    logger.info(f"  -> No size requirement, accepting JS tag: {creative.get('name')} ({creative_width}x{creative_height})")
+                    logger.debug(f"  -> No size requirement, accepting JS tag: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
                 
                 # Convert to int for comparison
@@ -1604,18 +1604,18 @@ class BiddingEngine:
                     creative_height = 250
                 
                 if (creative_width, creative_height) in acceptable_sizes:
-                    logger.info(f"  -> Exact JS tag size match: {creative.get('name')} ({creative_width}x{creative_height})")
+                    logger.debug(f"  -> Exact JS tag size match: {creative.get('name')} ({creative_width}x{creative_height})")
                     return creative
                 else:
-                    logger.info(f"  -> JS tag size mismatch: ({creative_width}, {creative_height}) not in {acceptable_sizes}")
+                    logger.debug(f"  -> JS tag size mismatch: ({creative_width}, {creative_height}) not in {acceptable_sizes}")
                     
             elif creative_type == "video" and imp_video:
                 if self._creative_matches_impression(creative, imp):
-                    logger.info(f"  -> Video match: {creative.get('name')}")
+                    logger.debug(f"  -> Video match: {creative.get('name')}")
                     return creative
                     
             elif creative_type == "native" and imp_native:
-                logger.info(f"  -> Native match: {creative.get('name')}")
+                logger.debug(f"  -> Native match: {creative.get('name')}")
                 return creative
         
         # If no exact match found and there are size requirements, log which sizes we have
@@ -1628,22 +1628,22 @@ class BiddingEngine:
                 elif c.get("type") == "js_tag":
                     jd = c.get("js_tag_data", {})
                     available_sizes.append(f"{c.get('name')}:{jd.get('width')}x{jd.get('height')}")
-            logger.info(f"  -> No matching size found. Available: {available_sizes}, Requested: {acceptable_sizes}")
+            logger.debug(f"  -> No matching size found. Available: {available_sizes}, Requested: {acceptable_sizes}")
         
         # Fallback: return first creative of matching type
         for creative in creatives:
             creative_type = creative.get("type")
             if creative_type == "banner" and imp_banner:
-                logger.info(f"  -> Fallback to first banner: {creative.get('name')}")
+                logger.debug(f"  -> Fallback to first banner: {creative.get('name')}")
                 return creative
             elif creative_type == "js_tag" and imp_banner:
-                logger.info(f"  -> Fallback to first JS tag: {creative.get('name')}")
+                logger.debug(f"  -> Fallback to first JS tag: {creative.get('name')}")
                 return creative
             elif creative_type == "video" and imp_video:
-                logger.info(f"  -> Fallback to first video: {creative.get('name')}")
+                logger.debug(f"  -> Fallback to first video: {creative.get('name')}")
                 return creative
             elif creative_type == "native" and imp_native:
-                logger.info(f"  -> Fallback to first native: {creative.get('name')}")
+                logger.debug(f"  -> Fallback to first native: {creative.get('name')}")
                 return creative
         
         return None

@@ -393,9 +393,11 @@ async def _process_bid_request_internal(
     if nurl_base and not nurl_base.startswith('http://localhost'):
         nurl_base = nurl_base.replace('http://', 'https://')
     
-    logger.info(f"Bid request from SSP {ssp_id}, host={host_header}, forwarded_host={forwarded_host}, nurl_base={nurl_base}")
+    # Reduce logging for performance - only log errors and bids
+    # logger.info(f"Bid request from SSP {ssp_id}")
     
     # Process bid request
+    process_start = time.time()
     try:
         response, log_data = await bidding_engine.process_bid_request(
             bid_request,
@@ -408,12 +410,19 @@ async def _process_bid_request_internal(
         logger.error(f"Bid processing error: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Bid processing failed")
     
+    process_time = (time.time() - process_start) * 1000
+    
+    # Log only when bid is made or slow request
+    if log_data.get("bid_made") or process_time > 50:
+        logger.info(f"Bid response: made={log_data.get('bid_made')}, time={process_time:.1f}ms, campaign={log_data.get('campaign_name')}")
+    
     # ====== CRITICAL PATH OPTIMIZATION ======
     # All database updates after bid response are moved to background tasks
     # to ensure fast response times for SSPs (typically need < 100ms)
     
     # Prepare log data for background save
     log_data["ssp_id"] = ssp_id
+    log_data["processing_time_ms"] = round(process_time, 2)
     log = BidLog(**log_data)
     log_doc = log.model_dump()
     log_doc["timestamp"] = log_doc["timestamp"].isoformat()
