@@ -31,14 +31,17 @@ _redis_client = None
 _redis_available = None
 
 # Default TTLs
-CAMPAIGNS_CACHE_TTL = 10  # 10 seconds for campaigns
+CAMPAIGNS_CACHE_TTL = 60  # 60 seconds for campaigns (increased for stability)
 BID_STATS_TTL = 3600  # 1 hour for bid stats (persisted)
 RECENT_BIDS_TTL = 300  # 5 minutes for recent bids list
+SSP_CACHE_TTL = 600  # 10 minutes for SSP endpoint cache
 
 # Cache keys
 CAMPAIGNS_CACHE_KEY = "dsp:campaigns:active"
+CAMPAIGNS_CACHE_TIME_KEY = "dsp:campaigns:active:time"
 BID_STATS_KEY = "dsp:stats:bids"
 RECENT_BIDS_KEY = "dsp:bids:recent"
+SSP_CACHE_PREFIX = "dsp:ssp:"
 
 
 def get_redis_client():
@@ -78,7 +81,7 @@ def get_redis_client():
         # Test connection
         _redis_client.ping()
         _redis_available = True
-        logger.info(f"Redis connected successfully!")
+        logger.info("Redis connected successfully!")
         return _redis_client
     except ImportError:
         logger.warning("Redis library not installed")
@@ -133,9 +136,98 @@ def invalidate_campaigns_cache():
     if client:
         try:
             client.delete(CAMPAIGNS_CACHE_KEY)
+            client.delete(CAMPAIGNS_CACHE_TIME_KEY)
             logger.info("Redis campaigns cache invalidated")
         except Exception as e:
             logger.warning(f"Redis invalidate failed: {e}")
+
+
+def get_campaigns_cache_age() -> float:
+    """Get how long ago the campaigns cache was last updated (in seconds)"""
+    client = get_redis_client()
+    if not client:
+        return float('inf')
+    
+    try:
+        cache_time = client.get(CAMPAIGNS_CACHE_TIME_KEY)
+        if cache_time:
+            age = datetime.now(timezone.utc).timestamp() - float(cache_time)
+            return max(0, age)
+        return float('inf')  # No cache time recorded
+    except Exception as e:
+        logger.warning(f"Redis get cache age failed: {e}")
+        return float('inf')
+
+
+def set_cached_campaigns_with_time(campaigns: List[Dict], ttl: int = CAMPAIGNS_CACHE_TTL):
+    """Set campaigns in Redis cache with timestamp tracking"""
+    client = get_redis_client()
+    if not client:
+        return False
+    
+    try:
+        pipe = client.pipeline()
+        pipe.setex(CAMPAIGNS_CACHE_KEY, ttl, json.dumps(campaigns))
+        pipe.setex(CAMPAIGNS_CACHE_TIME_KEY, ttl, str(datetime.now(timezone.utc).timestamp()))
+        pipe.execute()
+        return True
+    except Exception as e:
+        logger.warning(f"Redis set campaigns failed: {e}")
+        return False
+
+
+# ==================== SSP ENDPOINT CACHE ====================
+
+def get_cached_ssp(endpoint_token: str) -> Optional[Dict]:
+    """Get SSP endpoint from Redis cache"""
+    client = get_redis_client()
+    if not client:
+        return None
+    
+    try:
+        key = f"{SSP_CACHE_PREFIX}{endpoint_token}"
+        data = client.get(key)
+        if data:
+            return json.loads(data)
+        return None
+    except Exception as e:
+        logger.warning(f"Redis get SSP failed: {e}")
+        return None
+
+
+def set_cached_ssp(endpoint_token: str, ssp_data: Dict, ttl: int = SSP_CACHE_TTL):
+    """Set SSP endpoint in Redis cache"""
+    client = get_redis_client()
+    if not client:
+        return False
+    
+    try:
+        key = f"{SSP_CACHE_PREFIX}{endpoint_token}"
+        client.setex(key, ttl, json.dumps(ssp_data))
+        return True
+    except Exception as e:
+        logger.warning(f"Redis set SSP failed: {e}")
+        return False
+
+
+def cache_all_ssps(ssps: List[Dict], ttl: int = SSP_CACHE_TTL):
+    """Pre-cache all SSP endpoints for faster lookups"""
+    client = get_redis_client()
+    if not client:
+        return False
+    
+    try:
+        pipe = client.pipeline()
+        for ssp in ssps:
+            if ssp.get("endpoint_token"):
+                key = f"{SSP_CACHE_PREFIX}{ssp['endpoint_token']}"
+                pipe.setex(key, ttl, json.dumps(ssp))
+        pipe.execute()
+        logger.info(f"Pre-cached {len(ssps)} SSP endpoints in Redis")
+        return True
+    except Exception as e:
+        logger.warning(f"Redis bulk SSP cache failed: {e}")
+        return False
 
 
 # ==================== BID STATS ====================

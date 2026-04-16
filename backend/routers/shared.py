@@ -106,6 +106,81 @@ async def ensure_indexes():
         logger.warning(f"Index creation warning (may already exist): {e}")
 
 
+async def prewarm_cache():
+    """Pre-warm all caches on startup to prevent cold-start latency spikes"""
+    from routers.redis_cache import (
+        is_redis_available, set_cached_campaigns_with_time, 
+        cache_all_ssps, CAMPAIGNS_CACHE_TTL, SSP_CACHE_TTL
+    )
+    
+    try:
+        logger.info("Pre-warming caches...")
+        
+        # 1. Pre-warm campaigns cache
+        campaigns = await db.campaigns.find(
+            {"status": "active"},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        if campaigns:
+            # Batch fetch all creatives
+            all_creative_ids = set()
+            for campaign in campaigns:
+                creative_ids = campaign.get("creative_ids", [])
+                if campaign.get("creative_id"):
+                    creative_ids.append(campaign["creative_id"])
+                all_creative_ids.update(creative_ids)
+            
+            if all_creative_ids:
+                creatives_list = await db.creatives.find(
+                    {"id": {"$in": list(all_creative_ids)}},
+                    {"_id": 0}
+                ).to_list(500)
+                creatives_map = {c["id"]: c for c in creatives_list}
+                
+                for campaign in campaigns:
+                    creative_ids = campaign.get("creative_ids", [])
+                    if campaign.get("creative_id"):
+                        creative_ids.append(campaign["creative_id"])
+                    campaign_creatives = [creatives_map[cid] for cid in creative_ids if cid in creatives_map]
+                    if campaign_creatives:
+                        campaign["_creatives"] = campaign_creatives
+                        campaign["_creative"] = campaign_creatives[0]
+            
+            result_campaigns = [c for c in campaigns if "_creative" in c]
+            
+            if is_redis_available():
+                set_cached_campaigns_with_time(result_campaigns, CAMPAIGNS_CACHE_TTL)
+                logger.info(f"Pre-warmed Redis cache with {len(result_campaigns)} campaigns")
+            else:
+                logger.info("Redis not available, using in-memory cache only")
+            
+            # Also set in-memory cache (for BiddingEngine)
+            from openrtb_handler import BiddingEngine
+            import time
+            BiddingEngine._campaigns_cache = result_campaigns
+            BiddingEngine._campaigns_cache_time = time.time()
+            logger.info(f"Pre-warmed in-memory cache with {len(result_campaigns)} campaigns")
+        else:
+            logger.info("No active campaigns found to pre-warm")
+        
+        # 2. Pre-warm SSP endpoints cache
+        ssps = await db.ssp_endpoints.find(
+            {"status": "active"},
+            {"_id": 0}
+        ).to_list(100)
+        
+        if ssps and is_redis_available():
+            cache_all_ssps(ssps, SSP_CACHE_TTL)
+            logger.info(f"Pre-warmed SSP cache with {len(ssps)} endpoints")
+        
+        logger.info("Cache pre-warming complete!")
+        
+    except Exception as e:
+        logger.error(f"Cache pre-warming failed: {e}")
+        # Don't fail startup, just log the error
+
+
 # ==================== AUTH HELPERS ====================
 
 async def verify_api_key(x_api_key: str = Header(None)) -> Optional[Dict[str, Any]]:

@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
 
-from routers.shared import client, logger, ensure_indexes
+from routers.shared import client, logger, ensure_indexes, prewarm_cache
 
 # Import all routers
 from routers.reference import router as reference_router
@@ -31,6 +31,8 @@ async def lifespan(app: FastAPI):
     logger.info("OpenRTB Bidder starting up...")
     # Create database indexes for better performance
     await ensure_indexes()
+    # Pre-warm caches to prevent cold-start latency spikes
+    await prewarm_cache()
     yield
     logger.info("OpenRTB Bidder shutting down...")
     client.close()

@@ -887,8 +887,9 @@ class BiddingEngine:
     # Class-level cache for campaigns (shared across all instances)
     _campaigns_cache = None
     _campaigns_cache_time = 0
-    _cache_ttl = 30  # Increased to 30 seconds to reduce DB hits
+    _cache_ttl = 60  # Increased to 60 seconds to reduce DB hits
     _cache_loading = False  # Flag to prevent concurrent cache loads
+    _refresh_threshold = 45  # Start background refresh when cache is 45 seconds old
     
     def __init__(self, db):
         self.db = db
@@ -1358,9 +1359,19 @@ class BiddingEngine:
         return round(base_price * final_adjustment, 6)
     
     async def _get_active_campaigns(self) -> List[Dict[str, Any]]:
-        """Get all active campaigns with their creatives (with Redis/in-memory caching)"""
+        """Get all active campaigns with their creatives (with Redis/in-memory caching)
+        
+        Implements a multi-tier caching strategy:
+        1. Check Redis cache first (shared across workers)
+        2. Fall back to in-memory cache
+        3. Proactively refresh cache BEFORE it expires to avoid blocking
+        4. Return stale data while refreshing in background
+        """
         import time as time_module
-        from routers.redis_cache import get_cached_campaigns, set_cached_campaigns, is_redis_available
+        from routers.redis_cache import (
+            get_cached_campaigns, set_cached_campaigns_with_time, 
+            is_redis_available, get_campaigns_cache_age
+        )
         
         current_time = time_module.time()
         
@@ -1368,17 +1379,32 @@ class BiddingEngine:
         if is_redis_available():
             cached = get_cached_campaigns()
             if cached is not None:
+                # Check if we should proactively refresh (cache is getting old)
+                cache_age = get_campaigns_cache_age()
+                if cache_age > BiddingEngine._refresh_threshold and not BiddingEngine._cache_loading:
+                    # Start background refresh BEFORE cache expires
+                    BiddingEngine._cache_loading = True
+                    import asyncio
+                    asyncio.create_task(self._refresh_campaigns_cache())
+                
+                # Also update in-memory cache from Redis
+                BiddingEngine._campaigns_cache = cached
+                BiddingEngine._campaigns_cache_time = current_time
                 return cached
         
         # Fall back to in-memory cache
-        if (BiddingEngine._campaigns_cache is not None and 
-            current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
+        cache_age = current_time - BiddingEngine._campaigns_cache_time
+        if BiddingEngine._campaigns_cache is not None and cache_age < BiddingEngine._cache_ttl:
+            # Proactively refresh if cache is getting old
+            if cache_age > BiddingEngine._refresh_threshold and not BiddingEngine._cache_loading:
+                BiddingEngine._cache_loading = True
+                import asyncio
+                asyncio.create_task(self._refresh_campaigns_cache())
             return BiddingEngine._campaigns_cache
         
         # If cache is expired but we have old data, return old data and refresh in background
         if BiddingEngine._campaigns_cache is not None and not BiddingEngine._cache_loading:
             BiddingEngine._cache_loading = True
-            # Start background refresh
             import asyncio
             asyncio.create_task(self._refresh_campaigns_cache())
             # Return stale cache immediately (better than blocking)
@@ -1399,7 +1425,7 @@ class BiddingEngine:
     async def _load_campaigns_from_db(self) -> List[Dict[str, Any]]:
         """Load campaigns from database and update cache"""
         import time as time_module
-        from routers.redis_cache import set_cached_campaigns, is_redis_available
+        from routers.redis_cache import set_cached_campaigns_with_time, is_redis_available
         
         current_time = time_module.time()
         
@@ -1411,7 +1437,7 @@ class BiddingEngine:
         if not campaigns:
             result = []
             if is_redis_available():
-                set_cached_campaigns(result, 30)  # Cache for 30 seconds
+                set_cached_campaigns_with_time(result, 60)  # Cache for 60 seconds
             BiddingEngine._campaigns_cache = result
             BiddingEngine._campaigns_cache_time = current_time
             return result
@@ -1448,9 +1474,9 @@ class BiddingEngine:
         
         result = [c for c in campaigns if "_creative" in c]
         
-        # Update both caches
+        # Update both caches with longer TTL
         if is_redis_available():
-            set_cached_campaigns(result, 30)  # Cache for 30 seconds
+            set_cached_campaigns_with_time(result, 60)  # Cache for 60 seconds
         BiddingEngine._campaigns_cache = result
         BiddingEngine._campaigns_cache_time = current_time
         

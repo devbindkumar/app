@@ -480,36 +480,24 @@ async def handle_bid_request_by_token(
     """Handle OpenRTB bid requests for a specific SSP by unique token"""
     start_time = time.time()
     
-    # Look up SSP by endpoint_token (use cache if available)
-    cache_key = f"ssp:{endpoint_token}"
+    # Look up SSP by endpoint_token using optimized cache
+    from routers.redis_cache import get_cached_ssp, set_cached_ssp, is_redis_available
+    
     endpoint = None
     
-    # Try Redis cache first
-    from routers.redis_cache import get_redis_client, is_redis_available
+    # Try Redis cache first (faster than inline cache)
     if is_redis_available():
-        client = get_redis_client()
-        if client:
-            try:
-                cached = client.get(cache_key)
-                if cached:
-                    endpoint = json.loads(cached)
-            except Exception:
-                pass
+        endpoint = get_cached_ssp(endpoint_token)
     
-    # If not in cache, fetch from DB
+    # If not in cache, fetch from DB and cache it
     if not endpoint:
         endpoint = await db.ssp_endpoints.find_one(
             {"endpoint_token": endpoint_token},
             {"_id": 0}
         )
-        # Cache for 300 seconds (5 minutes) to reduce DB hits
+        # Cache for 10 minutes to reduce DB hits
         if endpoint and is_redis_available():
-            try:
-                client = get_redis_client()
-                if client:
-                    client.setex(cache_key, 300, json.dumps(endpoint))
-            except Exception:
-                pass
+            set_cached_ssp(endpoint_token, endpoint, 600)
     
     if not endpoint:
         raise HTTPException(status_code=404, detail="SSP endpoint not found")
