@@ -887,7 +887,8 @@ class BiddingEngine:
     # Class-level cache for campaigns (shared across all instances)
     _campaigns_cache = None
     _campaigns_cache_time = 0
-    _cache_ttl = 10  # Cache TTL in seconds (refresh campaigns every 10 seconds)
+    _cache_ttl = 30  # Increased to 30 seconds to reduce DB hits
+    _cache_loading = False  # Flag to prevent concurrent cache loads
     
     def __init__(self, db):
         self.db = db
@@ -1367,17 +1368,40 @@ class BiddingEngine:
         if is_redis_available():
             cached = get_cached_campaigns()
             if cached is not None:
-                logger.debug(f"Using Redis cached campaigns ({len(cached)} campaigns)")
                 return cached
-        else:
-            # Fall back to in-memory cache (single worker mode)
-            if (BiddingEngine._campaigns_cache is not None and 
-                current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
-                logger.debug(f"Using in-memory cached campaigns ({len(BiddingEngine._campaigns_cache)} campaigns)")
-                return BiddingEngine._campaigns_cache
         
-        # Cache miss or expired - fetch from database
-        logger.debug("Refreshing campaigns cache...")
+        # Fall back to in-memory cache
+        if (BiddingEngine._campaigns_cache is not None and 
+            current_time - BiddingEngine._campaigns_cache_time < BiddingEngine._cache_ttl):
+            return BiddingEngine._campaigns_cache
+        
+        # If cache is expired but we have old data, return old data and refresh in background
+        if BiddingEngine._campaigns_cache is not None and not BiddingEngine._cache_loading:
+            BiddingEngine._cache_loading = True
+            # Start background refresh
+            import asyncio
+            asyncio.create_task(self._refresh_campaigns_cache())
+            # Return stale cache immediately (better than blocking)
+            return BiddingEngine._campaigns_cache
+        
+        # No cache at all - must fetch synchronously (only happens on first request)
+        return await self._load_campaigns_from_db()
+    
+    async def _refresh_campaigns_cache(self):
+        """Background task to refresh campaign cache"""
+        try:
+            await self._load_campaigns_from_db()
+        except Exception as e:
+            logger.error(f"Background cache refresh failed: {e}")
+        finally:
+            BiddingEngine._cache_loading = False
+    
+    async def _load_campaigns_from_db(self) -> List[Dict[str, Any]]:
+        """Load campaigns from database and update cache"""
+        import time as time_module
+        from routers.redis_cache import set_cached_campaigns, is_redis_available
+        
+        current_time = time_module.time()
         
         campaigns = await self.db.campaigns.find(
             {"status": "active"},
@@ -1386,9 +1410,8 @@ class BiddingEngine:
         
         if not campaigns:
             result = []
-            # Update both caches
             if is_redis_available():
-                set_cached_campaigns(result)
+                set_cached_campaigns(result, 30)  # Cache for 30 seconds
             BiddingEngine._campaigns_cache = result
             BiddingEngine._campaigns_cache_time = current_time
             return result
@@ -1401,7 +1424,7 @@ class BiddingEngine:
                 creative_ids.append(campaign["creative_id"])
             all_creative_ids.update(creative_ids)
         
-        # Batch fetch ALL creatives in one query (major optimization!)
+        # Batch fetch ALL creatives in one query
         creatives_map = {}
         if all_creative_ids:
             creatives_cursor = self.db.creatives.find(
@@ -1427,7 +1450,7 @@ class BiddingEngine:
         
         # Update both caches
         if is_redis_available():
-            set_cached_campaigns(result)
+            set_cached_campaigns(result, 30)  # Cache for 30 seconds
         BiddingEngine._campaigns_cache = result
         BiddingEngine._campaigns_cache_time = current_time
         
